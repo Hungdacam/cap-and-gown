@@ -1,0 +1,10 @@
+node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
+# dữ liệu chạy thử ở máy, không đưa lên git
+data/guests.local.json
+data/dev-store.json
+*.log
+.DS_Store
