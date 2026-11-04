@@ -19,8 +19,25 @@ const toStatus = (cell) => {
 const GUEST_TTL_MS = 60_000; // đọc lại danh sách khách tối đa mỗi 60 giây
 const MISS_REFRESH_MS = 10_000; // slug không thấy trong cache cũ hơn 10 giây thì đọc lại một lần
 
+/**
+ * Chấp nhận nhiều kiểu dán GOOGLE_PRIVATE_KEY trên Vercel: có dấu nháy bao quanh,
+ * ký tự \n dạng chữ, xuống dòng bị đổi thành dấu cách, hoặc dán cả file JSON của service account.
+ * Trả về PEM chuẩn (thân khóa chia dòng 64 ký tự).
+ */
+export function normalizePrivateKey(raw) {
+  let s = String(raw ?? "").trim();
+  if (s.startsWith("{")) {
+    try { s = String(JSON.parse(s).private_key ?? ""); } catch { /* để bước dưới báo lỗi */ }
+  }
+  s = s.replace(/^["']+|["']+$/g, "");
+  const m = s.match(/-----BEGIN ((?:RSA |EC )?PRIVATE KEY)-----([\s\S]*?)-----END \1-----/);
+  if (!m) return s.replace(/\\n/g, "\n"); // không nhận ra, trả nguyên để Node báo lỗi
+  const body = m[2].replace(/\\n|\\r|\s/g, "");
+  return `-----BEGIN ${m[1]}-----\n${body.match(/.{1,64}/g)?.join("\n") ?? ""}\n-----END ${m[1]}-----\n`;
+}
+
 export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetch, now = () => Date.now() }) {
-  const key = privateKey.replace(/\\n/g, "\n");
+  const key = normalizePrivateKey(privateKey);
   let token = { value: null, exp: 0 };
   let guestCache = { rows: null, at: 0 };
 
