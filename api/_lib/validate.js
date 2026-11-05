@@ -1,7 +1,7 @@
 export const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 export const STATUSES = ["yes", "maybe", "no"];
 // Phải trùng với GUEST_CALLS trong public/src/config.js (có test kiểm tra)
-export const CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm"];
+export const CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm", "anh em"];
 export const MAX_MESSAGE = 300;
 export const MAX_PLUS_ONES = 5;
 

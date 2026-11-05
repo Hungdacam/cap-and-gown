@@ -8,7 +8,8 @@
 import { randomInt } from "node:crypto";
 import { readFileSync } from "node:fs";
 
-const CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm"];
+const CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm", "anh em"];
+const GROUP_CALLS = ["cả nhóm", "anh em"]; // gọi cả nhóm nên không ghép tên riêng
 const BASE = (process.env.BASE_URL || "https://<ten-mien-cua-ban>").replace(/\/$/, "");
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -16,7 +17,7 @@ export const unaccent = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replac
 
 export function makeSlug(name, call, used = new Set()) {
   const words = unaccent(name).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-  const stem = (call === "cả nhóm" ? words.slice(0, 3) : words.slice(-2)).join("-") || "khach";
+  const stem = (GROUP_CALLS.includes(call) ? words.slice(0, 3) : words.slice(-2)).join("-") || "khach";
   for (;;) {
     const suffix = Array.from({ length: 4 }, () => ALPHABET[randomInt(ALPHABET.length)]).join("");
     const slug = `${stem}-${suffix}`;
@@ -26,7 +27,7 @@ export function makeSlug(name, call, used = new Set()) {
 
 export function makeRow({ name, call = "bạn", group = "", channel = "" }, used) {
   call = CALLS.includes(call) ? call : "bạn";
-  const short = call === "cả nhóm" ? "" : name.trim().split(/\s+/).pop();
+  const short = GROUP_CALLS.includes(call) ? "" : name.trim().split(/\s+/).pop();
   const slug = makeSlug(name, call, used);
   return { slug, link: `${BASE}/t/${slug}`, cells: [slug, name.trim(), short, call, group, channel, "", ""] };
 }
@@ -42,7 +43,7 @@ function main(argv) {
   } else if (argv[0]) {
     people = [{ name: argv[0], call: argv[1] }];
   } else {
-    console.error('Cách dùng: npm run guest -- "Họ và tên" [bạn|anh|chị|em|thầy|cô|cả nhóm]\n          npm run guest -- --file danh-sach.csv');
+    console.error('Cách dùng: npm run guest -- "Họ và tên" [bạn|anh|chị|em|thầy|cô|cả nhóm|anh em]\n          npm run guest -- --file danh-sach.csv');
     process.exit(1);
   }
   const rows = people.map((p) => makeRow(p, used));

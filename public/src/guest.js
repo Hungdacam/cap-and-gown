@@ -36,6 +36,6 @@ export async function sendRsvp(payload, fetchImpl = fetch) {
 
 /** Cách gọi khách trong câu: "chị Linh", "cả nhóm", "bạn". */
 export function pronoun(g) {
-  if (g.call === "cả nhóm") return "cả nhóm";
+  if (g.call === "cả nhóm" || g.call === "anh em") return g.call;
   return g.short ? `${g.call} ${g.short}` : g.call;
 }

@@ -2,7 +2,9 @@ import { GUEST_CALLS, COPY } from "./config.js";
 import { $ } from "./util.js";
 import { renderStatic } from "./render.js";
 import { startCountdown, startPipeline } from "./countdown.js";
-import { initMap, initPhoneCopy } from "./map.js";
+import { initMap, initGoogleMap, initPhoneCopy } from "./map.js";
+import { initMusic } from "./music.js";
+import { initDecor } from "./decor.js";
 import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
 import { googleCalendarUrl, downloadIcs } from "./calendar.js";
@@ -28,7 +30,10 @@ async function boot() {
   startCountdown();
   startPipeline();
   initMap();
+  initGoogleMap();
   initPhoneCopy();
+  initMusic();
+  initDecor();
 
   $("cal").hidden = false;
   $("calGoogle").href = googleCalendarUrl();

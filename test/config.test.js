@@ -33,7 +33,7 @@ test("mỗi lộ trình trỏ tới id có thật trong sơ đồ, và id mặc 
 });
 
 test("mọi id mà JS tìm đều có trong index.html", () => {
-  const src = ["main", "render", "rsvp", "map", "countdown"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
+  const src = ["main", "render", "rsvp", "map", "countdown", "music", "decor"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
   const wanted = new Set([...src.matchAll(/\$\("([A-Za-z0-9_-]+)"\)/g)].map((m) => m[1]));
   ["yes", "maybe", "no"].forEach((i) => wanted.add(i));
   const missing = [...wanted].filter((id) => !html.includes(`id="${id}"`) && !["yes", "maybe", "no"].includes(id));

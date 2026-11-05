@@ -64,6 +64,19 @@ export function initMap() {
   });
 }
 
+/** Nhúng Google Map thật. Không lấy được link thì ẩn khung, nút "Mở Google Maps" vẫn dùng được. */
+export async function initGoogleMap(fetchImpl = fetch) {
+  try {
+    const res = await fetchImpl("/api/map");
+    if (!res.ok) throw new Error(`map ${res.status}`);
+    const { url } = await res.json();
+    $("gmapFrame").src = url;
+  } catch (err) {
+    console.error(err);
+    $("gmapFrame").hidden = true;
+  }
+}
+
 export function initPhoneCopy() {
   const btn = $("copyPhone");
   btn.addEventListener("click", async () => {

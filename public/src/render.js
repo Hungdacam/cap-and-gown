@@ -21,6 +21,13 @@ export function renderStatic() {
     `<span class="branch">${esc(COPY.fromLabel)} ${esc(EVENT.cohort)}</span><span>→</span><span class="branch">${esc(COPY.toLabel)}</span>` +
     `<span class="diff"><span class="add">${esc(COPY.diffAdd)}</span> <span class="del">${esc(COPY.diffDel)}</span></span>`;
 
+  $("cardCohort").textContent = EVENT.cohort;
+  $("cardPhoto").alt = `Ảnh thẻ của ${EVENT.graduate}`;
+  $("cardStamp").textContent = COPY.prBadge.toUpperCase();
+  $("cardName").textContent = EVENT.graduate;
+  $("cardMajor").textContent = EVENT.major;
+  $("cardDate").textContent = `Lễ tốt nghiệp ${EVENT.date.split("-").reverse().join("/")}`;
+
   const rows = [
     ["ngày", formatDateVi(EVENT.date), "n"],
     ["giờ", `${EVENT.guestArrive} – ${EVENT.guestWindowEnd}`, "v", `# lễ chính ${EVENT.ceremonyStart}`],
@@ -53,7 +60,8 @@ export function renderStatic() {
 
   // Liên hệ: chỉ hiện khi đã điền số thật
   if (EVENT.phone) {
-    $("phone").textContent = EVENT.phone;
+    $("phone").textContent = EVENT.phone.replace(/^(\d{4})(\d{3})(\d{3})$/, "$1 $2 $3");
+    $("phone").href = `tel:${EVENT.phone}`;
     $("contact").hidden = false;
   }
 

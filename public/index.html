@@ -11,6 +11,9 @@
 <meta property="og:title" content="Thiệp mời tốt nghiệp">
 <meta property="og:description" content="Mời bạn đến chung vui ngày 25/11/2026 tại IUH.">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -19,12 +22,21 @@
 <body>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
+<nav class="g-rail" aria-label="Các mục của thiệp">
+  <span class="g-tag">sinh-viên</span>
+  <div class="g-wrap"><ol class="g-list" id="gList"></ol><i class="g-fill" id="gFill"></i></div>
+  <span class="g-tag">cựu-sinh-viên</span>
+</nav>
+<div class="mini" id="mini" aria-hidden="true"></div>
+<div class="gbar" aria-hidden="true"><i id="gbarFill"></i></div>
+
 <div class="wrap">
 
   <!-- ===== TERMINAL HERO ===== -->
   <section class="panel term" aria-label="Lời chào">
     <div class="term-bar"><i></i><i></i><i></i><span id="termTitle">hung@grad: ~/2026</span></div>
     <div class="term-body">
+      <div class="hero-main">
       <div class="ln"><span class="prompt">➜ ~/2026</span> ./invite <span class="c-str">--guest=<span id="slugEcho">guest</span></span></div>
       <div class="ln c-cmt">[ok] đang mở thiệp mời… xong</div>
       <div class="ln c-cmt">[ok] kiểm tra bằng tốt nghiệp… <span class="c-ok" id="credits"></span></div>
@@ -33,6 +45,12 @@
         <span class="guest" id="guestName"></span><span class="caret"></span>
       </h1>
       <p class="lede" id="lede"></p>
+      </div>
+      <div class="idcard">
+        <div class="c-band"><span>Thẻ tốt nghiệp</span><span id="cardCohort"></span></div>
+        <div class="c-photo"><img src="/media/anh-the.jpg" width="560" height="712" alt="" id="cardPhoto"><span class="c-stamp" id="cardStamp"></span></div>
+        <div class="c-info"><strong id="cardName"></strong><small id="cardMajor"></small><small id="cardDate"></small><div class="c-bar" id="cardBar" aria-hidden="true"></div></div>
+      </div>
     </div>
   </section>
 
@@ -49,7 +67,7 @@
         <div class="checks" id="checks"></div>
       </div>
       <div class="eta">
-        <span class="eta-l">Còn lại đến lúc khách đến</span>
+        <span class="eta-l">Đếm ngược thời gian tốt nghiệp</span>
         <div class="eta-v" aria-live="off">
           <span><b id="cd-d">00</b><em>ngày</em></span><span><b id="cd-h">00</b><em>giờ</em></span><span><b id="cd-m">00</b><em>phút</em></span><span><b id="cd-s">00</b><em>giây</em></span>
         </div>
@@ -142,7 +160,7 @@
           <g id="n-car">
             <rect class="m-p2" x="20" y="200" width="170" height="64" rx="8"/>
             <text class="m-t" x="105" y="228" text-anchor="middle" style="fill:var(--amber);font-weight:700">bãi ô tô</text>
-            <text class="m-s" x="105" y="247" text-anchor="middle">đang chốt địa điểm</text>
+            <text class="m-s" x="105" y="247" text-anchor="middle">sẽ cập nhật sau</text>
           </g>
           <!-- grab drop -->
           <g id="n-grab">
@@ -161,6 +179,11 @@
           <span><i class="sw" style="background:var(--pink)"></i>lộ trình · điểm hẹn</span>
           <span>sơ đồ minh họa, chưa đúng tỉ lệ</span>
         </div>
+      </div>
+    </div>
+    <div class="panel gmap">
+      <iframe id="gmapFrame" title="Google Map: Trường Đại học Công nghiệp TP.HCM" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <div class="map-foot">
         <div class="map-actions">
           <button class="btn" id="copyAddr" type="button">Sao chép địa chỉ cho Grab</button>
           <a class="btn" id="mapLink" href="#" target="_blank" rel="noopener">Mở Google Maps ↗</a>
@@ -174,7 +197,7 @@
     <div class="sec-head"><span class="path">$ npx <b>grad-lint</b> ./ban-than</span><h2 id="lint-h">Vài lưu ý trước khi đi</h2></div>
     <div class="panel lint" id="lint"></div>
     <div class="panel ping" id="contact" hidden>
-      <div><span class="cmd">Lạc đường? Gọi mình</span><br><span class="num" id="phone"></span></div>
+      <div><span class="cmd">Lạc đường? Gọi mình</span><br><a class="num" id="phone" href="#"></a></div>
       <button class="btn" id="copyPhone" type="button">Sao chép số</button>
     </div>
   </section>
@@ -184,6 +207,11 @@
     <span id="footSub"></span>
   </footer>
 </div>
+
+<button class="music" id="musicBtn" type="button" aria-pressed="false">
+  <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span id="musicLabel">Bật nhạc</span>
+</button>
 
 <script type="module" src="/src/main.js"></script>
 </body>

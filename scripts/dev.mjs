@@ -8,7 +8,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const pub = join(root, "public");
 const port = Number(process.env.PORT) || 3000;
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".jpg": "image/jpeg", ".mp3": "audio/mpeg" };
+// Dùng đúng header của vercel.json (có CSP) để lỗi bị chặn hiện ra ngay khi chạy ở máy.
+const vercelHeaders = JSON.parse(await readFile(join(root, "vercel.json"), "utf8")).headers;
 
 async function runApi(name, req, res, url) {
   req.query = Object.fromEntries(url.searchParams);
@@ -26,6 +28,9 @@ async function runApi(name, req, res, url) {
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
+    for (const rule of vercelHeaders) {
+      if (new RegExp(`^${rule.source}$`).test(url.pathname)) for (const h of rule.headers) res.setHeader(h.key, h.value);
+    }
     if (url.pathname.startsWith("/api/")) {
       const name = url.pathname.slice(5).replace(/\/$/, "");
       if (!/^[a-z0-9-]+$/.test(name)) { res.statusCode = 404; return res.end(); }

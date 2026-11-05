@@ -25,7 +25,7 @@ export const EVENT = {
 
 export const COPY = {
   // {pron} được thay bằng cách gọi khách, ví dụ "chị Linh"
-  lede: "Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng mình cũng ra trường. Mình rất muốn có {pron} ở đó trong ngày đặc biệt này.",
+  lede: "Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng mình cũng ra trường. Mình rất mong muốn {pron} sẽ có mặt ở đó trong ngày đặc biệt này.",
   prTitle: "Mình chính thức tốt nghiệp rồi!",
   prNumber: "#2026",
   prBadge: "Đã tốt nghiệp",
@@ -84,7 +84,7 @@ export const ROUTES = [
     focus: "n-car",
     path: "M190 232 H200 V330 H398 V200 H376",
     hops: [
-      ["Gửi xe ở bãi ô tô gần trường (đang chốt địa điểm)", "bước 1"], // CẦN ĐIỀN tên và địa chỉ bãi
+      ["Bãi gửi ô tô mình sẽ cập nhật sau", "bước 1"], // CẦN ĐIỀN tên và địa chỉ bãi
       ["Đi bộ hoặc gọi Grab tới cổng chính", "bước 2"],
       ["Vào cổng chính, đi tới điểm hẹn", "bước 3"],
     ],
@@ -97,12 +97,18 @@ export const MAP = {
   schoolQuery: "Trường Đại học Công nghiệp TP.HCM 12 Nguyễn Văn Bảo",
 };
 
+// Nhạc nền, phát lặp từ lần bấm đầu tiên trên trang. volume: 0–1.
+export const MUSIC = {
+  src: "/media/uong-to-violin.mp3",
+  volume: 0.5,
+};
+
 // Lưu ý trước khi đi. sev: error (quan trọng) | warn (nên nhớ) | info (gợi ý)
 export const NOTES = [
   { sev: "error", title: "Đến trong khoảng 10:00–11:00", text: "Lễ chính trong hội trường bắt đầu lúc 8:00. Khách đến sau để chụp ảnh cùng mình, không cần dự lễ." },
   { sev: "warn", title: "Ưu tiên đi Grab", text: "Bãi xe trong trường rất đông vào ngày lễ. Đi Grab thì xuống ngay cổng chính, không phải tìm chỗ gửi." },
   { sev: "warn", title: "Nguyễn Văn Bảo là đường một chiều", text: "Đoạn gần trường chỉ đi một chiều. Đi xe máy thì gửi ở chợ Gò Vấp rồi vào cổng sau cho nhanh." },
-  { sev: "info", title: "Trang phục", text: "Lịch sự, tông sáng. Mặc trắng hoặc be chụp cùng áo cử nhân sẽ rất hợp." },
+  { sev: "info", title: "Trang phục", text: "Thoải mái nhé anh em, mặc gì dễ chịu là được." },
   { sev: "info", title: "Hoa không bắt buộc", text: "Có mặt là quý rồi. Nếu mang hoa, mình nhận ở điểm hẹn." },
   { sev: "info", title: "Nếu trời mưa", text: "Mang áo mưa mỏng. Điểm chụp ảnh trong nhà sẽ báo trên thiệp." },
 ];

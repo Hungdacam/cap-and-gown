@@ -11,7 +11,7 @@ Thiệp mời động cho lễ tốt nghiệp **25/11/2026** (IUH, 12 Nguyễn V
 
 ```bash
 npm run dev     # http://localhost:3000, không cần cấu hình gì
-npm test        # 36 test, dùng node --test (Node >= 20)
+npm test        # dùng node --test (Node >= 20)
 ```
 
 Chưa có biến môi trường thì API dùng `data/guests.sample.json` (hoặc `data/guests.local.json` nếu bạn tạo, file này không được commit)
@@ -25,7 +25,7 @@ Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 - Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau` (cột A đến H)
 - Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc` (cột A đến E)
 
-`xung_ho` là một trong: bạn, anh, chị, em, thầy, cô, cả nhóm (giá trị lạ tự về "bạn"). Cột H do site tự ghi lần đầu khách mở thiệp.
+`xung_ho` là một trong: bạn, anh, chị, em, thầy, cô, cả nhóm, anh em (giá trị lạ tự về "bạn"). Cột H do site tự ghi lần đầu khách mở thiệp.
 
 ### 2. Service account
 1. Google Cloud Console → tạo project → bật **Google Sheets API**.
@@ -36,6 +36,13 @@ Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 1. Import repo này (không cần framework, build command trống; `vercel.json` đã cấu hình `public/` và rewrite `/t/:slug`).
 2. Settings → Environment Variables, thêm 3 biến (xem `.env.example`): `SHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`.
 3. Deploy, mở thử một link khách và bấm xác nhận, kiểm tra tab `XacNhan` có dòng mới.
+
+### 4. Google Map (không bắt buộc)
+Chưa có key thì khung bản đồ dùng link nhúng không cần key. Muốn dùng API chính thức:
+
+1. Google Cloud Console → bật **Maps Embed API**.
+2. Sửa key: Application restrictions chọn **Websites** và thêm tên miền của site, API restrictions chỉ chọn **Maps Embed API**. Key này lộ trong link iframe nên bắt buộc phải giới hạn.
+3. Thêm biến `GOOGLE_MAPS_EMBED_KEY` trên Vercel rồi deploy lại.
 
 ## Thêm khách và tạo link
 
@@ -53,12 +60,14 @@ Slug là hai từ cuối của tên (bỏ dấu) cộng 4 ký tự ngẫu nhiên
 
 Mọi chữ, giờ giấc, lộ trình, lưu ý nằm trong `public/src/config.js`. Mục ghi `CẦN ĐIỀN` còn thiếu thông tin thật:
 
-- [ ] `EVENT.graduate`: họ tên đầy đủ trên thiệp
-- [ ] `EVENT.phone`: số điện thoại (để trống thì ẩn khung "Lạc đường? Gọi mình")
 - [ ] `EVENT.meetingPoint`: vị trí điểm hẹn trong trường
 - [ ] `ROUTES` (ô tô): tên và địa chỉ bãi ô tô
 - [ ] `MAP`: link ghim Google Maps của bãi chợ Gò Vấp, cổng sau (Lê Quang Định), cổng chính
 - [ ] Vẽ lại sơ đồ SVG trong `public/index.html` theo ảnh bản đồ thật (giữ nguyên id các khối thì code không cần đổi)
+
+## Nhạc nền
+
+Đổi bài: chép file vào `public/media/` rồi sửa `MUSIC` trong `config.js`. Trình duyệt chặn tự phát nên nhạc bắt đầu từ lần bấm đầu tiên trên trang; khách tắt bằng nút góc dưới bên phải và lựa chọn đó được nhớ lại.
 
 ## Lịch gửi thiệp
 
