@@ -1,5 +1,5 @@
 // Máy chủ chạy thử ở máy: phục vụ public/, rewrite /t/:slug về index.html và chạy các hàm trong api/ như Vercel.
-// Dùng: npm run dev   (mặc định cổng 3000, đổi bằng PORT=4000)
+// Dùng: npm run dev   (mặc định cổng 3333, đổi bằng PORT=4000)
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const pub = join(root, "public");
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 3333;
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".jpg": "image/jpeg", ".mp3": "audio/mpeg" };
 // Dùng đúng header của vercel.json (có CSP) để lỗi bị chặn hiện ra ngay khi chạy ở máy.
 const vercelHeaders = JSON.parse(await readFile(join(root, "vercel.json"), "utf8")).headers;
