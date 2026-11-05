@@ -10,22 +10,22 @@ export const EVENT = {
   calendarEnd: "11:30", // giờ kết thúc khi thêm vào lịch
   rsvpDeadline: "2026-11-23", // hạn báo có đến hay không
 
-  graduate: "Lê Việt Hưng", // CẦN XÁC NHẬN họ tên đầy đủ
+  graduate: "Lê Viết Nguyên Hưng", // CẦN XÁC NHẬN họ tên đầy đủ
   school: "Trường Đại học Công nghiệp TP.HCM (IUH)",
   schoolShort: "ĐH Công nghiệp TP.HCM (IUH)",
   address: "12 Nguyễn Văn Bảo, Gò Vấp, TP.HCM",
   major: "Kỹ thuật Phần mềm",
   degree: "Kỹ sư Phần mềm",
   cohort: "K17",
-  dressCode: "Lịch sự, tông sáng",
+  dressCode: "Thoải mái nhé anh em",
 
-  phone: "", // CẦN ĐIỀN số điện thoại thật. Để trống thì ẩn khung "Lạc đường? Gọi mình".
+  phone: "0917316172", // CẦN ĐIỀN số điện thoại thật. Để trống thì ẩn khung "Lạc đường? Gọi mình".
   meetingPoint: "sẽ cập nhật", // CẦN ĐIỀN vị trí điểm hẹn trong trường
 };
 
 export const COPY = {
   // {pron} được thay bằng cách gọi khách, ví dụ "chị Linh"
-  lede: "Sau những năm deadline, thi cử và những đêm làm đồ án tới sáng, cuối cùng mình cũng ra trường. Mình rất muốn có {pron} ở đó trong ngày đặc biệt này.",
+  lede: "Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng mình cũng ra trường. Mình rất muốn có {pron} ở đó trong ngày đặc biệt này.",
   prTitle: "Mình chính thức tốt nghiệp rồi!",
   prNumber: "#2026",
   prBadge: "Đã tốt nghiệp",
@@ -40,7 +40,7 @@ export const COPY = {
 
 // Điều kiện tốt nghiệp. Mục cuối "Sự có mặt của bạn" tự đạt khi khách bấm "sẽ đến".
 export const CHECKS = [
-  { label: "Khóa luận tốt nghiệp", value: "Loại Giỏi" },
+  { label: "Khóa luận tốt nghiệp", value: "Đã hoàn thành" },
   { label: "Tích lũy tín chỉ", value: "167 / 167", credits: "167/167 tín chỉ" },
   { label: "Chuẩn đầu ra tiếng Anh", value: "TOEIC 450+" },
 ];
@@ -48,7 +48,7 @@ export const CHECKS = [
 // Lịch trình buổi sáng. Trạng thái tự đổi theo giờ thật của ngày lễ.
 export const SCHEDULE = [
   { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: "Mình ở trong hội trường, khách chưa cần tới." },
-  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được.", key: true },
+  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được. Đến sớm được ưu tiên chụp hình trước nha anh em", key: true },
   { at: "10:30", end: "11:30", title: "Chụp ảnh cùng nhau", text: "Trong khuôn viên trường." },
   { at: "11:30", end: "12:00", title: "Chia tay", text: "Cảm ơn bạn đã dành buổi sáng cho mình." },
 ];
@@ -62,7 +62,7 @@ export const ROUTES = [
     focus: "n-grab",
     path: "M324 320 H398 V200 H376",
     hops: [
-      ["Đặt Grab tới 12 Nguyễn Văn Bảo, Gò Vấp", "bước 1"],
+      ["Đặt Grab tới 12 Nguyễn Văn Bảo, hoặc Cổng 4 đường Nguyễn Văn Nghi", "bước 1"],
       ["Xuống xe ngay cổng chính", "bước 2"],
       ["Đi vào trong tới điểm hẹn", "bước 3"],
     ],
@@ -73,7 +73,7 @@ export const ROUTES = [
     focus: "n-moto",
     path: "M105 72 V52 H318 V200 H344",
     hops: [
-      ["Gửi xe ở bãi đầu chợ Gò Vấp, đối diện Betma English", "bước 1"],
+      ["Đi sớm thì vào trường nha hoặc Gửi xe ở bãi đầu chợ Gò Vấp, đối diện Betma English", "bước 1"],
       ["Đi bộ theo đường Lê Quang Định tới cổng sau", "bước 2"],
       ["Vào cổng sau, đi tới điểm hẹn", "bước 3"],
     ],
@@ -114,4 +114,4 @@ export const CALENDAR = {
   details: "Cảm ơn bạn đã đến chung vui. Lễ chính 08:00, khách đến khoảng 10:00–11:00.",
 };
 
-export const GUEST_CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm"];
+export const GUEST_CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm", "anh em"];
