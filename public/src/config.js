@@ -109,7 +109,7 @@ export const NOTES = [
   { sev: "warn", title: "Ưu tiên đi Grab", text: "Bãi xe trong trường rất đông vào ngày lễ. Đi Grab thì xuống ngay cổng chính, không phải tìm chỗ gửi." },
   { sev: "warn", title: "Nguyễn Văn Bảo là đường một chiều", text: "Đoạn gần trường chỉ đi một chiều. Đi xe máy thì gửi ở chợ Gò Vấp rồi vào cổng sau cho nhanh." },
   { sev: "info", title: "Trang phục", text: "Thoải mái nhé anh em, mặc gì dễ chịu là được." },
-  { sev: "info", title: "Hoa không bắt buộc", text: "Có mặt là quý rồi. Nếu mang hoa, mình nhận ở điểm hẹn." },
+  { sev: "info", title: "Hoa không bắt buộc", text: "Có mặt là quý rồi. Không cần hoa đâu các cục dàng (mình nhà xa mang về hong có hết :< )" },
   { sev: "info", title: "Nếu trời mưa", text: "Mang áo mưa mỏng. Điểm chụp ảnh trong nhà sẽ báo trên thiệp." },
 ];
 export const SEV_LABEL = { error: "quan trọng", warn: "nên nhớ", info: "gợi ý" };

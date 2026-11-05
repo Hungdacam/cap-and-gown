@@ -22,7 +22,7 @@ export function googleCalendarUrl() {
 }
 
 // RFC 5545: escape \ ; , và xuống dòng
-const icsText = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+export const icsText = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
 
 // RFC 5545: dòng tối đa 75 byte, gập dòng bằng CRLF + space
 function fold(line) {
@@ -65,14 +65,10 @@ export function buildIcs(now = new Date()) {
   return lines.map(fold).join("\r\n") + "\r\n";
 }
 
-export function downloadIcs() {
-  const blob = new Blob([buildIcs()], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "chuc-mung-tot-nghiep.ics";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
+/** Trên iPhone/iPad, trình duyệt nhúng (Zalo, Messenger...) và Chrome thường không mở được hộp thêm lịch như Safari. */
+export function needsSafariForIcs(ua, maxTouchPoints = 0) {
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && maxTouchPoints > 1);
+  if (!ios) return false;
+  const safari = /Version\/[\d.]+.*Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|FBAN|FBAV|Instagram|Zalo|Line\//i.test(ua);
+  return !safari;
 }

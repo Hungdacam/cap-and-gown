@@ -202,6 +202,7 @@ footer b{color:var(--ok);font-weight:500}
 .btn:disabled{opacity:.6;cursor:progress}
 .cal{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .cal .lbl-s{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.cal-hint{flex-basis:100%;font-size:.78rem;color:var(--muted)}
 .log.err{color:var(--err)}
 .map-actions{display:flex;flex-wrap:wrap;gap:10px}
 

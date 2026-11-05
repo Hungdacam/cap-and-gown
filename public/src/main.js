@@ -7,7 +7,7 @@ import { initMusic } from "./music.js";
 import { initDecor } from "./decor.js";
 import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
-import { googleCalendarUrl, downloadIcs } from "./calendar.js";
+import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
 
 function renderGuest(g, slug) {
   const el = $("guestName");
@@ -37,7 +37,7 @@ async function boot() {
 
   $("cal").hidden = false;
   $("calGoogle").href = googleCalendarUrl();
-  $("calIcs").addEventListener("click", downloadIcs);
+  $("calHint").hidden = !needsSafariForIcs(navigator.userAgent, navigator.maxTouchPoints);
 
   const slug = getSlug();
   let guest = GENERIC_GUEST, rsvp = null, mode = "generic";
