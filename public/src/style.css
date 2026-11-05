@@ -234,13 +234,14 @@ footer b{color:var(--ok);font-weight:500}
 html.splash-on{overflow:hidden}
 html.splash-on .guest{animation:none}
 /* Lưới an toàn: JS lỗi thì splash vẫn tự biến mất. Dài hơn intro và thời gian chờ API thông thường. */
-.splash{position:fixed;inset:0;z-index:60;overflow:hidden;cursor:pointer;animation:splash-failsafe 0s linear 8s forwards}
+.splash{position:fixed;inset:0;z-index:60;overflow:hidden;cursor:pointer;background:var(--bg);animation:splash-failsafe 0s linear 8s forwards}
 @keyframes splash-failsafe{to{visibility:hidden}}
-.sp-bg{position:absolute;inset:0;background-color:var(--bg);background-image:radial-gradient(var(--line) 1px, transparent 1px);background-size:22px 22px}
+.sp-strips{position:absolute;inset:0;display:grid;grid-template-rows:repeat(9,1fr)}
+.sp-strips i{display:block;margin-bottom:-1px;background:var(--bg);border-inline:1px solid var(--accent);margin-inline:-2px;will-change:transform}
+.sp-strips i:nth-child(even){border-color:var(--pink)}
 .sp-glow{position:absolute;left:50%;top:50%;width:min(130vw,820px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--glow) 0%,transparent 65%);visibility:hidden;will-change:opacity}
 /* Mũ, vòng sáng, confetti là lớp HTML riêng để GPU xử lý: chỉ animate transform và opacity, không vẽ lại SVG mỗi khung hình. */
 .sp-lines{position:absolute;inset:0;width:100%;height:100%;will-change:opacity}
-.sp-warp{position:absolute;background:var(--surface-2);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);visibility:hidden;will-change:transform,opacity}
 .sp-scene{position:absolute;left:50%;top:50%;width:min(calc(100% - 32px),460px);aspect-ratio:320/240;translate:-50% -50%}
 .sp-ring{position:absolute;left:50%;top:81.67%;width:18%;aspect-ratio:1;margin:-9% 0 0 -9%;border:1px solid var(--text);border-radius:50%;visibility:hidden;will-change:transform,opacity}
 .sp-cap{position:absolute;left:31.9%;top:27%;width:37.5%;height:auto;overflow:visible;visibility:hidden;will-change:transform,opacity}
