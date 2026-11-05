@@ -8,6 +8,9 @@ import { initDecor } from "./decor.js";
 import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
 import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
+import { startSplash } from "./splash.js";
+import { initSmoothScroll } from "./smooth-scroll.js";
+import { initScrollEffects } from "./scroll-effects.js";
 
 function renderGuest(g, slug) {
   const el = $("guestName");
@@ -33,11 +36,12 @@ async function boot() {
   initGoogleMap();
   initPhoneCopy();
   initMusic();
-  initDecor();
+  const decor = initDecor();
 
   $("cal").hidden = false;
   $("calGoogle").href = googleCalendarUrl();
   $("calHint").hidden = !needsSafariForIcs(navigator.userAgent, navigator.maxTouchPoints);
+  const splash = startSplash();
 
   const slug = getSlug();
   let guest = GENERIC_GUEST, rsvp = null, mode = "generic";
@@ -56,6 +60,11 @@ async function boot() {
   }
   renderGuest(guest, mode === "ok" ? slug : "");
   initRsvp({ slug, guest, rsvp, mode });
+
+  await splash.ready;
+  initSmoothScroll(decor.syncScroll);
+  initScrollEffects(splash.opening);
+  await splash.open();
 }
 
 boot();

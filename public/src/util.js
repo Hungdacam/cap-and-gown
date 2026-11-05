@@ -7,6 +7,10 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
 
 export const capFirst = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 export const pad2 = (n) => String(n).padStart(2, "0");
+export const prefersReducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+/** Hiệu ứng chỉ để trang trí: thiếu GSAP thì thiệp vẫn phải dùng được. */
+export const canAnimate = () =>
+  ["gsap", "ScrollTrigger", "ScrollSmoother"].every((lib) => window[lib]) && !prefersReducedMotion();
 
 /** Thời điểm `time` (HH:MM) của ngày lễ, theo múi giờ cấu hình. */
 export const eventAt = (time) => new Date(`${EVENT.date}T${time}:00${EVENT.tz}`);

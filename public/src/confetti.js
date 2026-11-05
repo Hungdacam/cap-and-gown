@@ -1,5 +1,7 @@
+import { prefersReducedMotion } from "./util.js";
+
 export function confetti() {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (prefersReducedMotion()) return;
   const c = document.getElementById("confetti");
   const ctx = c.getContext("2d");
   const W = (c.width = innerWidth), H = (c.height = innerHeight);

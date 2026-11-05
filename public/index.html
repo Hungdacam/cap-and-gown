@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" class="splash-on">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -30,6 +30,27 @@
 <div class="mini" id="mini" aria-hidden="true"></div>
 <div class="gbar" aria-hidden="true"><i id="gbarFill"></i></div>
 
+<!-- ===== SPLASH: không có chữ. Commit graph merge, mũ bật lên, nảy xuống, rồi lao vào màn hình ===== -->
+<div class="splash" id="splash" aria-hidden="true">
+  <div class="sp-bg" id="spBg"></div>
+  <i class="sp-glow"></i>
+  <canvas class="sp-lines" id="spLines"></canvas>
+  <i class="sp-warp" id="spWarp"></i>
+  <div class="sp-scene" id="spScene">
+    <i class="sp-ring" id="spRing"></i>
+    <svg class="sp-cap" id="spCap" viewBox="200 44 104 72" fill="none">
+      <path class="sp-cap-base" d="M224 84 V102 C238 112 262 112 276 102 V84"/>
+      <path class="sp-cap-top" d="M250 52 L296 72 L250 92 L204 72 Z"/>
+      <g id="spTassel">
+        <path class="sp-tassel" d="M250 72 L286 78 V102"/>
+        <circle class="sp-tassel-tip" cx="286" cy="106" r="4"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<div id="smooth-wrapper">
+<div id="smooth-content">
 <div class="wrap">
 
   <!-- ===== TERMINAL HERO ===== -->
@@ -208,12 +229,17 @@
     <span id="footSub"></span>
   </footer>
 </div>
+</div>
+</div>
 
 <button class="music" id="musicBtn" type="button" aria-pressed="false">
   <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
   <span id="musicLabel">Bật nhạc</span>
 </button>
 
+<script src="/vendor/gsap/gsap.min.js"></script>
+<script src="/vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="/vendor/gsap/ScrollSmoother.min.js"></script>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

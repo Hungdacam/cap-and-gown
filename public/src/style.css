@@ -25,8 +25,8 @@
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.6;
-  background-image:radial-gradient(var(--line) 1px, transparent 1px);background-size:22px 22px;
-  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:24px 64px}
+  background-image:radial-gradient(var(--line) 1px, transparent 1px);background-size:22px 22px;margin:0}
+#smooth-content{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:24px 64px}
 .wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
 h1,h2,h3{margin:0;text-wrap:balance}
 h2{font-family:var(--f-display);font-size:1.6rem;font-weight:700;letter-spacing:.01em}
@@ -229,6 +229,31 @@ footer b{color:var(--ok);font-weight:500}
 
 .ping a.num{text-decoration:none;border-bottom:1px dashed var(--muted)}
 .ping a.num:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ===== Splash ===== */
+html.splash-on{overflow:hidden}
+html.splash-on .guest{animation:none}
+/* Lưới an toàn: JS lỗi thì splash vẫn tự biến mất. Dài hơn intro và thời gian chờ API thông thường. */
+.splash{position:fixed;inset:0;z-index:60;overflow:hidden;cursor:pointer;animation:splash-failsafe 0s linear 8s forwards}
+@keyframes splash-failsafe{to{visibility:hidden}}
+.sp-bg{position:absolute;inset:0;background-color:var(--bg);background-image:radial-gradient(var(--line) 1px, transparent 1px);background-size:22px 22px}
+.sp-glow{position:absolute;left:50%;top:50%;width:min(130vw,820px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--glow) 0%,transparent 65%);visibility:hidden;will-change:opacity}
+/* Mũ, vòng sáng, confetti là lớp HTML riêng để GPU xử lý: chỉ animate transform và opacity, không vẽ lại SVG mỗi khung hình. */
+.sp-lines{position:absolute;inset:0;width:100%;height:100%;will-change:opacity}
+.sp-warp{position:absolute;background:var(--surface-2);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);visibility:hidden;will-change:transform,opacity}
+.sp-scene{position:absolute;left:50%;top:50%;width:min(calc(100% - 32px),460px);aspect-ratio:320/240;translate:-50% -50%}
+.sp-ring{position:absolute;left:50%;top:81.67%;width:18%;aspect-ratio:1;margin:-9% 0 0 -9%;border:1px solid var(--text);border-radius:50%;visibility:hidden;will-change:transform,opacity}
+.sp-cap{position:absolute;left:31.9%;top:27%;width:37.5%;height:auto;overflow:visible;visibility:hidden;will-change:transform,opacity}
+.sp-cap-top{fill:var(--accent);stroke:var(--surface);stroke-width:2;stroke-linejoin:round}
+.sp-cap-base{fill:var(--surface-2);stroke:var(--accent);stroke-width:2}
+.sp-tassel{stroke:var(--amber);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.sp-tassel-tip{fill:var(--amber)}
+.sp-bit{position:absolute;left:50%;top:60%;width:9px;height:9px;border-radius:2px;background:var(--amber);visibility:hidden;will-change:transform,opacity}
+.sp-bit:nth-of-type(3n){background:var(--pink)}
+.sp-bit:nth-of-type(3n+1){background:var(--accent);border-radius:50%}
+.sp-bit:nth-of-type(4n){background:var(--ok)}
+@media (prefers-reduced-motion:reduce){.splash{display:none}}
+
 
 [hidden]{display:none!important}
 
