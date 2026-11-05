@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { generateKeyPairSync, createVerify } from "node:crypto";
+import { generateKeyPairSync, createVerify, createSign } from "node:crypto";
 import { createSheetsStore, STATUS_LABEL } from "../api/_lib/sheets.js";
 
 const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -118,4 +118,30 @@ test("lỗi từ Google được ném ra để API trả 500", async () => {
     fetchImpl: async (u) => (String(u).includes("oauth2") ? { ok: true, json: async () => ({ access_token: "t", expires_in: 3600 }) } : { ok: false, status: 403, json: async () => ({}) }),
   });
   await assert.rejects(() => store.getGuest("a-b-c1"), /sheets GET 403/);
+});
+
+import { normalizePrivateKey } from "../api/_lib/sheets.js";
+
+test("normalizePrivateKey: mọi kiểu dán sai phổ biến đều ra đúng khóa dùng được", () => {
+  const pemNorm = pem.trim();
+  const body = pemNorm.split("\n").slice(1, -1).join("");
+  const variants = {
+    "xuống dòng thật": pem,
+    "ký tự \\n": pem.replace(/\n/g, "\\n"),
+    "bao dấu nháy kép": `"${pem.replace(/\n/g, "\\n")}"`,
+    "xuống dòng thành dấu cách": pemNorm.replace(/\n/g, " "),
+    "thừa khoảng trắng hai đầu": `\n  ${pem}  \n`,
+    "nguyên file JSON": JSON.stringify({ type: "service_account", private_key: pem }),
+  };
+  for (const [name, v] of Object.entries(variants)) {
+    const out = normalizePrivateKey(v);
+    assert.equal(out, pem, name);
+    assert.doesNotThrow(() => createSign("RSA-SHA256").update("x").sign(out), name);
+  }
+  assert.ok(body.length > 100);
+});
+
+test("normalizePrivateKey: giá trị rỗng hoặc không phải khóa thì không làm hỏng, để Node báo lỗi", () => {
+  assert.equal(normalizePrivateKey(undefined), "");
+  assert.equal(normalizePrivateKey("không phải khóa"), "không phải khóa");
 });
