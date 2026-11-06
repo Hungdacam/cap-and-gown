@@ -34,6 +34,9 @@ export async function sendRsvp(payload, fetchImpl = fetch) {
   return res.json();
 }
 
+/** Thầy cô thì "Kính gửi", còn lại "Thân gửi". */
+export const greeting = (g) => (g.call === "cô" || g.call === "thầy" ? "Kính gửi" : "Thân gửi");
+
 /** Cách gọi khách trong câu: "chị Linh", "cả nhóm", "bạn". */
 export function pronoun(g) {
   if (g.call === "cả nhóm" || g.call === "anh em") return g.call;

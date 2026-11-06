@@ -1,3 +1,4 @@
+import { COPY } from "./config.js";
 import { $, canAnimate } from "./util.js";
 import { createLines } from "./splash-lines.js";
 
@@ -8,6 +9,9 @@ const MERGE_AT = 0.85; // giây, lúc các đường bên trái gặp nhau
 const NODE_Y = 0.8167; // điểm hội tụ theo chiều cao .sp-scene
 const RISE = 0.45;
 const FLIGHT = 0.74; // bay lên + rơi tới lần chạm đất đầu tiên của bounce.out
+const HINT_DELAY = 0.15; // giây, từ lúc intro xong tới lúc hiện lời gợi ý
+const AUTO_OPEN = 10; // giây, khách không chạm thì thiệp tự mở để không ai bị kẹt
+const FAILSAFE = 20; // giây, phải dài hơn intro + AUTO_OPEN + lúc mở
 
 const revealPage = () => document.documentElement.classList.remove("splash-on");
 
@@ -60,14 +64,16 @@ function buildIntro(bits) {
 
 /**
  * ready: intro xong, mũ đứng yên, lúc này làm việc nặng không ai thấy.
+ * tapped: khách đã chạm, hoặc đã hết giờ chờ. Không có gate thì resolve ngay.
+ * setGuest(): hiện lời chào trên màn hình chờ, dữ liệu khách về lúc nào thì hiện lúc đó.
  * open(): tung mũ khỏi màn hình rồi các dải nền trượt đi để lộ thiệp. opening resolve đúng lúc thiệp bắt đầu lộ ra.
  */
-export function startSplash() {
+export function startSplash({ gate = false } = {}) {
   const el = $("splash");
   if (!canAnimate()) {
     el.remove();
     revealPage();
-    return { ready: Promise.resolve(), opening: Promise.resolve(), open: async () => {} };
+    return { ready: Promise.resolve(), tapped: Promise.resolve(), opening: Promise.resolve(), setGuest() {}, open: async () => {} };
   }
 
   gsap.to(".sp-glow", { autoAlpha: 1, duration: 0.4, ease: "sine.out" });
@@ -76,22 +82,85 @@ export function startSplash() {
   requestAnimationFrame(() => intro.play()); // không đợi tải trang: khách phải thấy chuyển động ngay
   el.addEventListener("pointerdown", () => intro.timeScale(SKIP_SPEED), { once: true });
 
+  let markTapped;
+  const tapped = new Promise((resolve) => (markTapped = resolve));
+  let isTapped = false, hintShown = false, hasGreeting = false, hintCall, autoOpen;
+
+  const tap = () => {
+    if (isTapped) return;
+    isTapped = true;
+    hintCall?.kill();
+    autoOpen?.kill();
+    markTapped();
+  };
+  const revealGreeting = () => {
+    if (!hintShown || !hasGreeting || isTapped) return;
+    gsap.fromTo("#spHello", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" });
+  };
+  const showHint = () => {
+    hintShown = true;
+    el.focus({ preventScroll: true });
+    gsap.to("#spLines", { opacity: 0.45, duration: 0.5, ease: "sine.inOut" }); // lùi các đường line để chữ dễ đọc
+    gsap.fromTo("#spHint", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" });
+    revealGreeting();
+    autoOpen = gsap.delayedCall(AUTO_OPEN, tap);
+  };
+
+  if (gate) {
+    el.removeAttribute("aria-hidden");
+    el.setAttribute("role", "button");
+    el.tabIndex = 0;
+    const hint = matchMedia("(pointer: coarse)").matches ? COPY.tapHint : COPY.clickHint;
+    el.setAttribute("aria-label", hint);
+    $("spHintText").textContent = hint;
+    el.addEventListener("click", tap);
+    el.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      tap();
+    });
+  } else {
+    tap();
+  }
+
   let idle;
   const ready = intro.then(() => {
-    // Chỉ thấy khi API chậm: dữ liệu về sớm thì open() hủy tween này trước khi nó kịp chạy.
+    // Mũ nhún nhẹ trong lúc chờ khách chạm hoặc chờ API.
     idle = gsap.to("#spCap", { y: -8, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 0.4 });
+    // Đợi một nhịp để việc nặng ngay sau ready xong trước, chữ hiện ra không bị giật.
+    if (!isTapped) hintCall = gsap.delayedCall(HINT_DELAY, showHint);
   });
 
   let markOpening;
   const opening = new Promise((resolve) => (markOpening = resolve));
 
+  // JS đã chạy thì thay lưới an toàn của CSS bằng đồng hồ GSAP: tab nền làm GSAP dừng nhưng CSS vẫn đếm,
+  // splash sẽ biến mất giữa chừng trong khi trang còn khóa cuộn. Hết giờ thì mở khóa luôn, không chờ API nữa.
+  el.style.animation = "none";
+  const failsafe = gsap.delayedCall(FAILSAFE, () => {
+    el.remove();
+    revealPage();
+    markOpening();
+  });
+
   return {
     ready,
+    tapped,
     opening,
+    setGuest(greeting, name) {
+      $("spGreet").textContent = greeting;
+      $("spName").textContent = name;
+      hasGreeting = true;
+      revealGreeting();
+    },
     async open() {
+      if (!el.isConnected) return; // lưới an toàn đã mở thiệp trước
+      failsafe.kill();
       idle.kill();
+      gsap.killTweensOf(["#spLines", "#spHint", "#spHello"]);
       const { bottom } = $("spCap").getBoundingClientRect();
       await gsap.timeline()
+        .to(["#spHello", "#spHint"], { autoAlpha: 0, y: 8, duration: 0.2, ease: "sine.in" }, 0)
         .to("#spCap", { y: 10, scale: 0.94, duration: 0.18, ease: "sine.out" }, 0)
         .to("#spCap", { y: -(bottom + 60), scale: 0.8, rotation: "+=320", duration: 0.6, ease: "power2.in" }, 0.18)
         .to(["#spLines", ".sp-glow"], { autoAlpha: 0, duration: 0.4, ease: "sine.inOut" }, 0.2)
