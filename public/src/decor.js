@@ -34,7 +34,12 @@ export function initDecor() {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = label;
-    b.addEventListener("click", () => el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }));
+    b.addEventListener("click", () => {
+      // ScrollSmoother dịch nội dung bằng transform nên scrollIntoView không cuộn được.
+      const smoother = window.ScrollSmoother?.get();
+      if (smoother) smoother.scrollTo(el, true, "top 24px");
+      else el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+    });
     li.append(b);
     list.append(li);
     return li;
@@ -88,4 +93,5 @@ export function initDecor() {
   addEventListener("resize", buildMini);
   // Nội dung đổi chiều cao (tên khách, form xác nhận, ảnh tải xong) thì vẽ lại bản đồ thu nhỏ.
   new ResizeObserver(buildMini).observe(document.querySelector(".wrap"));
+  return { syncScroll: onScroll };
 }

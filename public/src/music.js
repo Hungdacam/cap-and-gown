@@ -4,9 +4,11 @@ import { $ } from "./util.js";
 const OFF_KEY = "music-off";
 const FADE_MS = 1500;
 
-// Trình duyệt chặn tự phát nhạc khi chưa có tương tác, nên nhạc bắt đầu từ lần bấm đầu tiên trên trang.
+// Vào trang là thử phát ngay. Trình duyệt thường chặn tự phát khi chưa có tương tác; khi đó nhạc bắt đầu
+// từ lần chạm, bấm hoặc gõ phím đầu tiên trên trang, thường là cú chạm để mở thiệp ở splash.
 // Khách đã tắt thì lần sau không tự bật lại. localStorage có thể bị chặn nên phải bọc try/catch.
-const readOff = () => { try { return localStorage.getItem(OFF_KEY) === "1"; } catch { return false; } };
+const GESTURES = ["pointerdown", "touchend", "click", "keydown"];
+export const isMusicOff = () => { try { return localStorage.getItem(OFF_KEY) === "1"; } catch { return false; } };
 const writeOff = (off) => { try { localStorage.setItem(OFF_KEY, off ? "1" : "0"); } catch { /* không lưu được thì thôi */ } };
 
 export function initMusic() {
@@ -37,7 +39,7 @@ export function initMusic() {
   audio.addEventListener("play", paint);
   audio.addEventListener("pause", paint);
 
-  const removeGestures = () => ["click", "keydown"].forEach((ev) => document.removeEventListener(ev, onFirstGesture));
+  const removeGestures = () => GESTURES.forEach((ev) => document.removeEventListener(ev, onFirstGesture));
   const play = async () => {
     try {
       const fresh = audio.currentTime === 0;
@@ -57,12 +59,14 @@ export function initMusic() {
     else { writeOff(true); audio.pause(); removeGestures(); }
   });
 
-  if (!readOff()) ["click", "keydown"].forEach((ev) => document.addEventListener(ev, onFirstGesture));
+  const wanted = !isMusicOff();
+  if (wanted) GESTURES.forEach((ev) => document.addEventListener(ev, onFirstGesture));
 
-  // Rời tab hoặc khóa màn hình thì tạm dừng, quay lại phát tiếp.
-  let resume = false;
+  // Rời tab hoặc khóa màn hình thì tạm dừng, quay lại phát tiếp. Mở trang ở tab nền thì đợi tới khi xem mới phát.
+  let resume = wanted && document.hidden;
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) { resume = !audio.paused; audio.pause(); }
     else if (resume) { resume = false; play(); }
   });
+  if (wanted && !document.hidden) play();
 }

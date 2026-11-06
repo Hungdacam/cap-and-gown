@@ -11,7 +11,7 @@ export const EVENT = {
   rsvpDeadline: "2026-11-23", // hạn báo có đến hay không
 
   graduate: "Lê Viết Nguyên Hưng", // CẦN XÁC NHẬN họ tên đầy đủ
-  school: "Trường Đại học Công nghiệp TP.HCM (IUH)",
+  school: "Trường Đại học Công Nghiệp TP.HCM (IUH)",
   schoolShort: "ĐH Công nghiệp TP.HCM (IUH)",
   address: "12 Nguyễn Văn Bảo, Gò Vấp, TP.HCM",
   major: "Kỹ thuật Phần mềm",
@@ -36,6 +36,8 @@ export const COPY = {
   footerLine: "Hẹn gặp bạn ở buổi lễ",
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
   genericName: "Bạn thân mến",
+  tapHint: "Chạm để mở thiệp", // màn hình mở đầu trên điện thoại
+  clickHint: "Bấm để mở thiệp", // màn hình mở đầu trên máy tính
 };
 
 // Điều kiện tốt nghiệp. Mục cuối "Sự có mặt của bạn" tự đạt khi khách bấm "sẽ đến".
@@ -47,8 +49,8 @@ export const CHECKS = [
 
 // Lịch trình buổi sáng. Trạng thái tự đổi theo giờ thật của ngày lễ.
 export const SCHEDULE = [
-  { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: "Mình ở trong hội trường, khách chưa cần tới." },
-  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được. Đến sớm được ưu tiên chụp hình trước nha anh em", key: true },
+  { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: "Mình ở trong hội trường, mọi người chưa cần tới nhé." },
+  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được nha mọi người. ", key: true },
   { at: "10:30", end: "11:30", title: "Chụp ảnh cùng nhau", text: "Trong khuôn viên trường." },
   { at: "11:30", end: "12:00", title: "Chia tay", text: "Cảm ơn bạn đã dành buổi sáng cho mình." },
 ];

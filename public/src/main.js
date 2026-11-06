@@ -3,18 +3,20 @@ import { $ } from "./util.js";
 import { renderStatic } from "./render.js";
 import { startCountdown, startPipeline } from "./countdown.js";
 import { initMap, initGoogleMap, initPhoneCopy } from "./map.js";
-import { initMusic } from "./music.js";
+import { initMusic, isMusicOff } from "./music.js";
 import { initDecor } from "./decor.js";
-import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
+import { getSlug, fetchGuest, GENERIC_GUEST, pronoun, greeting } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
 import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
+import { startSplash } from "./splash.js";
+import { initSmoothScroll } from "./smooth-scroll.js";
+import { initScrollEffects } from "./scroll-effects.js";
 
 function renderGuest(g, slug) {
   const el = $("guestName");
   el.textContent = g.name;
   $("slugEcho").textContent = slug || "guest";
-  const formal = g.call === "cô" || g.call === "thầy";
-  $("greet").textContent = formal ? "// Kính gửi" : "// Thân gửi";
+  $("greet").textContent = `// ${greeting(g)}`;
 
   // Câu mở đầu, {pron} in đậm. Dựng bằng DOM nên tên khách không bao giờ bị hiểu là HTML.
   const lede = $("lede");
@@ -33,11 +35,13 @@ async function boot() {
   initGoogleMap();
   initPhoneCopy();
   initMusic();
-  initDecor();
+  const decor = initDecor();
 
   $("cal").hidden = false;
   $("calGoogle").href = googleCalendarUrl();
   $("calHint").hidden = !needsSafariForIcs(navigator.userAgent, navigator.maxTouchPoints);
+  // Cú chạm mở thiệp là để bật nhạc, khách đã tắt nhạc thì không cần chạm.
+  const splash = startSplash({ gate: !isMusicOff() });
 
   const slug = getSlug();
   let guest = GENERIC_GUEST, rsvp = null, mode = "generic";
@@ -56,6 +60,13 @@ async function boot() {
   }
   renderGuest(guest, mode === "ok" ? slug : "");
   initRsvp({ slug, guest, rsvp, mode });
+  if (mode === "ok") splash.setGuest(greeting(guest), pronoun(guest));
+
+  await splash.ready;
+  initSmoothScroll(decor.syncScroll);
+  initScrollEffects(splash.opening);
+  await splash.tapped;
+  await splash.open();
 }
 
 boot();

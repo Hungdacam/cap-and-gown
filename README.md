@@ -3,14 +3,14 @@
 Thiệp mời động cho lễ tốt nghiệp **25/11/2026** (IUH, 12 Nguyễn Văn Bảo, Gò Vấp). Mỗi khách có một link riêng
 `/t/<slug>`; trang tự điền đúng tên và cách xưng hô, khách bấm xác nhận có đến hay không, dữ liệu lưu vào Google Sheet.
 
-- Giao diện: HTML + CSS + ES modules thuần, không bundler, không dependency (`public/`).
+- Giao diện: HTML + CSS + ES modules thuần, không bundler (`public/`). Thư viện duy nhất là GSAP 3.15.0, lưu sẵn trong `public/vendor/gsap/`.
 - API: hai hàm serverless trên Vercel (`api/guest.js`, `api/rsvp.js`), gọi Google Sheets REST bằng service account (JWT RS256 qua `node:crypto`).
 - Bản thiết kế gốc để đối chiếu: `design/thiep.html`.
 
 ## Chạy thử ở máy
 
 ```bash
-npm run dev     # http://localhost:3000, không cần cấu hình gì
+npm run dev     # http://localhost:3333, không cần cấu hình gì
 npm test        # dùng node --test (Node >= 20)
 ```
 
