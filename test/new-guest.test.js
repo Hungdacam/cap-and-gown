@@ -22,6 +22,6 @@ test("dòng cho Sheet có đủ 8 cột; nhóm không có tên gọi ngắn", ()
   assert.equal(g.cells[2], "");
   assert.match(g.slug, /^hoi-k17-than-[a-z0-9]{4}$/);
   assert.equal(makeRow({ name: "A B", call: "  Sếp  " }, new Set()).cells[3], "sếp");
-  assert.equal(makeRow({ name: "A B", call: " " }, new Set()).cells[3], "bạn");
-  assert.equal(makeRow({ name: "A B" }, new Set()).cells[3], "bạn");
+  assert.deepEqual(makeRow({ name: "A B", call: " " }, new Set()).cells.slice(2, 4), ["A B", ""]);
+  assert.deepEqual(makeRow({ name: "cô Mai và bác Vinh" }, new Set()).cells.slice(2, 4), ["cô Mai và bác Vinh", ""]);
 });

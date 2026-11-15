@@ -33,10 +33,10 @@ test("khách đã xác nhận vẫn được gọi đúng xưng hô khi mở l�
   const { el, paragraphs } = setupDocument(t);
   renderGuestCopy(guest);
   initRsvp({ ...state, rsvp: { status: "yes", plusOnes: 1, message: "Hẹn gặp" } });
-  assert.equal(el("footLine").textContent, "Hẹn gặp chị ở buổi lễ");
-  assert.equal(paragraphs.at(-1).textContent, "Cảm ơn chị đã dành buổi sáng cho mình.");
-  assert.match(el("checks").innerHTML, /Sự có mặt của chị/);
-  assert.match(el("log").innerHTML, /Chị đã trả lời: Sẽ đến/);
+  assert.equal(el("footLine").textContent, "Hưng hẹn gặp chị Linh ở buổi lễ");
+  assert.equal(paragraphs.at(-1).textContent, "Hưng cảm ơn chị Linh đã dành buổi sáng đến chung vui.");
+  assert.match(el("checks").innerHTML, /Sự có mặt của chị Linh/);
+  assert.match(el("log").innerHTML, /Chị Linh đã trả lời: Sẽ đến/);
   assert.equal(el("yes").textContent, "✓ Sẽ đến");
   let payload;
   t.mock.method(globalThis, "fetch", async (_url, options) => {
@@ -46,16 +46,16 @@ test("khách đã xác nhận vẫn được gọi đúng xưng hô khi mở l�
   await el("rsvpForm").events.submit({ preventDefault() {} });
   assert.equal(payload.slug, state.slug);
   assert.equal(payload.plusOnes, 1);
-  assert.match(el("log").innerHTML, /Hẹn gặp chị lúc 10:00/);
+  assert.match(el("log").innerHTML, /Hưng hẹn gặp chị Linh lúc 10:00/);
 });
 
-test("xưng hô trống và thiệp chung dùng bạn, thiệp chung không có form xác nhận", (t) => {
+test("xưng hô trống dùng tên; thiệp chung dùng bạn và không có form xác nhận", (t) => {
   const { el } = setupDocument(t);
   initRsvp({ ...state, guest: { ...guest, call: " " } });
-  assert.match(el("checks").innerHTML, /Sự có mặt của bạn/);
+  assert.match(el("checks").innerHTML, /Sự có mặt của Linh/);
   renderGuestCopy(GENERIC_GUEST);
   initRsvp({ slug: "", guest: GENERIC_GUEST, rsvp: null, mode: "generic" });
-  assert.equal(el("footLine").textContent, "Hẹn gặp bạn ở buổi lễ");
+  assert.equal(el("footLine").textContent, "Hưng hẹn gặp bạn ở buổi lễ");
   assert.equal(el("rsvpBtns").hidden, true);
   assert.equal(el("rsvpForm").hidden, true);
 });
@@ -70,7 +70,21 @@ test("xưng hô tùy chỉnh được escape trong checklist và thông báo RSV
   t.mock.method(globalThis, "fetch", async () => { throw new Error("offline"); });
   t.mock.method(console, "error", () => {});
   await el("rsvpForm").events.submit({ preventDefault() {} });
-  assert.match(el("log").innerHTML, /Sếp &lt;img/);
+  assert.match(el("log").innerHTML, /liên hệ trực tiếp với Hưng/);
   assert.ok(!el("log").innerHTML.includes("<img"));
   assert.equal(el("rsvpSend").disabled, false);
+});
+
+test("phản hồi RSVP cho cô Mai và bác Vinh luôn xưng Hưng", async (t) => {
+  const { el } = setupDocument(t);
+  const recipients = { name: "Cô Mai và bác Vinh", short: "cô Mai và bác Vinh", call: "" };
+  initRsvp({ ...state, guest: recipients, rsvp: { status: "yes" } });
+  t.mock.method(globalThis, "fetch", async () => ({ ok: true, json: async () => ({ ok: true }) }));
+  for (const status of ["yes", "maybe", "no"]) {
+    el(status).events.click();
+    await el("rsvpForm").events.submit({ preventDefault() {} });
+    assert.match(el("log").innerHTML, /Hưng/);
+    assert.match(el("log").innerHTML, /[Cc]ô Mai và bác Vinh/);
+    assert.doesNotMatch(el("log").innerHTML, /mình|\bbạn\b/);
+  }
 });

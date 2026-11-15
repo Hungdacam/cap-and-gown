@@ -1,22 +1,22 @@
 import { COPY } from "./config.js";
 import { normalizeCall } from "./address.js";
-import { $ } from "./util.js";
+import { $, capFirst } from "./util.js";
 import { renderStatic, renderGuestCopy } from "./render.js";
 import { startCountdown, startPipeline } from "./countdown.js";
 import { initMap, initGoogleMap, initPhoneCopy } from "./map.js";
 import { initMusic, isMusicOff } from "./music.js";
 import { initDecor } from "./decor.js";
-import { getSlug, fetchGuest, GENERIC_GUEST, pronoun, greeting } from "./guest.js";
+import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
 import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
 import { startSplash } from "./splash.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
 import { initScrollEffects } from "./scroll-effects.js";
 
-function renderGuest(g, slug) {
-  $("guestName").textContent = g.name;
+function renderGuest(g, slug, name) {
+  $("guestName").textContent = name;
   $("slugEcho").textContent = slug || "guest";
-  $("greet").textContent = `// ${greeting(g)}`;
+  $("greet").textContent = `// ${COPY.invitationGreeting}`;
 
   // Câu mở đầu, {pron} in đậm. Dựng bằng DOM nên tên khách không bao giờ bị hiểu là HTML.
   const lede = $("lede");
@@ -59,9 +59,10 @@ async function boot() {
       mode = "error";
     }
   }
-  renderGuest(guest, mode === "ok" ? slug : "");
+  const name = mode === "ok" ? capFirst(pronoun(guest)) : guest.name;
+  renderGuest(guest, mode === "ok" ? slug : "", name);
   initRsvp({ slug, guest, rsvp, mode });
-  splash.setGuest(greeting(guest), mode === "ok" ? pronoun(guest) : guest.name);
+  splash.setGuest(COPY.invitationGreeting, name);
 
   await splash.ready;
   initSmoothScroll(decor.syncScroll);

@@ -43,3 +43,10 @@ test("mọi id mà JS tìm đều có trong index.html", () => {
 test("mức độ lưu ý hợp lệ", () => {
   for (const n of C.NOTES) assert.ok(n.sev in C.SEV_LABEL);
 });
+
+test("lời văn tự xưng Hưng, không dùng mình hoặc tôi", () => {
+  const copy = JSON.stringify([C.COPY, C.EVENT.dressCode, C.SCHEDULE, C.ROUTES, C.NOTES, C.CALENDAR, html]).normalize("NFC");
+  assert.equal(C.EVENT.graduateShort, "Hưng");
+  assert.match(C.COPY.lede, /Hưng rất mong \{pron\}/);
+  assert.doesNotMatch(copy, /(^|[^\p{L}])(mình|tôi)(?=$|[^\p{L}])/iu);
+});

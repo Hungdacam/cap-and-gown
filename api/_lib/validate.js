@@ -8,7 +8,7 @@ export const MAX_PLUS_ONES = 5;
 
 export const isValidSlug = (s) => typeof s === "string" && SLUG_RE.test(s);
 
-/** Xưng hô dùng chung với frontend; ô trống mặc định là "bạn". */
+/** Xưng hô dùng chung với frontend; giữ ô trống để dùng nguyên tên gọi. */
 export const safeCall = normalizeCall;
 
 /**

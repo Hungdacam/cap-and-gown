@@ -11,29 +11,31 @@ export const EVENT = {
   rsvpDeadline: "2026-11-23", // hạn báo có đến hay không
 
   graduate: "Lê Viết Nguyên Hưng", // CẦN XÁC NHẬN họ tên đầy đủ
+  graduateShort: "Hưng", // Tên tự xưng trong lời mời và hướng dẫn.
   school: "Trường Đại học Công Nghiệp TP.HCM (IUH)",
   schoolShort: "ĐH Công nghiệp TP.HCM (IUH)",
   address: "12 Nguyễn Văn Bảo, Gò Vấp, TP.HCM",
   major: "Kỹ thuật Phần mềm",
   degree: "Kỹ sư Phần mềm",
   cohort: "K17",
-  dressCode: "Thoải mái nhé anh em",
+  dressCode: "Thoải mái, thuận tiện chụp ảnh",
 
-  phone: "0917316172", // CẦN ĐIỀN số điện thoại thật. Để trống thì ẩn khung "Lạc đường? Gọi mình".
+  phone: "0917316172", // Để trống thì ẩn khung liên hệ.
   meetingPoint: "sẽ cập nhật", // CẦN ĐIỀN vị trí điểm hẹn trong trường
 };
 
 export const COPY = {
+  invitationGreeting: "Trân trọng kính mời",
   // {pron} được thay bằng cách gọi khách, ví dụ "chị Linh"
-  lede: "Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng mình cũng ra trường. Mình rất mong muốn {pron} sẽ có mặt ở đó trong ngày đặc biệt này.",
-  prTitle: "Mình chính thức tốt nghiệp rồi!",
+  lede: `Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng ${EVENT.graduateShort} cũng ra trường. ${EVENT.graduateShort} rất mong {pron} sẽ có mặt trong ngày đặc biệt này.`,
+  prTitle: `${EVENT.graduateShort} chính thức tốt nghiệp rồi!`,
   prNumber: "#2026",
   prBadge: "Đã tốt nghiệp",
   fromLabel: "sinh viên",
   toLabel: "cựu sinh viên",
   diffAdd: "+167 tín chỉ",
   diffDel: "−0 lần bỏ cuộc",
-  footerLine: "Hẹn gặp {call} ở buổi lễ",
+  footerLine: `${EVENT.graduateShort} hẹn gặp {pron} ở buổi lễ`,
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
   genericName: "Bạn thân mến",
   tapHint: "Chạm để mở thiệp", // màn hình mở đầu trên điện thoại
@@ -49,10 +51,10 @@ export const CHECKS = [
 
 // Lịch trình buổi sáng. Trạng thái tự đổi theo giờ thật của ngày lễ.
 export const SCHEDULE = [
-  { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: "Mình ở trong hội trường, mọi người chưa cần tới nhé." },
-  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được nha mọi người. ", key: true },
+  { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: `${EVENT.graduateShort} dự lễ trong hội trường. Khách mời có thể đến từ 10:00.` },
+  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: `${EVENT.graduateShort} đón {pron} trong khoảng 10:00–11:00.`, key: true },
   { at: "10:30", end: "11:30", title: "Chụp ảnh cùng nhau", text: "Trong khuôn viên trường." },
-  { at: "11:30", end: "12:00", title: "Chia tay", text: "Cảm ơn {call} đã dành buổi sáng cho mình." },
+  { at: "11:30", end: "12:00", title: "Chia tay", text: `${EVENT.graduateShort} cảm ơn {pron} đã dành buổi sáng đến chung vui.` },
 ];
 
 // Hướng dẫn đường đi. `path` là đường vẽ trên sơ đồ SVG trong index.html,
@@ -86,7 +88,7 @@ export const ROUTES = [
     focus: "n-car",
     path: "M190 232 H200 V330 H398 V200 H376",
     hops: [
-      ["Bãi gửi ô tô mình sẽ cập nhật sau", "bước 1"], // CẦN ĐIỀN tên và địa chỉ bãi
+      [`${EVENT.graduateShort} sẽ cập nhật thông tin bãi gửi ô tô sau`, "bước 1"], // CẦN ĐIỀN tên và địa chỉ bãi
       ["Đi bộ hoặc gọi Grab tới cổng chính", "bước 2"],
       ["Vào cổng chính, đi tới điểm hẹn", "bước 3"],
     ],
@@ -107,19 +109,19 @@ export const MUSIC = {
 
 // Lưu ý trước khi đi. sev: error (quan trọng) | warn (nên nhớ) | info (gợi ý)
 export const NOTES = [
-  { sev: "error", title: "Đến trong khoảng 10:00–11:00", text: "Lễ chính trong hội trường bắt đầu lúc 8:00. Khách đến sau để chụp ảnh cùng mình, không cần dự lễ." },
+  { sev: "error", title: "Đến trong khoảng 10:00–11:00", text: `Lễ chính trong hội trường bắt đầu lúc 8:00. Khách mời đến chụp ảnh cùng ${EVENT.graduateShort} từ 10:00, không cần dự lễ chính.` },
   { sev: "warn", title: "Ưu tiên đi Grab", text: "Bãi xe trong trường rất đông vào ngày lễ. Đi Grab thì xuống ngay cổng chính, không phải tìm chỗ gửi." },
   { sev: "warn", title: "Nguyễn Văn Bảo là đường một chiều", text: "Đoạn gần trường chỉ đi một chiều. Đi xe máy thì gửi ở chợ Gò Vấp rồi vào cổng sau cho nhanh." },
-  { sev: "info", title: "Trang phục", text: "Thoải mái nhé anh em, mặc gì dễ chịu là được." },
-  { sev: "info", title: "Hoa không bắt buộc", text: "Có mặt là quý rồi. Không cần hoa đâu các cục dàng (mình nhà xa mang về hong có hết :< )" },
+  { sev: "info", title: "Trang phục", text: "Ưu tiên trang phục thoải mái, dễ di chuyển và thuận tiện chụp ảnh." },
+  { sev: "info", title: "Hoa không bắt buộc", text: `Có mặt là quý rồi, không cần chuẩn bị hoa. Nhà ${EVENT.graduateShort} ở xa nên việc mang hoa về hơi bất tiện.` },
   { sev: "info", title: "Nếu trời mưa", text: "Mang áo mưa mỏng. Điểm chụp ảnh trong nhà sẽ báo trên thiệp." },
 ];
 export const SEV_LABEL = { error: "quan trọng", warn: "nên nhớ", info: "gợi ý" };
 
 // Thêm vào lịch
 export const CALENDAR = {
-  title: "Chúc mừng tốt nghiệp của Hưng",
-  details: "Cảm ơn đã đến chung vui. Lễ chính 08:00, khách đến khoảng 10:00–11:00.",
+  title: `Chúc mừng tốt nghiệp của ${EVENT.graduateShort}`,
+  details: `Đến chung vui và chụp ảnh cùng ${EVENT.graduateShort}. Lễ chính 08:00, khách đến khoảng 10:00–11:00.`,
 };
 
 export { GUEST_CALLS } from "./address.js";

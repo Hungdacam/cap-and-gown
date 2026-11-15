@@ -12,13 +12,13 @@ test("slug hợp lệ và không hợp lệ", () => {
   for (const s of ["", "ab", "Thuy-Duong", "a b c", "../etc/passwd", "x".repeat(65), null, undefined, 123, "thủy-dương"]) assert.equal(isValidSlug(s), false, String(s));
 });
 
-test("xưng hô tùy chỉnh được giữ, chỉ giá trị trống hoặc sai kiểu về 'bạn'", () => {
+test("xưng hô tùy chỉnh được giữ, giá trị trống hoặc sai kiểu để rỗng", () => {
   assert.equal(safeCall("Chị"), "chị");
   assert.equal(safeCall(" cả nhóm "), "cả nhóm");
   assert.equal(safeCall("sếp"), "sếp");
   assert.equal(safeCall("  Cậu  "), "cậu");
   assert.equal(safeCall("Cả nhóm"), "cả nhóm");
-  for (const value of [undefined, null, "", " \t\n ", {}, 123]) assert.equal(safeCall(value), "bạn");
+  for (const value of [undefined, null, "", " \t\n ", {}, 123]) assert.equal(safeCall(value), "");
 });
 
 const ok = (o) => ({ slug: "thuy-duong-k7q2", status: "yes", ...o });

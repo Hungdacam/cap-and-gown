@@ -53,12 +53,12 @@ test("token được dùng lại cho các lần gọi sau", async () => {
   assert.equal(calls.filter((c) => c.url.includes("oauth2")).length, 1);
 });
 
-test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và dùng 'bạn' khi trống", async () => {
+test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và ô trống", async () => {
   const { store } = setup({ khach: [["", "Dòng trống slug"], ["t-l-1abc", "Trần Thị Mỹ Linh", "Linh", "chị", "Lớp", "Zalo", "x", ""], ["s-e-2abc", "Sếp", "", "sếp"], ["a-b-3abc", "Nguyễn A", "A", " "]] });
   const g = await store.getGuest("t-l-1abc");
   assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "" });
   assert.equal((await store.getGuest("s-e-2abc")).call, "sếp");
-  assert.equal((await store.getGuest("a-b-3abc")).call, "bạn");
+  assert.equal((await store.getGuest("a-b-3abc")).call, "");
   assert.equal(await store.getGuest("khong-co-1"), null);
 });
 

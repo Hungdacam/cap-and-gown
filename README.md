@@ -25,9 +25,21 @@ Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 - Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau` (cột A đến H)
 - Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc` (cột A đến E)
 
-`xung_ho` tùy chỉnh theo từng khách, ví dụ: bạn, anh, chị, em, thầy, cô, cả nhóm, anh em, cậu… Ô trống mặc định là "bạn".
-Màn hình mở đầu và lời mời dùng `xung_ho + ten_goi`; "cả nhóm" / "anh em" dùng riêng xưng hô. Các câu khác dùng xưng hô của khách;
-thiệp chung không có slug dùng "Bạn thân mến" và xưng hô "bạn". Cột H do site tự ghi lần đầu khách mở thiệp.
+Lời văn tự xưng **Hưng** (cấu hình `EVENT.graduateShort`). Cách gọi người nhận là `xung_ho + ten_goi`, dùng nhất quán
+ở màn hình mở đầu, đầu thiệp, lời mời và các câu cá nhân hóa. Lời chào chung là "Trân trọng kính mời".
+
+| `ten_goi` | `xung_ho` | Cách gọi trong câu |
+| --- | --- | --- |
+| Linh | chị | chị Linh |
+| Mai | cô | cô Mai |
+| Minh Anh | bạn | bạn Minh Anh |
+| cô Mai và bác Vinh | *(trống)* | cô Mai và bác Vinh |
+| Minh Anh | *(trống)* | Minh Anh |
+
+`xung_ho` có thể tùy chỉnh. Ô trống dùng nguyên tên gọi, không tự thêm "bạn"; thiếu `ten_goi` thì dùng `ho_ten`.
+Tên gọi đã có đúng danh xưng sẽ được giữ nguyên để tránh ghép trùng. "cả nhóm" / "anh em" dùng riêng xưng hô.
+Thiệp chung không có slug dùng "Bạn thân mến" và xưng hô "bạn". Nhãn thao tác dùng văn trung tính.
+Cột H do site tự ghi lần đầu khách mở thiệp.
 
 ### 2. Service account
 1. Google Cloud Console → tạo project → bật **Google Sheets API**.
@@ -49,7 +61,8 @@ Chưa có key thì khung bản đồ dùng link nhúng không cần key. Muốn 
 ## Thêm khách và tạo link
 
 ```bash
-npm run guest -- "Đặng Thùy Dương" chị      # chị là xưng hô; bỏ trống thì mặc định "bạn"
+npm run guest -- "Đặng Thùy Dương" chị      # bỏ xưng hô thì dùng nguyên tên
+npm run guest -- "cô Mai và bác Vinh"       # một thiệp mời chung hai người
 npm run guest -- --file danh-sach.csv       # CSV, mỗi dòng: ho_ten,xung_ho,nhom,kenh_gui
 BASE_URL=https://ten-mien-cua-ban.vercel.app npm run guest -- "Tên Khách" anh
 ```

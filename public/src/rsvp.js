@@ -3,7 +3,7 @@ import { $, esc, capFirst, formatDayMonth } from "./util.js";
 import { sendRsvp } from "./guest.js";
 import { renderChecks } from "./render.js";
 import { confetti } from "./confetti.js";
-import { normalizeCall } from "./address.js";
+import { pronoun } from "./address.js";
 
 const STATUSES = ["yes", "maybe", "no"];
 const WAITING = "Đang chờ xác nhận ↓";
@@ -32,8 +32,9 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
   let saved = rsvp; // { status, plusOnes, message, updatedAt } | null
   let chosen = rsvp?.status || null;
   let sending = false;
-  const call = normalizeCall(guest.call);
+  const call = pronoun(guest);
   const safeAddress = esc(capFirst(call));
+  const host = esc(EVENT.graduateShort);
 
   const showChecks = () =>
     renderChecks({ guest, present: saved?.status === "yes", note: saved?.status === "yes" ? `${guest.name} sẽ đến` : WAITING });
@@ -43,8 +44,8 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
     $("rsvpBtns").hidden = true;
     $("rsvpForm").hidden = true;
     setLog(mode === "error"
-      ? `<span class="c-cmt">› Chưa tải được thông tin lúc này. ${safeAddress} tải lại trang giúp mình nhé.</span>`
-      : '<span class="c-cmt">› Link này chưa nhận ra khách mời. Hãy mở lại đúng link mình gửi riêng, hoặc nhắn trực tiếp để xác nhận nhé.</span>');
+      ? `<span class="c-cmt">› Chưa tải được thông tin lúc này. Vui lòng tải lại trang hoặc liên hệ ${host}.</span>`
+      : `<span class="c-cmt">› Link này chưa nhận ra khách mời. Vui lòng mở đúng link ${host} gửi riêng, hoặc liên hệ ${host} để xác nhận nhé.</span>`);
     return;
   }
 
@@ -88,17 +89,17 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
       showChecks();
       const who = esc(guest.name);
       if (chosen === "yes") {
-        setLog(`<b>✓ Đã xác nhận sẽ đến</b> · ${who}<br><span class="c-cmt">› Hẹn gặp ${esc(call)} lúc ${esc(EVENT.guestArrive)} nhé!</span>`);
+        setLog(`<b>✓ Đã xác nhận sẽ đến</b> · ${who}<br><span class="c-cmt">› ${host} hẹn gặp ${esc(call)} lúc ${esc(EVENT.guestArrive)} nhé!</span>`);
         if (!wasYes) confetti();
       } else if (chosen === "maybe") {
-        setLog(`<span style="color:var(--warn)">● Chưa chắc</span> · ${who}<br><span class="c-cmt">› Không sao, chốt rồi báo mình trước ngày ${esc(formatDayMonth(EVENT.rsvpDeadline))} nha.</span>`);
+        setLog(`<span style="color:var(--warn)">● Chưa chắc</span> · ${who}<br><span class="c-cmt">› ${safeAddress} có thể báo lại cho ${host} trước ngày ${esc(formatDayMonth(EVENT.rsvpDeadline))} nhé.</span>`);
       } else {
-        setLog(`<span style="color:var(--muted)">○ Không đi được</span> · ${who}<br><span class="c-cmt">› Tiếc ghê! Cảm ơn đã báo, mình sẽ gửi ảnh sau.</span>`);
+        setLog(`<span style="color:var(--muted)">○ Không đi được</span> · ${who}<br><span class="c-cmt">› ${host} cảm ơn ${esc(call)} đã phản hồi. Hẹn gặp vào dịp khác!</span>`);
       }
       send.textContent = "Cập nhật xác nhận";
     } catch (err) {
       console.error(err);
-      setLog(`<span>› Chưa gửi được. ${safeAddress} kiểm tra mạng rồi bấm gửi lại giúp mình, hoặc nhắn trực tiếp cho mình nhé.</span>`, true);
+      setLog(`<span>› Chưa gửi được. Vui lòng kiểm tra mạng và thử lại, hoặc liên hệ trực tiếp với ${host} nhé.</span>`, true);
       send.textContent = label;
     } finally {
       sending = false;

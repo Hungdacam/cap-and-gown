@@ -1,5 +1,5 @@
 import { COPY } from "./config.js";
-export { greeting, pronoun } from "./address.js";
+export { pronoun } from "./address.js";
 
 const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 
@@ -22,7 +22,7 @@ export async function fetchGuest(slug, fetchImpl = fetch) {
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`guest ${res.status}`);
   const data = await res.json();
-  return { guest: { name: data.name, call: data.call, short: data.short || "" }, rsvp: data.rsvp || null };
+  return { guest: { name: data.name, call: data.call, short: data.short?.trim() || data.name || "" }, rsvp: data.rsvp || null };
 }
 
 export async function sendRsvp(payload, fetchImpl = fetch) {

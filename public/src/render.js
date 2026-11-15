@@ -10,6 +10,9 @@ const addressShort = () => EVENT.address.replace(/,\s*TP\.HCM$/i, "");
 
 export function renderStatic() {
   document.title = `Thiệp mời tốt nghiệp của ${EVENT.graduate}`;
+  $("messageLabel").textContent = `Lời nhắn cho ${EVENT.graduateShort} (không bắt buộc)`;
+  $("contactLabel").textContent = `Lạc đường? Liên hệ ${EVENT.graduateShort}`;
+  $("log").textContent = `Chọn một trạng thái để ${EVENT.graduateShort} sắp xếp đón tiếp nhé`;
 
   const credits = CHECKS.find((c) => c.credits);
   $("credits").textContent = credits ? credits.credits : "";
@@ -85,5 +88,5 @@ export function renderChecks({ present, note, guest }) {
   $("checks").innerHTML =
     `<h3>Điều kiện tốt nghiệp · ${ok}/${total} đạt</h3>` +
     CHECKS.map((c) => `<div class="check">${CHECK_SVG}<div>${esc(c.label)}<small>${esc(c.value)}</small></div></div>`).join("") +
-    `<div class="check${present ? "" : " pending"}">${present ? CHECK_SVG : PEND_SVG}<div>${esc(guestText("Sự có mặt của {call}", guest))}<small>${esc(note)}</small></div></div>`;
+    `<div class="check${present ? "" : " pending"}">${present ? CHECK_SVG : PEND_SVG}<div>${esc(guestText("Sự có mặt của {pron}", guest))}<small>${esc(note)}</small></div></div>`;
 }

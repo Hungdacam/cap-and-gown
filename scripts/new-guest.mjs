@@ -26,7 +26,7 @@ export function makeSlug(name, call, used = new Set()) {
 
 export function makeRow({ name, call, group = "", channel = "" }, used) {
   call = normalizeCall(call);
-  const short = isGroupCall(call) ? "" : name.trim().split(/\s+/).pop();
+  const short = isGroupCall(call) ? "" : call ? name.trim().split(/\s+/).pop() : name.trim();
   const slug = makeSlug(name, call, used);
   return { slug, link: `${BASE}/t/${slug}`, cells: [slug, name.trim(), short, call, group, channel, "", ""] };
 }
@@ -42,7 +42,7 @@ function main(argv) {
   } else if (argv[0]) {
     people = [{ name: argv[0], call: argv[1] }];
   } else {
-    console.error('Cách dùng: npm run guest -- "Họ và tên" [xưng hô, mặc định: bạn]\n          npm run guest -- --file danh-sach.csv');
+    console.error('Cách dùng: npm run guest -- "Họ và tên" [xưng hô, bỏ trống để dùng nguyên tên]\n          npm run guest -- --file danh-sach.csv');
     process.exit(1);
   }
   const rows = people.map((p) => makeRow(p, used));
