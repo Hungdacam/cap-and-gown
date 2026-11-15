@@ -25,7 +25,9 @@ Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 - Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau` (cột A đến H)
 - Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc` (cột A đến E)
 
-`xung_ho` là một trong: bạn, anh, chị, em, thầy, cô, cả nhóm, anh em (giá trị lạ tự về "bạn"). Cột H do site tự ghi lần đầu khách mở thiệp.
+`xung_ho` tùy chỉnh theo từng khách, ví dụ: bạn, anh, chị, em, thầy, cô, cả nhóm, anh em, cậu… Ô trống mặc định là "bạn".
+Màn hình mở đầu và lời mời dùng `xung_ho + ten_goi`; "cả nhóm" / "anh em" dùng riêng xưng hô. Các câu khác dùng xưng hô của khách;
+thiệp chung không có slug dùng "Bạn thân mến" và xưng hô "bạn". Cột H do site tự ghi lần đầu khách mở thiệp.
 
 ### 2. Service account
 1. Google Cloud Console → tạo project → bật **Google Sheets API**.
@@ -67,7 +69,7 @@ Mọi chữ, giờ giấc, lộ trình, lưu ý nằm trong `public/src/config.j
 
 ## Nhạc nền
 
-Đổi bài: chép file vào `public/media/` rồi sửa `MUSIC` trong `config.js`. Trình duyệt chặn tự phát nên nhạc bắt đầu từ lần bấm đầu tiên trên trang; khách tắt bằng nút góc dưới bên phải và lựa chọn đó được nhớ lại.
+Đổi bài: chép file vào `public/media/` rồi sửa `MUSIC` trong `config.js`. Vào trang là nhạc thử tự phát; nếu trình duyệt chặn thì nhạc bắt đầu từ lần chạm, bấm hoặc gõ phím đầu tiên. Màn hình mở đầu dừng lại chờ khách chạm để mở thiệp nên nhạc thường bật đúng lúc này; khách không chạm thì thiệp tự mở sau 10 giây. Khách tắt bằng nút góc dưới bên phải và lựa chọn đó được nhớ lại.
 
 ## Lịch gửi thiệp
 

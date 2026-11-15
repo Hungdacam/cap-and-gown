@@ -1,4 +1,5 @@
 import { COPY } from "./config.js";
+export { greeting, pronoun } from "./address.js";
 
 const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 
@@ -32,13 +33,4 @@ export async function sendRsvp(payload, fetchImpl = fetch) {
   });
   if (!res.ok) throw new Error(`rsvp ${res.status}`);
   return res.json();
-}
-
-/** Thầy cô thì "Kính gửi", còn lại "Thân gửi". */
-export const greeting = (g) => (g.call === "cô" || g.call === "thầy" ? "Kính gửi" : "Thân gửi");
-
-/** Cách gọi khách trong câu: "chị Linh", "cả nhóm", "bạn". */
-export function pronoun(g) {
-  if (g.call === "cả nhóm" || g.call === "anh em") return g.call;
-  return g.short ? `${g.call} ${g.short}` : g.call;
 }

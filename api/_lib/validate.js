@@ -1,17 +1,15 @@
+import { normalizeCall } from "../../public/src/address.js";
+
 export const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 export const STATUSES = ["yes", "maybe", "no"];
-// Phải trùng với GUEST_CALLS trong public/src/config.js (có test kiểm tra)
-export const CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm", "anh em"];
+export { GUEST_CALLS as CALLS } from "../../public/src/address.js";
 export const MAX_MESSAGE = 300;
 export const MAX_PLUS_ONES = 5;
 
 export const isValidSlug = (s) => typeof s === "string" && SLUG_RE.test(s);
 
-/** Xưng hô lạ trong Sheet thì rơi về "bạn", không làm hỏng thiệp. */
-export const safeCall = (c) => {
-  const v = String(c ?? "").trim().toLowerCase();
-  return CALLS.includes(v) ? v : "bạn";
-};
+/** Xưng hô dùng chung với frontend; ô trống mặc định là "bạn". */
+export const safeCall = normalizeCall;
 
 /**
  * Kiểm tra body của POST /api/rsvp.

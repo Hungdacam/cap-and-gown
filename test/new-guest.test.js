@@ -21,5 +21,7 @@ test("dòng cho Sheet có đủ 8 cột; nhóm không có tên gọi ngắn", ()
   const g = makeRow({ name: "Hội K17 thân yêu", call: "cả nhóm" }, new Set());
   assert.equal(g.cells[2], "");
   assert.match(g.slug, /^hoi-k17-than-[a-z0-9]{4}$/);
-  assert.equal(makeRow({ name: "A B", call: "sếp" }, new Set()).cells[3], "bạn");
+  assert.equal(makeRow({ name: "A B", call: "  Sếp  " }, new Set()).cells[3], "sếp");
+  assert.equal(makeRow({ name: "A B", call: " " }, new Set()).cells[3], "bạn");
+  assert.equal(makeRow({ name: "A B" }, new Set()).cells[3], "bạn");
 });

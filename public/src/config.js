@@ -33,14 +33,14 @@ export const COPY = {
   toLabel: "cựu sinh viên",
   diffAdd: "+167 tín chỉ",
   diffDel: "−0 lần bỏ cuộc",
-  footerLine: "Hẹn gặp bạn ở buổi lễ",
+  footerLine: "Hẹn gặp {call} ở buổi lễ",
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
   genericName: "Bạn thân mến",
   tapHint: "Chạm để mở thiệp", // màn hình mở đầu trên điện thoại
   clickHint: "Bấm để mở thiệp", // màn hình mở đầu trên máy tính
 };
 
-// Điều kiện tốt nghiệp. Mục cuối "Sự có mặt của bạn" tự đạt khi khách bấm "sẽ đến".
+// Điều kiện tốt nghiệp. Mục cuối về sự có mặt của khách tự đạt khi bấm "sẽ đến".
 export const CHECKS = [
   { label: "Khóa luận tốt nghiệp", value: "Đã hoàn thành" },
   { label: "Tích lũy tín chỉ", value: "167 / 167", credits: "167/167 tín chỉ" },
@@ -52,7 +52,7 @@ export const SCHEDULE = [
   { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: "Mình ở trong hội trường, mọi người chưa cần tới nhé." },
   { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: "Đến trong khoảng 10:00–11:00 là được nha mọi người. ", key: true },
   { at: "10:30", end: "11:30", title: "Chụp ảnh cùng nhau", text: "Trong khuôn viên trường." },
-  { at: "11:30", end: "12:00", title: "Chia tay", text: "Cảm ơn bạn đã dành buổi sáng cho mình." },
+  { at: "11:30", end: "12:00", title: "Chia tay", text: "Cảm ơn {call} đã dành buổi sáng cho mình." },
 ];
 
 // Hướng dẫn đường đi. `path` là đường vẽ trên sơ đồ SVG trong index.html,
@@ -119,7 +119,7 @@ export const SEV_LABEL = { error: "quan trọng", warn: "nên nhớ", info: "g�
 // Thêm vào lịch
 export const CALENDAR = {
   title: "Chúc mừng tốt nghiệp của Hưng",
-  details: "Cảm ơn bạn đã đến chung vui. Lễ chính 08:00, khách đến khoảng 10:00–11:00.",
+  details: "Cảm ơn đã đến chung vui. Lễ chính 08:00, khách đến khoảng 10:00–11:00.",
 };
 
-export const GUEST_CALLS = ["bạn", "anh", "chị", "em", "thầy", "cô", "cả nhóm", "anh em"];
+export { GUEST_CALLS } from "./address.js";
