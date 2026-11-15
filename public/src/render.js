@@ -1,5 +1,6 @@
 import { EVENT, COPY, CHECKS, SCHEDULE, NOTES, SEV_LABEL } from "./config.js";
 import { $, esc, formatDateVi } from "./util.js";
+import { guestText } from "./address.js";
 
 export const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>';
 export const PEND_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke-dasharray="3 2.2"/></svg>';
@@ -43,13 +44,13 @@ export function renderStatic() {
 
   $("meetLabel").textContent = `${EVENT.guestArrive} · ${EVENT.meetingPoint}`;
 
-  // Lịch trình
+  // Lịch trình: tạo một lần để giữ trạng thái và các hiệu ứng khi tải xong khách.
   const pipe = $("pipe");
   pipe.style.setProperty("--n", SCHEDULE.length);
   pipe.innerHTML = SCHEDULE.map((s) =>
     `<div class="stage${s.key ? " key" : ""}" data-at="${esc(s.at)}" data-end="${esc(s.end)}">` +
     `<span class="st"><i class="dotst"></i><span class="lbl">sắp tới</span></span>` +
-    `<time>${esc(s.at)}</time><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join("");
+    `<time>${esc(s.at)}</time><h3>${esc(s.title)}</h3><p>${esc(guestText(s.text))}</p></div>`).join("");
 
   // Lưu ý
   const count = (sev) => NOTES.filter((n) => n.sev === sev).length;
@@ -65,16 +66,24 @@ export function renderStatic() {
     $("contact").hidden = false;
   }
 
-  $("footLine").textContent = COPY.footerLine;
+  renderGuestCopy();
   $("footSub").textContent = COPY.footerSub;
 }
 
+/** Nội dung cá nhân hóa; không truyền khách thì dùng xưng hô mặc định. */
+export function renderGuestCopy(guest = {}) {
+  document.querySelectorAll("#pipe .stage p").forEach((el, i) => {
+    el.textContent = guestText(SCHEDULE[i].text, guest);
+  });
+  $("footLine").textContent = guestText(COPY.footerLine, guest);
+}
+
 /** Cột "Điều kiện tốt nghiệp". `present` = khách đã bấm "sẽ đến". */
-export function renderChecks({ present, note }) {
+export function renderChecks({ present, note, guest }) {
   const total = CHECKS.length + 1;
   const ok = CHECKS.length + (present ? 1 : 0);
   $("checks").innerHTML =
     `<h3>Điều kiện tốt nghiệp · ${ok}/${total} đạt</h3>` +
     CHECKS.map((c) => `<div class="check">${CHECK_SVG}<div>${esc(c.label)}<small>${esc(c.value)}</small></div></div>`).join("") +
-    `<div class="check${present ? "" : " pending"}">${present ? CHECK_SVG : PEND_SVG}<div>Sự có mặt của bạn<small>${esc(note)}</small></div></div>`;
+    `<div class="check${present ? "" : " pending"}">${present ? CHECK_SVG : PEND_SVG}<div>${esc(guestText("Sự có mặt của {call}", guest))}<small>${esc(note)}</small></div></div>`;
 }

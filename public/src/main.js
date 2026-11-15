@@ -1,6 +1,7 @@
-import { GUEST_CALLS, COPY } from "./config.js";
+import { COPY } from "./config.js";
+import { normalizeCall } from "./address.js";
 import { $ } from "./util.js";
-import { renderStatic } from "./render.js";
+import { renderStatic, renderGuestCopy } from "./render.js";
 import { startCountdown, startPipeline } from "./countdown.js";
 import { initMap, initGoogleMap, initPhoneCopy } from "./map.js";
 import { initMusic, isMusicOff } from "./music.js";
@@ -13,8 +14,7 @@ import { initSmoothScroll } from "./smooth-scroll.js";
 import { initScrollEffects } from "./scroll-effects.js";
 
 function renderGuest(g, slug) {
-  const el = $("guestName");
-  el.textContent = g.name;
+  $("guestName").textContent = g.name;
   $("slugEcho").textContent = slug || "guest";
   $("greet").textContent = `// ${greeting(g)}`;
 
@@ -25,6 +25,7 @@ function renderGuest(g, slug) {
   const b = document.createElement("b");
   b.textContent = pronoun(g);
   lede.append(before, b, after);
+  renderGuestCopy(g);
 }
 
 async function boot() {
@@ -49,7 +50,7 @@ async function boot() {
     try {
       const found = await fetchGuest(slug);
       if (found) {
-        guest = { ...found.guest, call: GUEST_CALLS.includes(found.guest.call) ? found.guest.call : "bạn" };
+        guest = { ...found.guest, call: normalizeCall(found.guest.call) };
         rsvp = found.rsvp;
         mode = "ok";
       }
@@ -60,7 +61,7 @@ async function boot() {
   }
   renderGuest(guest, mode === "ok" ? slug : "");
   initRsvp({ slug, guest, rsvp, mode });
-  if (mode === "ok") splash.setGuest(greeting(guest), pronoun(guest));
+  splash.setGuest(greeting(guest), mode === "ok" ? pronoun(guest) : guest.name);
 
   await splash.ready;
   initSmoothScroll(decor.syncScroll);

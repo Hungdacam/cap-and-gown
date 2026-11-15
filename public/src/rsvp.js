@@ -3,9 +3,10 @@ import { $, esc, capFirst, formatDayMonth } from "./util.js";
 import { sendRsvp } from "./guest.js";
 import { renderChecks } from "./render.js";
 import { confetti } from "./confetti.js";
+import { normalizeCall } from "./address.js";
 
 const STATUSES = ["yes", "maybe", "no"];
-const WAITING = "Đang chờ bạn xác nhận ↓";
+const WAITING = "Đang chờ xác nhận ↓";
 const LABEL = { yes: "Sẽ đến", maybe: "Chưa chắc", no: "Không đi được" };
 
 function formatWhen(iso) {
@@ -31,23 +32,24 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
   let saved = rsvp; // { status, plusOnes, message, updatedAt } | null
   let chosen = rsvp?.status || null;
   let sending = false;
+  const call = normalizeCall(guest.call);
+  const safeAddress = esc(capFirst(call));
 
   const showChecks = () =>
-    renderChecks({ present: saved?.status === "yes", note: saved?.status === "yes" ? `${guest.name} sẽ đến` : WAITING });
+    renderChecks({ guest, present: saved?.status === "yes", note: saved?.status === "yes" ? `${guest.name} sẽ đến` : WAITING });
   showChecks();
 
   if (mode !== "ok") {
     $("rsvpBtns").hidden = true;
     $("rsvpForm").hidden = true;
     setLog(mode === "error"
-      ? '<span class="c-cmt">› Chưa tải được thông tin lúc này. Bạn tải lại trang giúp mình nhé.</span>'
-      : '<span class="c-cmt">› Link này chưa nhận ra tên bạn. Hãy mở lại đúng link mình gửi riêng cho bạn, hoặc nhắn trực tiếp để xác nhận nhé.</span>');
+      ? `<span class="c-cmt">› Chưa tải được thông tin lúc này. ${safeAddress} tải lại trang giúp mình nhé.</span>`
+      : '<span class="c-cmt">› Link này chưa nhận ra khách mời. Hãy mở lại đúng link mình gửi riêng, hoặc nhắn trực tiếp để xác nhận nhé.</span>');
     return;
   }
 
   $("rsvpBtns").hidden = false;
-  const subj = guest.call === "bạn" ? "Mình" : capFirst(guest.call);
-  $("yes").textContent = `✓ ${subj} sẽ đến`;
+  $("yes").textContent = "✓ Sẽ đến";
 
   const form = $("rsvpForm"), plus = $("plusOnes"), msg = $("rsvpMsg"), count = $("rsvpCount"), send = $("rsvpSend");
   const updateCount = () => (count.textContent = `${msg.value.length}/300`);
@@ -68,7 +70,7 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
     updateCount();
     select(saved.status);
     const when = saved.updatedAt ? ` lúc ${formatWhen(saved.updatedAt)}` : "";
-    setLog(`<b>✓ Bạn đã trả lời: ${esc(LABEL[saved.status])}</b>${esc(when)}<br><span class="c-cmt">› Muốn đổi thì chọn lại rồi bấm "Cập nhật xác nhận".</span>`);
+    setLog(`<b>✓ ${safeAddress} đã trả lời: ${esc(LABEL[saved.status])}</b>${esc(when)}<br><span class="c-cmt">› Muốn đổi thì chọn lại rồi bấm "Cập nhật xác nhận".</span>`);
   }
 
   form.addEventListener("submit", async (e) => {
@@ -86,7 +88,7 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
       showChecks();
       const who = esc(guest.name);
       if (chosen === "yes") {
-        setLog(`<b>✓ Đã xác nhận sẽ đến</b> · ${who}<br><span class="c-cmt">› Hẹn gặp bạn lúc ${esc(EVENT.guestArrive)} nhé!</span>`);
+        setLog(`<b>✓ Đã xác nhận sẽ đến</b> · ${who}<br><span class="c-cmt">› Hẹn gặp ${esc(call)} lúc ${esc(EVENT.guestArrive)} nhé!</span>`);
         if (!wasYes) confetti();
       } else if (chosen === "maybe") {
         setLog(`<span style="color:var(--warn)">● Chưa chắc</span> · ${who}<br><span class="c-cmt">› Không sao, chốt rồi báo mình trước ngày ${esc(formatDayMonth(EVENT.rsvpDeadline))} nha.</span>`);
@@ -94,8 +96,9 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
         setLog(`<span style="color:var(--muted)">○ Không đi được</span> · ${who}<br><span class="c-cmt">› Tiếc ghê! Cảm ơn đã báo, mình sẽ gửi ảnh sau.</span>`);
       }
       send.textContent = "Cập nhật xác nhận";
-    } catch {
-      setLog('<span>› Chưa gửi được. Bạn kiểm tra mạng rồi bấm gửi lại giúp mình, hoặc nhắn trực tiếp cho mình nhé.</span>', true);
+    } catch (err) {
+      console.error(err);
+      setLog(`<span>› Chưa gửi được. ${safeAddress} kiểm tra mạng rồi bấm gửi lại giúp mình, hoặc nhắn trực tiếp cho mình nhé.</span>`, true);
       send.textContent = label;
     } finally {
       sending = false;
