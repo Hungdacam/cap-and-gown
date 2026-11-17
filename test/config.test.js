@@ -42,12 +42,33 @@ test("mỗi lộ trình trỏ tới id có thật trong sơ đồ, và id mặc 
   for (const id of ["route", "grid", "tabs", "trace", "meetLabel"]) assert.ok(html.includes(`id="${id}"`), id);
 });
 
-test("mọi id mà JS tìm đều có trong index.html", () => {
-  const src = ["main", "render", "rsvp", "wish", "map", "countdown", "music", "decor"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
+test("mọi id mà JS tìm đều có trong index.html hoặc do JS tự tạo", () => {
+  const src = ["main", "render", "rsvp", "wish", "map", "countdown", "music", "decor", "splash", "hero", "facts", "fx", "map3d", "bg-graph", "scroll-effects"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
   const wanted = new Set([...src.matchAll(/\$\("([A-Za-z0-9_-]+)"\)/g)].map((m) => m[1]));
   ["yes", "maybe", "no"].forEach((i) => wanted.add(i));
-  const missing = [...wanted].filter((id) => !html.includes(`id="${id}"`) && !["yes", "maybe", "no"].includes(id));
+  // id do JS dựng ra (ví dụ #credN trong render.js) thì phải có chuỗi id="..." trong chính mã nguồn.
+  const missing = [...wanted].filter((id) => !html.includes(`id="${id}"`) && !src.includes(`id="${id}"`));
   assert.deepEqual(missing, []);
+});
+
+test("mỗi lộ trình có dữ liệu cho sơ đồ 3D hợp lệ, bước cuối là điểm hẹn", () => {
+  const lots = new Set(["grab", "grab2", "moto", "car"]);
+  for (const r of C.ROUTES) {
+    const c = r.campus;
+    assert.ok(c && lots.has(c.lot), `${r.id}: thiếu campus.lot`);
+    assert.ok(c.pts.length >= 2 && c.pts.every((p) => p.length === 2 && p.every(Number.isFinite)), `${r.id}: pts sai`);
+    assert.equal(c.stops.length, r.hops.length, `${r.id}: số trạm phải bằng số bước`);
+    assert.ok(c.stops.every((s, i) => Number.isInteger(s) && s >= 0 && s < c.pts.length && (!i || s > c.stops[i - 1])), `${r.id}: stops phải tăng dần`);
+    assert.equal(c.stops.at(-1), c.pts.length - 1, `${r.id}: bước cuối phải là điểm cuối`);
+  }
+  const ends = new Set(C.ROUTES.map((r) => r.campus.pts.at(-1).join(",")));
+  assert.equal(ends.size, 1, "mọi lộ trình kết thúc ở cùng điểm hẹn");
+});
+
+test("thư viện ngoài đều nằm trong public/vendor (CSP chặn CDN)", () => {
+  const scripts = [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(scripts.includes("/vendor/three/three.min.js"));
+  for (const s of scripts) assert.ok(s.startsWith("/"), `script ngoài site: ${s}`);
 });
 
 test("mức độ lưu ý hợp lệ", () => {

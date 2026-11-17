@@ -1,7 +1,7 @@
 import { EVENT } from "./config.js";
 import { $, esc } from "./util.js";
 import { sendWish } from "./guest.js";
-import { confetti } from "./confetti.js";
+import { mood, planeFly } from "./fx.js";
 
 const MAX = 300;
 
@@ -36,8 +36,9 @@ export function initWish() {
       await sendWish({ message, name: $("wishName").value.trim(), website: $("wishWeb").value });
       msg.value = "";
       count.textContent = `0/${MAX}`;
-      setLog(`<b>✓ Đã gửi lời chúc</b><br><span class="c-cmt">› ${host} cảm ơn bạn rất nhiều! Muốn chúc thêm thì cứ viết tiếp.</span>`);
-      confetti();
+      const signed = $("wishName").value.trim();
+      setLog(`<b>✓ Đã gửi lời chúc${signed ? ` · ký tên ${esc(signed)}` : ""}</b><br><span class="c-cmt">› ${host} cảm ơn bạn rất nhiều! Muốn chúc thêm thì cứ viết tiếp.</span>`);
+      try { planeFly(send); mood("wish", { fromEl: send }); } catch (e) { console.error(e); }
     } catch (err) {
       console.error(err);
       setLog(err.code === "too_many"

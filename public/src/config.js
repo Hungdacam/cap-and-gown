@@ -66,14 +66,17 @@ export const SCHEDULE = [
   { at: W2.from, end: W2.to, title: "Gặp gỡ, chụp ảnh · đợt 2", text: `Chụp ảnh cùng ${EVENT.graduateShort} sau khi nhận bằng. ${EVENT.graduateShort} cảm ơn {pron} đã dành thời gian đến chung vui.`, key: true },
 ];
 
-// Hướng dẫn đường đi. `path` là đường vẽ trên sơ đồ SVG trong index.html,
+// Hướng dẫn đường đi. `path` là đường vẽ trên sơ đồ SVG trong index.html (dự phòng khi không có 3D),
 // `focus` là id của khối được làm nổi bật.
+// `campus` dùng cho sơ đồ 3D (map3d.js), toạ độ theo bản vẽ khuôn viên: bắc ở trên, đường Nguyễn Văn Bảo ở dưới.
+//   pts: các điểm gấp khúc của lộ trình; stops: chỉ số điểm ứng với từng bước; yaw: góc xoay camera (3 = nhìn từ phía Lê Quang Định).
 export const ROUTES = [
   {
     id: "grab",
     tab: "Grab · cổng chính",
     focus: "n-grab",
     path: "M324 320 H398 V200 H376",
+    campus: { lot: "grab", pts: [[168, 408], [215, 408], [215, 378], [222, 310], [230, 252], [270, 240], [322, 241]], stops: [0, 2, 6] },
     hops: [
       ["Đặt Grab tới 12 Nguyễn Văn Bảo, hoặc Cổng 4 đường Nguyễn Văn Nghi", "bước 1"],
       ["Xuống xe ngay cổng chính", "bước 2"],
@@ -85,6 +88,7 @@ export const ROUTES = [
     tab: "Grab · cổng sau",
     focus: "n-grab2",
     path: "M344 52 H318 V200 H344", // bắt đầu ở mép trái ô GRAB để không đè lên chữ
+    campus: { lot: "grab2", yaw: 3, pts: [[376, -47], [342, -47], [342, 0], [342, 132], [402, 132], [402, 238], [322, 241]], stops: [0, 2, 6] },
     hops: [
       ["Đặt Grab tới cổng sau trường, đường Lê Quang Định", "bước 1"],
       ["Xuống xe ngay cổng sau", "bước 2"],
@@ -96,10 +100,11 @@ export const ROUTES = [
     tab: "Xe máy",
     focus: "n-moto",
     path: "M105 72 V52 H318 V200 H344",
+    campus: { lot: "moto", yaw: 3, pts: [[-40, 120], [-40, -47], [342, -47], [342, 0], [342, 132], [402, 132], [402, 238], [322, 241]], stops: [0, 3, 7] },
     hops: [
       ["Đi sớm thì vào trường nha hoặc Gửi xe ở bãi đầu chợ Gò Vấp, đối diện Betma English", "bước 1"],
       ["Đi bộ theo đường Lê Quang Định tới cổng sau", "bước 2"],
-      ["Vào cổng sau, đi tới điểm hẹn", "bước 3"],
+      ["Vào cổng sau, đi tới sân trước nhà E hoặc nhà H", "bước 3"],
     ],
   },
   {
@@ -107,10 +112,11 @@ export const ROUTES = [
     tab: "Ô tô",
     focus: "n-car",
     path: "M190 232 H200 V330 H398 V200 H376",
+    campus: { lot: "car", pts: [[-70, 375], [-70, 408], [215, 408], [215, 378], [222, 310], [230, 252], [270, 240], [322, 241]], stops: [0, 3, 7] },
     hops: [
       [`${EVENT.graduateShort} sẽ cập nhật thông tin bãi gửi ô tô sau`, "bước 1"], // CẦN ĐIỀN tên và địa chỉ bãi
       ["Đi bộ hoặc gọi Grab tới cổng chính", "bước 2"],
-      ["Vào cổng chính, đi tới điểm hẹn", "bước 3"],
+      ["Vào cổng chính, qua sân xe đạp tới sân trước nhà E hoặc nhà H", "bước 3"],
     ],
   },
 ];

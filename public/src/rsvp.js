@@ -2,7 +2,7 @@ import { EVENT } from "./config.js";
 import { $, esc, capFirst, formatDayMonth } from "./util.js";
 import { sendRsvp } from "./guest.js";
 import { renderChecks } from "./render.js";
-import { confetti } from "./confetti.js";
+import { mood } from "./fx.js";
 import { pronoun } from "./address.js";
 import { findArrival } from "./arrival.js";
 
@@ -94,19 +94,19 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
     const payload = { slug, status: chosen, plusOnes: chosen === "no" ? 0 : Number(plus.value) || 0, arrival: slot ? slot.id : "", message: msg.value.trim() };
     try {
       await sendRsvp(payload);
-      const wasYes = saved?.status === "yes";
       saved = { ...payload, updatedAt: new Date().toISOString() };
       showChecks();
       const who = esc(guest.name);
       if (chosen === "yes") {
         setLog(`<b>✓ Đã xác nhận sẽ đến</b> · ${who}<br><span class="c-cmt">› ${host} hẹn gặp ${esc(call)} lúc ${esc(slot.when)} nhé!</span>`);
-        if (!wasYes) confetti();
       } else if (chosen === "maybe") {
         setLog(`<span style="color:var(--warn)">● Chưa chắc</span> · ${who}<br><span class="c-cmt">› ${safeAddress} có thể báo lại cho ${host} trước ngày ${esc(formatDayMonth(EVENT.rsvpDeadline))} nhé.</span>`);
       } else {
         setLog(`<span style="color:var(--muted)">○ Không đi được</span> · ${who}<br><span class="c-cmt">› ${host} cảm ơn ${esc(call)} đã phản hồi. Hẹn gặp vào dịp khác!</span>`);
       }
       send.textContent = "Cập nhật xác nhận";
+      // Hiệu ứng theo tâm trạng chỉ để trang trí, lỗi ở đây không được biến thành "chưa gửi được".
+      try { mood(chosen, { when: slot?.when, pron: call, fromEl: $(chosen) }); } catch (e) { console.error(e); }
     } catch (err) {
       console.error(err);
       setLog(`<span>› Chưa gửi được. Vui lòng kiểm tra mạng và thử lại, hoặc liên hệ trực tiếp với ${host} nhé.</span>`, true);
