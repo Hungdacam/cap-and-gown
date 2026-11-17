@@ -1,14 +1,13 @@
 import { COPY } from "./config.js";
+import { isValidSlug } from "./slug.js";
 export { pronoun } from "./address.js";
-
-const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 
 /** Slug khách lấy từ /t/<slug>, hoặc #<slug> để chạy thử. */
 export function getSlug(loc = location) {
-  const m = loc.pathname.match(/^\/t\/([a-z0-9-]{3,64})\/?$/);
-  if (m) return m[1];
+  const m = loc.pathname.match(/^\/t\/([^/]+)\/?$/);
+  if (m && isValidSlug(m[1])) return m[1];
   const h = (loc.hash || "").slice(1);
-  return SLUG_RE.test(h) ? h : "";
+  return isValidSlug(h) ? h : "";
 }
 
 export const GENERIC_GUEST = { name: COPY.genericName, call: "bạn", short: "" };
@@ -23,6 +22,21 @@ export async function fetchGuest(slug, fetchImpl = fetch) {
   if (!res.ok) throw new Error(`guest ${res.status}`);
   const data = await res.json();
   return { guest: { name: data.name, call: data.call, short: data.short?.trim() || data.name || "" }, rsvp: data.rsvp || null };
+}
+
+/** Lời chúc (chữ ký không bắt buộc) từ link công khai. Ném lỗi kèm mã (`err.code`) để giao diện báo đúng. */
+export async function sendWish(payload, fetchImpl = fetch) {
+  const res = await fetchImpl("/api/wish", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = new Error(`wish ${res.status}`);
+    err.code = res.status === 429 ? "too_many" : (await res.json().catch(() => ({}))).error || "server_error";
+    throw err;
+  }
+  return res.json();
 }
 
 export async function sendRsvp(payload, fetchImpl = fetch) {

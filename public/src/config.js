@@ -1,13 +1,22 @@
 // Toàn bộ nội dung thiệp nằm ở đây. Sửa file này rồi deploy lại là xong.
 // Mục nào ghi "CẦN ĐIỀN" thì đang để trống hoặc là giá trị tạm.
 
+// Hai khung giờ gặp khách. Khoảng giữa là lúc Hưng nhận bằng trong hội trường.
+const GUEST_WINDOWS = [
+  { from: "09:00", to: "11:00" },
+  { from: "12:30", to: "13:30" },
+];
+
 export const EVENT = {
   date: "2026-11-25",
   tz: "+07:00",
-  ceremonyStart: "08:00", // lễ chính trong hội trường
-  guestArrive: "10:00", // khách bắt đầu đến, đếm ngược tới mốc này
-  guestWindowEnd: "11:00", // khách nên đến trước giờ này
-  calendarEnd: "11:30", // giờ kết thúc khi thêm vào lịch
+  ceremonySession: "Phiên 3", // phiên nhận bằng của Hưng
+  ceremonyStart: "11:04",
+  ceremonyEnd: "12:10",
+  guestWindows: GUEST_WINDOWS,
+  guestWindowsText: GUEST_WINDOWS.map((w) => `${w.from}–${w.to}`).join(" hoặc "),
+  guestArrive: GUEST_WINDOWS[0].from, // đếm ngược và lịch bắt đầu từ mốc này
+  calendarEnd: GUEST_WINDOWS.at(-1).to, // giờ kết thúc khi thêm vào lịch
   rsvpDeadline: "2026-11-23", // hạn báo có đến hay không
 
   graduate: "Lê Viết Nguyên Hưng", // CẦN XÁC NHẬN họ tên đầy đủ
@@ -21,7 +30,7 @@ export const EVENT = {
   dressCode: "Thoải mái, thuận tiện chụp ảnh",
 
   phone: "0917316172", // Để trống thì ẩn khung liên hệ.
-  meetingPoint: "sẽ cập nhật", // CẦN ĐIỀN vị trí điểm hẹn trong trường
+  meetingPoint: "trước nhà E hoặc nhà H", // để rộng một chút, khách dễ tìm hơn
 };
 
 export const COPY = {
@@ -49,12 +58,12 @@ export const CHECKS = [
   { label: "Chuẩn đầu ra tiếng Anh", value: "TOEIC 450+" },
 ];
 
-// Lịch trình buổi sáng. Trạng thái tự đổi theo giờ thật của ngày lễ.
+// Lịch trình ngày lễ. Trạng thái tự đổi theo giờ thật của ngày lễ.
+const [W1, W2] = GUEST_WINDOWS;
 export const SCHEDULE = [
-  { at: "08:00", end: "09:45", title: "Lễ trao bằng", text: `${EVENT.graduateShort} dự lễ trong hội trường. Khách mời có thể đến từ 10:00.` },
-  { at: "10:00", end: "10:30", title: "Khách đến, gặp ở điểm hẹn", text: `${EVENT.graduateShort} đón {pron} trong khoảng 10:00–11:00.`, key: true },
-  { at: "10:30", end: "11:30", title: "Chụp ảnh cùng nhau", text: "Trong khuôn viên trường." },
-  { at: "11:30", end: "12:00", title: "Chia tay", text: `${EVENT.graduateShort} cảm ơn {pron} đã dành buổi sáng đến chung vui.` },
+  { at: W1.from, end: W1.to, title: "Gặp gỡ, chụp ảnh · đợt 1", text: `${EVENT.graduateShort} đón {pron} ở điểm hẹn, chụp ảnh cùng nhau trước giờ nhận bằng.`, key: true },
+  { at: EVENT.ceremonyStart, end: EVENT.ceremonyEnd, title: `Nhận bằng · ${EVENT.ceremonySession}`, text: `${EVENT.graduateShort} vào hội trường nhận bằng. Hẹn gặp lại {pron} lúc ${W2.from}.` },
+  { at: W2.from, end: W2.to, title: "Gặp gỡ, chụp ảnh · đợt 2", text: `Chụp ảnh cùng ${EVENT.graduateShort} sau khi nhận bằng. ${EVENT.graduateShort} cảm ơn {pron} đã dành thời gian đến chung vui.`, key: true },
 ];
 
 // Hướng dẫn đường đi. `path` là đường vẽ trên sơ đồ SVG trong index.html,
@@ -62,13 +71,24 @@ export const SCHEDULE = [
 export const ROUTES = [
   {
     id: "grab",
-    tab: "Grab · khuyên dùng",
+    tab: "Grab · cổng chính",
     focus: "n-grab",
     path: "M324 320 H398 V200 H376",
     hops: [
       ["Đặt Grab tới 12 Nguyễn Văn Bảo, hoặc Cổng 4 đường Nguyễn Văn Nghi", "bước 1"],
       ["Xuống xe ngay cổng chính", "bước 2"],
-      ["Đi vào trong tới điểm hẹn", "bước 3"],
+      ["Đi thẳng qua sân xe đạp tới sân trước nhà E hoặc nhà H", "bước 3"],
+    ],
+  },
+  {
+    id: "grab-sau",
+    tab: "Grab · cổng sau",
+    focus: "n-grab2",
+    path: "M344 52 H318 V200 H344", // bắt đầu ở mép trái ô GRAB để không đè lên chữ
+    hops: [
+      ["Đặt Grab tới cổng sau trường, đường Lê Quang Định", "bước 1"],
+      ["Xuống xe ngay cổng sau", "bước 2"],
+      [`Vào cổng sau, đi theo lộ trình xe máy của ${EVENT.graduateShort} tới sân trước nhà E hoặc nhà H`, "bước 3"],
     ],
   },
   {
@@ -109,8 +129,8 @@ export const MUSIC = {
 
 // Lưu ý trước khi đi. sev: error (quan trọng) | warn (nên nhớ) | info (gợi ý)
 export const NOTES = [
-  { sev: "error", title: "Đến trong khoảng 10:00–11:00", text: `Lễ chính trong hội trường bắt đầu lúc 8:00. Khách mời đến chụp ảnh cùng ${EVENT.graduateShort} từ 10:00, không cần dự lễ chính.` },
-  { sev: "warn", title: "Ưu tiên đi Grab", text: "Bãi xe trong trường rất đông vào ngày lễ. Đi Grab thì xuống ngay cổng chính, không phải tìm chỗ gửi." },
+  { sev: "error", title: `Đến trong khoảng ${EVENT.guestWindowsText}`, text: `Từ ${EVENT.ceremonyStart} đến ${EVENT.ceremonyEnd}, ${EVENT.graduateShort} nhận bằng ở ${EVENT.ceremonySession} trong hội trường nên không ra gặp được. Khách mời chọn một trong hai khung giờ trên để chụp ảnh cùng ${EVENT.graduateShort}, không cần dự lễ.` },
+  { sev: "warn", title: "Ưu tiên đi Grab", text: `Bãi xe trong trường rất đông vào ngày lễ. Đi Grab thì xuống ngay cổng chính, không phải tìm chỗ gửi, hoặc đi Grab tới cổng sau (đường Lê Quang Định) rồi đi theo lộ trình hướng dẫn xe máy của ${EVENT.graduateShort}.` },
   { sev: "warn", title: "Nguyễn Văn Bảo là đường một chiều", text: "Đoạn gần trường chỉ đi một chiều. Đi xe máy thì gửi ở chợ Gò Vấp rồi vào cổng sau cho nhanh." },
   { sev: "info", title: "Trang phục", text: "Ưu tiên trang phục thoải mái, dễ di chuyển và thuận tiện chụp ảnh." },
   { sev: "info", title: "Hoa không bắt buộc", text: `Có mặt là quý rồi, không cần chuẩn bị hoa. Nhà ${EVENT.graduateShort} ở xa nên việc mang hoa về hơi bất tiện.` },
@@ -121,7 +141,7 @@ export const SEV_LABEL = { error: "quan trọng", warn: "nên nhớ", info: "g�
 // Thêm vào lịch
 export const CALENDAR = {
   title: `Chúc mừng tốt nghiệp của ${EVENT.graduateShort}`,
-  details: `Đến chung vui và chụp ảnh cùng ${EVENT.graduateShort}. Lễ chính 08:00, khách đến khoảng 10:00–11:00.`,
+  details: `Đến chung vui và chụp ảnh cùng ${EVENT.graduateShort}. Khung giờ gặp: ${EVENT.guestWindowsText}. ${EVENT.graduateShort} nhận bằng ${EVENT.ceremonySession}, ${EVENT.ceremonyStart}–${EVENT.ceremonyEnd}.`,
 };
 
 export { GUEST_CALLS } from "./address.js";

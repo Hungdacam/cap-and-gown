@@ -102,6 +102,10 @@
         <button class="btn" id="no" type="button" aria-pressed="false">Không đi được</button>
       </div>
       <form class="rsvp-form" id="rsvpForm" hidden novalidate>
+        <div class="field" id="arrivalField">
+          <label for="arrival">Khung giờ sẽ đến</label>
+          <select id="arrival" name="arrival"></select>
+        </div>
         <div class="field" id="plusField">
           <label for="plusOnes">Số người đi cùng</label>
           <select id="plusOnes" name="plusOnes">
@@ -122,6 +126,22 @@
           <button class="btn primary" id="rsvpSend" type="submit">Gửi xác nhận</button>
         </div>
       </form>
+      <form class="rsvp-form wish-form" id="wishForm" hidden novalidate>
+        <div class="field">
+          <label for="wishMsg">Lời chúc gửi Hưng</label>
+          <textarea id="wishMsg" name="message" maxlength="300" placeholder="Chúc mừng tân kỹ sư…"></textarea>
+          <span class="count" id="wishCount">0/300</span>
+        </div>
+        <div class="field">
+          <label for="wishName">Ký tên (không bắt buộc)</label>
+          <input id="wishName" name="name" type="text" maxlength="60" autocomplete="name" placeholder="Để trống nếu không muốn ghi tên">
+        </div>
+        <input class="hp" type="text" id="wishWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="wish-note">Lời chúc chỉ Hưng đọc, không công khai. Để chống spam, Hưng ghi lại thời gian gửi, loại thiết bị và địa chỉ IP.</p>
+        <div class="row-actions">
+          <button class="btn primary" id="wishSend" type="submit">Gửi lời chúc</button>
+        </div>
+      </form>
       <div class="panel log" id="log" aria-live="polite"><span class="c-cmt">› Chọn một trạng thái để xác nhận tham dự</span></div>
       <div class="cal" id="cal" hidden>
         <span class="lbl-s">Thêm vào lịch</span>
@@ -134,7 +154,7 @@
 
   <!-- ===== PIPELINE = LỊCH TRÌNH ===== -->
   <section class="sec" aria-labelledby="pipe-h">
-    <div class="sec-head"><span class="path">.github/workflows/<b>graduation.yml</b></span><h2 id="pipe-h">Lịch trình buổi sáng</h2></div>
+    <div class="sec-head"><span class="path">.github/workflows/<b>graduation.yml</b></span><h2 id="pipe-h">Lịch trình ngày lễ</h2></div>
     <div class="panel">
       <div class="pipe" id="pipe"></div>
       <div class="bar"><i id="pipeBar"></i></div>
@@ -147,7 +167,7 @@
     <div class="tabs" id="tabs" role="tablist" aria-label="Phương tiện"></div>
     <div class="panel map">
       <div class="map-scroll">
-        <svg viewBox="0 0 640 360" role="img" aria-label="Sơ đồ minh họa: chợ Gò Vấp, đường Lê Quang Định, cổng sau, cổng chính và điểm hẹn trong trường">
+        <svg viewBox="0 0 640 360" role="img" aria-label="Sơ đồ minh họa: chợ Gò Vấp, đường Lê Quang Định, cổng sau, cổng chính, hai điểm xuống Grab và điểm hẹn trong trường">
           <rect class="m-bg" width="640" height="360"/>
           <g id="grid"></g>
           <!-- roads -->
@@ -161,12 +181,12 @@
           <!-- hall -->
           <rect class="m-hall" x="440" y="100" width="150" height="70" rx="10"/>
           <text class="m-t" x="515" y="132" text-anchor="middle" style="font-weight:700">HỘI TRƯỜNG</text>
-          <text class="m-s" x="515" y="150" text-anchor="middle">lễ chính · 08:00</text>
+          <text class="m-s" x="515" y="150" text-anchor="middle" id="hallLabel">nhận bằng · 11:04</text>
           <!-- meeting -->
           <circle class="m-pink" cx="360" cy="200" r="9"/>
           <circle cx="360" cy="200" r="16" fill="none" stroke="var(--pink)" stroke-opacity=".4"/>
           <text class="m-t" x="382" y="196">điểm hẹn</text>
-          <text class="m-s" x="382" y="212" id="meetLabel">10:00 · sẽ cập nhật</text>
+          <text class="m-s" x="382" y="212" id="meetLabel">09:00 · sẽ cập nhật</text>
           <!-- gates -->
           <rect class="m-acc" x="300" y="69" width="36" height="14" rx="3"/>
           <text class="m-s" x="344" y="80">cổng sau</text>
@@ -188,6 +208,11 @@
           <g id="n-grab">
             <rect class="m-acc" x="300" y="320" width="48" height="20" rx="4"/>
             <text x="324" y="334" text-anchor="middle" style="fill:var(--bg);font-family:var(--f-mono);font-size:10px;font-weight:700">GRAB</text>
+          </g>
+          <!-- grab drop at back gate, Lê Quang Định -->
+          <g id="n-grab2">
+            <rect class="m-acc" x="344" y="42" width="48" height="20" rx="4"/>
+            <text x="368" y="56" text-anchor="middle" style="fill:var(--bg);font-family:var(--f-mono);font-size:10px;font-weight:700">GRAB</text>
           </g>
           <path id="route" class="m-route" d=""/>
         </svg>

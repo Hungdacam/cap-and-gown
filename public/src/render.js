@@ -1,6 +1,7 @@
 import { EVENT, COPY, CHECKS, SCHEDULE, NOTES, SEV_LABEL } from "./config.js";
 import { $, esc, formatDateVi } from "./util.js";
 import { guestText } from "./address.js";
+import { ARRIVALS } from "./arrival.js";
 
 export const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>';
 export const PEND_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke-dasharray="3 2.2"/></svg>';
@@ -34,7 +35,8 @@ export function renderStatic() {
 
   const rows = [
     ["ngày", formatDateVi(EVENT.date), "n"],
-    ["giờ", `${EVENT.guestArrive} – ${EVENT.guestWindowEnd}`, "v", `# lễ chính ${EVENT.ceremonyStart}`],
+    ["giờ gặp", EVENT.guestWindows.map((w) => `${w.from}–${w.to}`).join(", "), "v"],
+    ["nhận bằng", `${EVENT.ceremonyStart}–${EVENT.ceremonyEnd}`, "v", `# ${EVENT.ceremonySession.toLowerCase()}`],
     ["trường", EVENT.schoolShort, "v"],
     ["địa chỉ", addressShort(), "v"],
     ["ngành", EVENT.major, "v"],
@@ -46,6 +48,9 @@ export function renderStatic() {
     rows.map(([k, v, cls, cmt]) => `<div><span class="k">${esc(k)}</span>: <span class="${cls}">${esc(v)}</span>${cmt ? ` <span class="c-cmt">${esc(cmt)}</span>` : ""}</div>`).join("");
 
   $("meetLabel").textContent = `${EVENT.guestArrive} · ${EVENT.meetingPoint}`;
+  $("hallLabel").textContent = `nhận bằng · ${EVENT.ceremonyStart}`;
+  $("arrival").innerHTML = '<option value="">Chọn khung giờ…</option>' +
+    ARRIVALS.map((a) => `<option value="${esc(a.id)}">${esc(a.label)}</option>`).join("");
 
   // Lịch trình: tạo một lần để giữ trạng thái và các hiệu ứng khi tải xong khách.
   const pipe = $("pipe");
@@ -53,7 +58,7 @@ export function renderStatic() {
   pipe.innerHTML = SCHEDULE.map((s) =>
     `<div class="stage${s.key ? " key" : ""}" data-at="${esc(s.at)}" data-end="${esc(s.end)}">` +
     `<span class="st"><i class="dotst"></i><span class="lbl">sắp tới</span></span>` +
-    `<time>${esc(s.at)}</time><h3>${esc(s.title)}</h3><p>${esc(guestText(s.text))}</p></div>`).join("");
+    `<time>${esc(s.at)}<small>–${esc(s.end)}</small></time><h3>${esc(s.title)}</h3><p>${esc(guestText(s.text))}</p></div>`).join("");
 
   // Lưu ý
   const count = (sev) => NOTES.filter((n) => n.sev === sev).length;

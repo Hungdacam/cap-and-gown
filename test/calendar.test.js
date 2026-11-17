@@ -6,17 +6,17 @@ import { formatDateVi, formatDayMonth } from "../public/src/util.js";
 import calendarHandler from "../api/calendar.js";
 import { fakeRes } from "./helpers.js";
 
-test("giờ lịch đúng: 10:00–11:30 giờ Việt Nam là 03:00–04:30 UTC", () => {
+test("giờ lịch đúng: 09:00–13:30 giờ Việt Nam là 02:00–06:30 UTC", () => {
   const { start, end } = calendarRange();
-  assert.equal(start.toISOString(), "2026-11-25T03:00:00.000Z");
-  assert.equal(end.toISOString(), "2026-11-25T04:30:00.000Z");
+  assert.equal(start.toISOString(), "2026-11-25T02:00:00.000Z");
+  assert.equal(end.toISOString(), "2026-11-25T06:30:00.000Z");
 });
 
 test("link Google Calendar có đủ tham số", () => {
   const u = new URL(googleCalendarUrl());
   assert.equal(u.origin + u.pathname, "https://calendar.google.com/calendar/render");
   assert.equal(u.searchParams.get("action"), "TEMPLATE");
-  assert.equal(u.searchParams.get("dates"), "20261125T030000Z/20261125T043000Z");
+  assert.equal(u.searchParams.get("dates"), "20261125T020000Z/20261125T063000Z");
   assert.equal(u.searchParams.get("ctz"), "Asia/Ho_Chi_Minh");
   assert.match(u.searchParams.get("location"), /12 Nguyễn Văn Bảo/);
 });
@@ -24,8 +24,8 @@ test("link Google Calendar có đủ tham số", () => {
 test("file .ics đúng cấu trúc RFC 5545", () => {
   const ics = buildIcs(new Date("2026-11-05T00:00:00Z"));
   assert.ok(ics.startsWith("BEGIN:VCALENDAR\r\n") && ics.endsWith("END:VCALENDAR\r\n"));
-  assert.match(ics, /DTSTART:20261125T030000Z\r\n/);
-  assert.match(ics, /DTEND:20261125T043000Z\r\n/);
+  assert.match(ics, /DTSTART:20261125T020000Z\r\n/);
+  assert.match(ics, /DTEND:20261125T063000Z\r\n/);
   assert.match(ics, /DTSTAMP:20261105T000000Z\r\n/);
   assert.equal((ics.match(/BEGIN:VALARM/g) || []).length, 2);
   assert.equal(ics.includes("\n") && !/[^\r]\n/.test(ics), true, "mọi xuống dòng là CRLF");

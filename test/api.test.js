@@ -14,7 +14,7 @@ beforeEach(() => {
   store = {
     getGuest: async (s) => db.guests[s] || null,
     getRsvp: async (s) => db.rsvps[s] || null,
-    upsertRsvp: async (r) => { db.rsvps[r.slug] = { status: r.status, plusOnes: r.plusOnes, message: r.message, updatedAt: r.updatedAt }; },
+    upsertRsvp: async (r) => { db.rsvps[r.slug] = { status: r.status, plusOnes: r.plusOnes, arrival: r.arrival, message: r.message, updatedAt: r.updatedAt }; },
     markOpened: async (slug, row, at) => { if (db.failOpen) throw new Error("boom"); db.opened.push([slug, row]); db.guests[slug].openedAt = at; },
   };
   __setStoreForTests(store);
@@ -49,20 +49,35 @@ test("GET /api/guest: slug sai, lạ, hoặc sai phương thức", async () => {
 });
 
 test("POST /api/rsvp rồi GET trả lại đúng lựa chọn đã lưu", async () => {
-  const res = await post({ slug: "thuy-duong-k7q2", status: "yes", plusOnes: 2, message: "Hẹn gặp" });
+  const res = await post({ slug: "thuy-duong-k7q2", status: "yes", plusOnes: 2, arrival: "dot2", message: "Hẹn gặp" });
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body, { ok: true });
   const g = await get("thuy-duong-k7q2");
   assert.equal(g.body.rsvp.status, "yes");
   assert.equal(g.body.rsvp.plusOnes, 2);
+  assert.equal(g.body.rsvp.arrival, "dot2");
   assert.equal(g.body.rsvp.message, "Hẹn gặp");
   assert.ok(!Number.isNaN(Date.parse(g.body.rsvp.updatedAt)));
 });
 
+test("GET khách và POST RSVP chấp nhận slug cM-bV, không đổi hoa thường", async () => {
+  const slug = "cM-bV";
+  db.guests[slug] = { ...db.guests["thuy-duong-k7q2"], slug, row: 3 };
+  assert.equal((await get(slug)).statusCode, 200);
+  assert.equal((await post({ slug, status: "yes", arrival: "dot1" })).statusCode, 200);
+  assert.equal(db.rsvps[slug].status, "yes");
+  assert.equal((await get(slug)).body.rsvp.status, "yes");
+  assert.equal((await get("cm-bv")).statusCode, 404);
+  assert.equal(db.rsvps["cm-bv"], undefined);
+});
+
 test("POST /api/rsvp: dữ liệu sai bị từ chối và không ghi gì", async () => {
   assert.equal((await post({ slug: "thuy-duong-k7q2", status: "maybe?" })).statusCode, 400);
-  assert.equal((await post({ slug: "thuy-duong-k7q2", status: "yes", plusOnes: 9 })).statusCode, 400);
-  const unknown = await post({ slug: "chua-co-1", status: "yes" });
+  assert.equal((await post({ slug: "thuy-duong-k7q2", status: "yes", plusOnes: 9, arrival: "dot1" })).statusCode, 400);
+  const noSlot = await post({ slug: "thuy-duong-k7q2", status: "yes" });
+  assert.equal(noSlot.statusCode, 400);
+  assert.equal(noSlot.body.error, "missing_arrival");
+  const unknown = await post({ slug: "chua-co-1", status: "yes", arrival: "dot1" });
   assert.equal(unknown.statusCode, 400);
   assert.equal(unknown.body.error, "unknown_guest");
   assert.deepEqual(db.rsvps, {});

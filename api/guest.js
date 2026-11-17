@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       short: guest.short,
       call: guest.call,
       rsvp: found
-        ? { status: found.status, plusOnes: found.plusOnes, message: found.message, updatedAt: found.updatedAt }
+        ? { status: found.status, plusOnes: found.plusOnes, arrival: found.arrival || "", message: found.message, updatedAt: found.updatedAt }
         : null,
     });
   } catch (e) {
