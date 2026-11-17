@@ -23,6 +23,7 @@ export function initDecor() {
 
   const sections = [
     ["Lời mời", document.querySelector(".term")],
+    ["Thông tin", $("facts-h").closest("section")],
     ["Thiệp mời", $("pr-h").closest("section")],
     ["Lịch trình", $("pipe-h").closest("section")],
     ["Đường đi", $("map-h").closest("section")],
@@ -88,6 +89,15 @@ export function initDecor() {
     }
     onScroll();
   };
+
+  // Viền sáng chạy theo con trỏ trên các khung (CSS .panel::after đọc --mx, --my).
+  addEventListener("pointermove", (e) => {
+    const p = e.target.closest?.(".panel");
+    if (!p) return;
+    const r = p.getBoundingClientRect();
+    p.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    p.style.setProperty("--my", `${e.clientY - r.top}px`);
+  }, { passive: true });
 
   addEventListener("scroll", onScroll, { passive: true });
   addEventListener("resize", buildMini);

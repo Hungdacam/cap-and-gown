@@ -13,6 +13,9 @@ import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
 import { startSplash } from "./splash.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
 import { initScrollEffects } from "./scroll-effects.js";
+import { initFacts } from "./facts.js";
+import { playHeroIntro, initCardTilt } from "./hero.js";
+import { initBgGraph } from "./bg-graph.js";
 
 function renderGuest(g, slug, name) {
   $("guestName").textContent = name;
@@ -33,7 +36,8 @@ async function boot() {
   renderStatic();
   startCountdown();
   startPipeline();
-  initMap();
+  initFacts();
+  const map = initMap();
   initGoogleMap();
   initPhoneCopy();
   initMusic();
@@ -67,9 +71,16 @@ async function boot() {
   if (mode === "generic") initWish();
   splash.setGuest(COPY.invitationGreeting, name);
 
+  // Thiệp lộ ra thì terminal gõ lệnh, tên khách giải mã, thẻ tốt nghiệp đung đưa.
+  splash.opening.then(playHeroIntro);
+
   await splash.ready;
   initSmoothScroll(decor.syncScroll);
-  initScrollEffects(splash.opening);
+  initScrollEffects(splash.opening, { map });
+  // Trang trí: lỗi ở đây không được chặn bước mở thiệp phía sau.
+  for (const decorate of [initCardTilt, initBgGraph]) {
+    try { decorate(); } catch (err) { console.error(err); }
+  }
   await splash.tapped;
   await splash.open();
 }
