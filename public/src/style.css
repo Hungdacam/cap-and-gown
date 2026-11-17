@@ -124,6 +124,7 @@ pre.out{margin:0;padding:12px;border-radius:6px;background:var(--bg);border:1px 
 .stage h3{font-size:.95rem;font-weight:600}
 .stage p{font-size:.82rem;color:var(--muted)}
 .stage.key time{color:var(--accent)}
+.stage time small{font-size:.8rem;font-weight:500;color:var(--muted)}
 .bar{height:3px;background:var(--line);border-radius:0 0 10px 10px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--pink));transition:width .6s}
 
@@ -188,6 +189,7 @@ footer b{color:var(--ok);font-weight:500}
   .stage{display:grid;grid-template-columns:76px 1fr;gap:2px 12px}
   .stage .st{grid-column:1/-1}
   .stage time{grid-row:2/4}
+  .stage time small{display:block}
 }
 @media (prefers-reduced-motion:reduce){.guest,.caret,.m-route,.stage[data-s="running"] .dotst{animation:none}}
 
@@ -200,6 +202,10 @@ footer b{color:var(--ok);font-weight:500}
 .rsvp-form .count{align-self:flex-end;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
 .rsvp-form .row-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .btn:disabled{opacity:.6;cursor:progress}
+/* ô bẫy bot của form lời chúc: người dùng không thấy */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.rsvp-form input[type="text"]{font:inherit;font-size:.95rem;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);min-width:0;width:100%}
+.wish-note{font-size:.76rem;color:var(--muted);line-height:1.5}
 .cal{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .cal .lbl-s{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
 .cal-hint{flex-basis:100%;font-size:.78rem;color:var(--muted)}

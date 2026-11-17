@@ -1,8 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pronoun, fetchGuest, GENERIC_GUEST } from "../public/src/guest.js";
+import { getSlug, pronoun, fetchGuest, GENERIC_GUEST } from "../public/src/guest.js";
 import { guestText } from "../public/src/address.js";
 import { COPY } from "../public/src/config.js";
+
+test("slug từ link và hash giữ nguyên chữ hoa như trong Sheet", () => {
+  assert.equal(getSlug({ pathname: "/t/cM-bV", hash: "" }), "cM-bV");
+  assert.equal(getSlug({ pathname: "/t/cM-bV/", hash: "" }), "cM-bV");
+  assert.equal(getSlug({ pathname: "/", hash: "#cM-bV" }), "cM-bV");
+  assert.equal(getSlug({ pathname: "/t/my-linh-c3d4", hash: "" }), "my-linh-c3d4");
+  for (const pathname of ["/", "/t/ab", "/t/has space", "/t/a_b", "/t/abc/def", `/t/${"A".repeat(65)}`]) {
+    assert.equal(getSlug({ pathname, hash: "" }), "", pathname);
+  }
+});
 
 test("lời chào trên splash ghép đúng tên gọi", () => {
   assert.equal(pronoun({ call: "chị", short: "Linh" }), "chị Linh");

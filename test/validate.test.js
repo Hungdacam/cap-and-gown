@@ -8,8 +8,8 @@ test("danh sách xưng hô ở client và server khớp nhau", () => {
 });
 
 test("slug hợp lệ và không hợp lệ", () => {
-  for (const s of ["thuy-duong-k7q2", "abc", "a-b-c-1"]) assert.equal(isValidSlug(s), true, s);
-  for (const s of ["", "ab", "Thuy-Duong", "a b c", "../etc/passwd", "x".repeat(65), null, undefined, 123, "thủy-dương"]) assert.equal(isValidSlug(s), false, String(s));
+  for (const s of ["thuy-duong-k7q2", "abc", "a-b-c-1", "cM-bV", "Thuy-Duong"]) assert.equal(isValidSlug(s), true, s);
+  for (const s of ["", "ab", "a_b", "a b c", "../etc/passwd", "x".repeat(65), null, undefined, 123, "thủy-dương"]) assert.equal(isValidSlug(s), false, String(s));
 });
 
 test("xưng hô tùy chỉnh được giữ, giá trị trống hoặc sai kiểu để rỗng", () => {
@@ -21,11 +21,21 @@ test("xưng hô tùy chỉnh được giữ, giá trị trống hoặc sai kiể
   for (const value of [undefined, null, "", " \t\n ", {}, 123]) assert.equal(safeCall(value), "");
 });
 
-const ok = (o) => ({ slug: "thuy-duong-k7q2", status: "yes", ...o });
+const ok = (o) => ({ slug: "thuy-duong-k7q2", status: "yes", arrival: "dot1", ...o });
 
 test("rsvp hợp lệ, mặc định plusOnes 0 và message rỗng", () => {
   const r = parseRsvpBody(ok());
-  assert.deepEqual(r, { ok: true, value: { slug: "thuy-duong-k7q2", status: "yes", plusOnes: 0, message: "" } });
+  assert.deepEqual(r, { ok: true, value: { slug: "thuy-duong-k7q2", status: "yes", plusOnes: 0, arrival: "dot1", message: "" } });
+});
+
+test("rsvp: khung giờ bắt buộc khi sẽ đến, tùy chọn khi chưa chắc, bỏ khi không đi", () => {
+  for (const a of ["dot1", "dot2", "ca-hai"]) assert.equal(parseRsvpBody(ok({ arrival: a })).value.arrival, a);
+  assert.equal(parseRsvpBody(ok({ arrival: undefined })).error, "missing_arrival");
+  assert.equal(parseRsvpBody(ok({ arrival: "" })).error, "missing_arrival");
+  for (const a of ["dot3", "Đợt 1", 1, {}]) assert.equal(parseRsvpBody(ok({ arrival: a })).error, "bad_arrival", String(a));
+  assert.equal(parseRsvpBody(ok({ status: "maybe", arrival: undefined })).value.arrival, "");
+  assert.equal(parseRsvpBody(ok({ status: "maybe", arrival: "dot2" })).value.arrival, "dot2");
+  assert.equal(parseRsvpBody(ok({ status: "no", arrival: "dot2" })).value.arrival, "");
 });
 
 test("rsvp: 'no' luôn ép plusOnes về 0", () => {

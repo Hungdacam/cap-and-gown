@@ -8,6 +8,7 @@ import { initMusic, isMusicOff } from "./music.js";
 import { initDecor } from "./decor.js";
 import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
+import { initWish } from "./wish.js";
 import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
 import { startSplash } from "./splash.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
@@ -62,6 +63,8 @@ async function boot() {
   const name = mode === "ok" ? capFirst(pronoun(guest)) : guest.name;
   renderGuest(guest, mode === "ok" ? slug : "", name);
   initRsvp({ slug, guest, rsvp, mode });
+  // Thiệp chung (link công khai): thay phần xác nhận bằng form lời chúc (chữ ký không bắt buộc).
+  if (mode === "generic") initWish();
   splash.setGuest(COPY.invitationGreeting, name);
 
   await splash.ready;

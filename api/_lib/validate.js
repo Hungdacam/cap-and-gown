@@ -1,12 +1,12 @@
 import { normalizeCall } from "../../public/src/address.js";
+import { isValidSlug } from "../../public/src/slug.js";
+import { isArrival } from "../../public/src/arrival.js";
+export { SLUG_RE, isValidSlug } from "../../public/src/slug.js";
 
-export const SLUG_RE = /^[a-z0-9-]{3,64}$/;
 export const STATUSES = ["yes", "maybe", "no"];
 export { GUEST_CALLS as CALLS } from "../../public/src/address.js";
 export const MAX_MESSAGE = 300;
 export const MAX_PLUS_ONES = 5;
-
-export const isValidSlug = (s) => typeof s === "string" && SLUG_RE.test(s);
 
 /** Xưng hô dùng chung với frontend; giữ ô trống để dùng nguyên tên gọi. */
 export const safeCall = normalizeCall;
@@ -26,11 +26,40 @@ export function parseRsvpBody(body) {
   if (!Number.isInteger(plusOnes) || plusOnes < 0 || plusOnes > MAX_PLUS_ONES) return { ok: false, error: "bad_plus_ones" };
   if (status === "no") plusOnes = 0;
 
+  // Khung giờ sẽ đến: bắt buộc khi "Sẽ đến", không bắt buộc khi "Chưa chắc", bỏ qua khi "Không đi được".
+  let arrival = body.arrival ?? "";
+  if (arrival !== "" && !isArrival(arrival)) return { ok: false, error: "bad_arrival" };
+  if (status === "yes" && !arrival) return { ok: false, error: "missing_arrival" };
+  if (status === "no") arrival = "";
+
   let message = body.message ?? "";
   if (typeof message !== "string") return { ok: false, error: "bad_message" };
   // bỏ ký tự điều khiển (giữ xuống dòng), rồi cắt khoảng trắng hai đầu
   message = message.replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "").trim();
   if ([...message].length > MAX_MESSAGE) return { ok: false, error: "message_too_long" };
 
-  return { ok: true, value: { slug, status, plusOnes, message } };
+  return { ok: true, value: { slug, status, plusOnes, arrival, message } };
+}
+
+export const MIN_WISH = 2;
+export const MAX_WISH_NAME = 60;
+
+/**
+ * Kiểm tra body của POST /api/wish (lời chúc riêng tư từ link công khai).
+ * `name` là chữ ký, không bắt buộc. `website` là ô bẫy bot: người thật không thấy nên luôn để trống.
+ * Trả về { ok: true, value } | { ok: true, spam: true } | { ok: false, error }.
+ */
+export function parseWishBody(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return { ok: false, error: "bad_body" };
+  if (typeof body.website === "string" && body.website.trim()) return { ok: true, spam: true };
+  let message = body.message ?? "";
+  if (typeof message !== "string") return { ok: false, error: "bad_message" };
+  message = message.replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "").trim();
+  if ([...message].length < MIN_WISH) return { ok: false, error: "empty_wish" };
+  if ([...message].length > MAX_MESSAGE) return { ok: false, error: "message_too_long" };
+  let name = body.name ?? "";
+  if (typeof name !== "string") return { ok: false, error: "bad_name" };
+  name = name.replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
+  if ([...name].length > MAX_WISH_NAME) return { ok: false, error: "name_too_long" };
+  return { ok: true, value: { message, name } };
 }

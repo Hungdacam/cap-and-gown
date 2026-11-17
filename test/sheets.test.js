@@ -19,7 +19,7 @@ function setup({ khach = [], xacnhan = [], clock } = {}) {
     const range = decodeURIComponent(m[1]);
     if ((init.method || "GET") === "GET") {
       if (range === "Khach!A2:H") return json({ values: state.khach });
-      if (range === "XacNhan!A2:E") return json({ values: state.xacnhan });
+      if (range === "XacNhan!A2:F") return json({ values: state.xacnhan });
     }
     return json({});
   };
@@ -62,6 +62,12 @@ test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và ô trống", a
   assert.equal(await store.getGuest("khong-co-1"), null);
 });
 
+test("slug có chữ hoa trong Sheet được tra đúng, không trùng với slug chữ thường", async () => {
+  const { store } = setup({ khach: [["cM-bV", "Cô Mai và bác Vinh", "cô Mai và bác Vinh", ""], ["cm-bv", "Khách khác", "Khách khác", ""]] });
+  assert.equal((await store.getGuest("cM-bV")).name, "Cô Mai và bác Vinh");
+  assert.equal((await store.getGuest("cm-bv")).name, "Khách khác");
+});
+
 test("cache danh sách khách 60 giây, slug mới chỉ đọc lại khi cache cũ hơn 10 giây", async () => {
   const { store, calls, state } = setup({ khach: [["a-b-c1", "A", "A", "bạn"]] });
   const reads = () => sheetCalls(calls).filter((c) => c.url.includes("Khach")).length;
@@ -84,24 +90,39 @@ test("cache danh sách khách 60 giây, slug mới chỉ đọc lại khi cache 
 });
 
 test("getRsvp: nhận nhãn tiếng Việt, lấy dòng cuối nếu trùng, null nếu chưa có", async () => {
-  const { store } = setup({ xacnhan: [["a-b-c1", "Chưa chắc", "0", "", "2026-11-05T01:00:00.000Z"], ["x-y-z1", "yes", "1", "ok", "t"], ["a-b-c1", "Sẽ đến", "2", "Hẹn gặp", "2026-11-06T01:00:00.000Z"]] });
-  assert.deepEqual(await store.getRsvp("a-b-c1"), { row: 4, status: "yes", plusOnes: 2, message: "Hẹn gặp", updatedAt: "2026-11-06T01:00:00.000Z" });
+  const { store } = setup({ xacnhan: [["a-b-c1", "Chưa chắc", "0", "", "2026-11-05T01:00:00.000Z"], ["x-y-z1", "yes", "1", "ok", "t"], ["a-b-c1", "Sẽ đến", "2", "Hẹn gặp", "2026-11-06T01:00:00.000Z", "Đợt 2 · 12:30–13:30"]] });
+  assert.deepEqual(await store.getRsvp("a-b-c1"), { row: 4, status: "yes", plusOnes: 2, message: "Hẹn gặp", updatedAt: "2026-11-06T01:00:00.000Z", arrival: "dot2" });
   assert.equal((await store.getRsvp("x-y-z1")).status, "yes");
+  assert.equal((await store.getRsvp("x-y-z1")).arrival, "", "dòng cũ chưa có cột F");
   assert.equal(await store.getRsvp("khong-co-1"), null);
+});
+
+test("cột giờ đến (F): nhận mã, nhãn, nhãn đã đổi giờ; ô lạ thì để trống", async () => {
+  const rows = [["a-1-x", "Sẽ đến", "0", "", "t", "ca-hai"], ["a-2-x", "Sẽ đến", "0", "", "t", "đợt 1 (08:30–10:30)"], ["a-3-x", "Sẽ đến", "0", "", "t", "Cả hai đợt"], ["a-4-x", "Sẽ đến", "0", "", "t", "buổi chiều"]];
+  const { store } = setup({ xacnhan: rows });
+  assert.deepEqual(await Promise.all(["a-1-x", "a-2-x", "a-3-x", "a-4-x"].map(async (s) => (await store.getRsvp(s)).arrival)), ["ca-hai", "dot1", "ca-hai", ""]);
 });
 
 test("upsertRsvp: dòng mới thì append, đã có thì ghi đè đúng dòng, luôn RAW", async () => {
   const a = setup();
-  await a.store.upsertRsvp({ slug: "a-b-c1", status: "yes", plusOnes: 1, message: "=HYPERLINK(1)", updatedAt: "T" });
+  await a.store.upsertRsvp({ slug: "a-b-c1", status: "yes", plusOnes: 1, arrival: "dot1", message: "=HYPERLINK(1)", updatedAt: "T" });
   const post = sheetCalls(a.calls).find((c) => c.method === "POST");
-  assert.match(decodeURIComponent(post.url), /values\/XacNhan!A:E:append\?valueInputOption=RAW&insertDataOption=INSERT_ROWS/);
-  assert.deepEqual(JSON.parse(post.body), { values: [["a-b-c1", STATUS_LABEL.yes, 1, "=HYPERLINK(1)", "T"]] });
+  assert.match(decodeURIComponent(post.url), /values\/XacNhan!A:F:append\?valueInputOption=RAW&insertDataOption=INSERT_ROWS/);
+  assert.deepEqual(JSON.parse(post.body), { values: [["a-b-c1", STATUS_LABEL.yes, 1, "=HYPERLINK(1)", "T", "Đợt 1 · 09:00–11:00"]] });
 
-  const b = setup({ xacnhan: [["x-y-z1", "Sẽ đến", "0", "", "t"], ["a-b-c1", "Chưa chắc", "0", "", "t"]] });
-  await b.store.upsertRsvp({ slug: "a-b-c1", status: "no", plusOnes: 0, message: "", updatedAt: "T2" });
+  const b = setup({ xacnhan: [["x-y-z1", "Sẽ đến", "0", "", "t"], ["a-b-c1", "Chưa chắc", "0", "", "t", "Đợt 2 · 12:30–13:30"]] });
+  await b.store.upsertRsvp({ slug: "a-b-c1", status: "no", plusOnes: 0, arrival: "", message: "", updatedAt: "T2" });
   const put = sheetCalls(b.calls).find((c) => c.method === "PUT");
-  assert.match(decodeURIComponent(put.url), /values\/XacNhan!A3:E3\?valueInputOption=RAW/);
-  assert.deepEqual(JSON.parse(put.body), { values: [["a-b-c1", "Không đi được", 0, "", "T2"]] });
+  assert.match(decodeURIComponent(put.url), /values\/XacNhan!A3:F3\?valueInputOption=RAW/);
+  assert.deepEqual(JSON.parse(put.body), { values: [["a-b-c1", "Không đi được", 0, "", "T2", ""]] }, "không đi thì xoá giờ đến cũ");
+});
+
+test("addWish append vào tab LoiChuc A:E, luôn RAW để lời chúc hay chữ ký bắt đầu bằng = không thành công thức", async () => {
+  const { store, calls } = setup();
+  await store.addWish({ message: "=chúc mừng", name: "=Minh", createdAt: "2026-11-25T03:00:00.000Z", device: "iPhone · Zalo", ip: "1.2.3.4" });
+  const post = sheetCalls(calls).find((c) => c.method === "POST");
+  assert.match(decodeURIComponent(post.url), /values\/LoiChuc!A:E:append\?valueInputOption=RAW&insertDataOption=INSERT_ROWS/);
+  assert.deepEqual(JSON.parse(post.body), { values: [["2026-11-25T03:00:00.000Z", "=chúc mừng", "=Minh", "iPhone · Zalo", "1.2.3.4"]] });
 });
 
 test("markOpened ghi cột H đúng dòng và cập nhật cache", async () => {

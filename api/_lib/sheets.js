@@ -1,9 +1,11 @@
 // Lưu trữ bằng Google Sheets qua REST API, không dùng thư viện ngoài.
 // Hai tab:
 //   Khach    : slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau
-//   XacNhan  : slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc
+//   XacNhan  : slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den
+//   LoiChuc  : thoi_gian | loi_chuc | ky_ten | thiet_bi | ip   (lời chúc riêng tư từ link công khai)
 import { createSign } from "node:crypto";
 import { safeCall } from "./validate.js";
+import { findArrival, toArrival } from "../../public/src/arrival.js";
 
 const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -102,7 +104,7 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
     },
 
     async getRsvp(slug) {
-      const rows = await read("XacNhan!A2:E");
+      const rows = await read("XacNhan!A2:F");
       let hit = null;
       rows.forEach((r, i) => {
         if (String(r[0] ?? "").trim() === slug) hit = { r, row: i + 2 }; // nếu trùng dòng thì lấy dòng cuối
@@ -116,14 +118,19 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
         plusOnes: Number.parseInt(hit.r[2], 10) || 0,
         message: String(hit.r[3] ?? ""),
         updatedAt: String(hit.r[4] ?? ""),
+        arrival: toArrival(hit.r[5]),
       };
     },
 
-    async upsertRsvp({ slug, status, plusOnes, message, updatedAt }) {
-      const values = [[slug, STATUS_LABEL[status], plusOnes, message, updatedAt]];
+    async upsertRsvp({ slug, status, plusOnes, message, updatedAt, arrival = "" }) {
+      const values = [[slug, STATUS_LABEL[status], plusOnes, message, updatedAt, findArrival(arrival)?.label ?? ""]];
       const existing = await this.getRsvp(slug);
-      if (existing) await update(`XacNhan!A${existing.row}:E${existing.row}`, values);
-      else await append("XacNhan!A:E", values);
+      if (existing) await update(`XacNhan!A${existing.row}:F${existing.row}`, values);
+      else await append("XacNhan!A:F", values);
+    },
+
+    async addWish({ message, name = "", createdAt, device = "", ip = "" }) {
+      await append("LoiChuc!A:E", [[createdAt, message, name, device, ip]]);
     },
 
     async markOpened(slug, row, at) {

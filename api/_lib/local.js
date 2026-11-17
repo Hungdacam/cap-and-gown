@@ -27,9 +27,14 @@ export function createLocalStore() {
       const s = await loadStore();
       return s.rsvps?.[slug] ? { row: 0, ...s.rsvps[slug] } : null;
     },
-    async upsertRsvp({ slug, status, plusOnes, message, updatedAt }) {
+    async upsertRsvp({ slug, status, plusOnes, message, updatedAt, arrival = "" }) {
       const s = await loadStore();
-      (s.rsvps ||= {})[slug] = { status, plusOnes, message, updatedAt };
+      (s.rsvps ||= {})[slug] = { status, plusOnes, arrival, message, updatedAt };
+      await saveStore(s);
+    },
+    async addWish({ message, name = "", createdAt, device = "", ip = "" }) {
+      const s = await loadStore();
+      (s.wishes ||= []).push({ createdAt, message, name, device, ip });
       await saveStore(s);
     },
     async markOpened(slug, _row, at) {

@@ -23,7 +23,12 @@ và ghi RSVP vào `data/dev-store.json`. Link thử: `/t/my-linh-c3d4`. Mở `/`
 Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 
 - Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau` (cột A đến H)
-- Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc` (cột A đến E)
+- Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den` (cột A đến F).
+  `gio_den` là khung giờ khách chọn: `Đợt 1 · 09:00–11:00`, `Đợt 2 · 12:30–13:30` hoặc `Cả hai đợt`
+  (bắt buộc khi "Sẽ đến", để trống khi "Không đi được"). Sheet cũ chỉ cần thêm tiêu đề `gio_den` ở ô F1.
+- Tab `LoiChuc`: `thoi_gian | loi_chuc | ky_ten | thiet_bi | ip` (cột A đến E). Lời chúc gửi từ link công khai
+  (không có slug). Chữ ký không bắt buộc. Form báo rõ cho khách là có ghi thời gian, loại thiết bị và IP để
+  chống spam. Mỗi IP gửi tối đa 5 lời chúc trong 10 phút.
 
 Lời văn tự xưng **Hưng** (cấu hình `EVENT.graduateShort`). Cách gọi người nhận là `xung_ho + ten_goi`, dùng nhất quán
 ở màn hình mở đầu, đầu thiệp, lời mời và các câu cá nhân hóa. Lời chào chung là "Trân trọng kính mời".
@@ -70,6 +75,8 @@ BASE_URL=https://ten-mien-cua-ban.vercel.app npm run guest -- "Tên Khách" anh
 Lệnh in ra các dòng (cách nhau bằng tab) để dán vào tab `Khach` từ ô A2, rồi danh sách link `tên → link` để gửi từng người.
 
 Slug là hai từ cuối của tên (bỏ dấu) cộng 4 ký tự ngẫu nhiên, khó đoán nên không cần đăng nhập.
+Nếu tự điền slug trong Sheet, dùng 3–64 ký tự gồm chữ cái không dấu (`a-z`, `A-Z`), chữ số và dấu `-`.
+Slug phân biệt hoa/thường: ô A ghi `cM-bV` thì link là `/t/cM-bV`; giữ nguyên giá trị này khi gửi link và xác nhận RSVP.
 
 ## Sửa nội dung
 
@@ -101,7 +108,7 @@ design/thiep.html  bản thiết kế đã chốt
 
 ## Ghi chú kỹ thuật
 
-- API: `GET /api/guest?slug=` → `{name, short, call, rsvp|null}` hoặc 404. `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, message ≤ 300}`, bắt buộc `Content-Type: application/json`.
+- API: `GET /api/guest?slug=` → `{name, short, call, rsvp|null}` hoặc 404. `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, arrival: dot1|dot2|ca-hai (bắt buộc khi yes), message ≤ 300}`, bắt buộc `Content-Type: application/json`. `POST /api/wish` `{message: 2–300 ký tự, name?: ≤ 60 ký tự}` (có ô bẫy bot `website`; server tự ghi thiết bị từ User-Agent và IP), cũng bắt buộc JSON.
 - Danh sách khách cache 60 giây; gặp slug lạ thì đọc lại Sheet nếu cache cũ hơn 10 giây, nên thêm khách xong dùng link được gần như ngay.
 - Mọi ghi vào Sheet dùng `valueInputOption=RAW` nên lời nhắn bắt đầu bằng `=` không bị chạy thành công thức.
 - Header bảo mật và CSP nằm trong `vercel.json`. CSP chưa kiểm trên deploy thật: mở DevTools trên bản preview, nếu có lỗi chặn thì nới đúng chỗ đó.

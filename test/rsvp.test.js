@@ -32,11 +32,12 @@ const state = { slug: "my-linh-c3d4", guest, rsvp: null, mode: "ok" };
 test("khách đã xác nhận vẫn được gọi đúng xưng hô khi mở lại và cập nhật", async (t) => {
   const { el, paragraphs } = setupDocument(t);
   renderGuestCopy(guest);
-  initRsvp({ ...state, rsvp: { status: "yes", plusOnes: 1, message: "Hẹn gặp" } });
+  initRsvp({ ...state, rsvp: { status: "yes", plusOnes: 1, arrival: "dot2", message: "Hẹn gặp" } });
   assert.equal(el("footLine").textContent, "Hưng hẹn gặp chị Linh ở buổi lễ");
-  assert.equal(paragraphs.at(-1).textContent, "Hưng cảm ơn chị Linh đã dành buổi sáng đến chung vui.");
+  assert.equal(paragraphs.at(-1).textContent, "Chụp ảnh cùng Hưng sau khi nhận bằng. Hưng cảm ơn chị Linh đã dành thời gian đến chung vui.");
   assert.match(el("checks").innerHTML, /Sự có mặt của chị Linh/);
-  assert.match(el("log").innerHTML, /Chị Linh đã trả lời: Sẽ đến/);
+  assert.match(el("log").innerHTML, /Chị Linh đã trả lời: Sẽ đến · Đợt 2 · 12:30–13:30/);
+  assert.equal(el("arrival").value, "dot2");
   assert.equal(el("yes").textContent, "✓ Sẽ đến");
   let payload;
   t.mock.method(globalThis, "fetch", async (_url, options) => {
@@ -46,7 +47,25 @@ test("khách đã xác nhận vẫn được gọi đúng xưng hô khi mở l�
   await el("rsvpForm").events.submit({ preventDefault() {} });
   assert.equal(payload.slug, state.slug);
   assert.equal(payload.plusOnes, 1);
-  assert.match(el("log").innerHTML, /Hưng hẹn gặp chị Linh lúc 10:00/);
+  assert.equal(payload.arrival, "dot2");
+  assert.match(el("log").innerHTML, /Hưng hẹn gặp chị Linh lúc 12:30–13:30 nhé/);
+});
+
+test("khách đã xác nhận trước khi có cột giờ đến: phải chọn khung giờ mới gửi lại được", async (t) => {
+  const { el } = setupDocument(t);
+  initRsvp({ ...state, rsvp: { status: "yes", plusOnes: 0, message: "" } });
+  assert.equal(el("arrival").value, "");
+  let sent = false;
+  t.mock.method(globalThis, "fetch", async () => { sent = true; return { ok: true, json: async () => ({ ok: true }) }; });
+  await el("rsvpForm").events.submit({ preventDefault() {} });
+  assert.equal(sent, false);
+  assert.match(el("log").innerHTML, /Chị Linh chọn giúp Hưng khung giờ sẽ đến/);
+  el("arrival").value = "ca-hai";
+  await el("rsvpForm").events.submit({ preventDefault() {} });
+  assert.equal(sent, true);
+  assert.match(el("log").innerHTML, /lúc 09:00–11:00 và 12:30–13:30 nhé/);
+  el("no").events.click();
+  assert.equal(el("arrivalField").hidden, true);
 });
 
 test("xưng hô trống dùng tên; thiệp chung dùng bạn và không có form xác nhận", (t) => {
@@ -58,6 +77,7 @@ test("xưng hô trống dùng tên; thiệp chung dùng bạn và không có for
   assert.equal(el("footLine").textContent, "Hưng hẹn gặp bạn ở buổi lễ");
   assert.equal(el("rsvpBtns").hidden, true);
   assert.equal(el("rsvpForm").hidden, true);
+  assert.match(el("checks").innerHTML, /Gửi Hưng vài lời chúc ↓/, "thiệp chung không còn chờ xác nhận");
 });
 
 test("xưng hô tùy chỉnh được escape trong checklist và thông báo RSVP", async (t) => {
@@ -69,6 +89,7 @@ test("xưng hô tùy chỉnh được escape trong checklist và thông báo RSV
   assert.ok(!el("checks").innerHTML.includes("<img"));
   t.mock.method(globalThis, "fetch", async () => { throw new Error("offline"); });
   t.mock.method(console, "error", () => {});
+  el("arrival").value = "dot1";
   await el("rsvpForm").events.submit({ preventDefault() {} });
   assert.match(el("log").innerHTML, /liên hệ trực tiếp với Hưng/);
   assert.ok(!el("log").innerHTML.includes("<img"));
@@ -80,6 +101,7 @@ test("phản hồi RSVP cho cô Mai và bác Vinh luôn xưng Hưng", async (t) 
   const recipients = { name: "Cô Mai và bác Vinh", short: "cô Mai và bác Vinh", call: "" };
   initRsvp({ ...state, guest: recipients, rsvp: { status: "yes" } });
   t.mock.method(globalThis, "fetch", async () => ({ ok: true, json: async () => ({ ok: true }) }));
+  el("arrival").value = "ca-hai";
   for (const status of ["yes", "maybe", "no"]) {
     el(status).events.click();
     await el("rsvpForm").events.submit({ preventDefault() {} });
