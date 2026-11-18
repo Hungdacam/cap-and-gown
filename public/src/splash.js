@@ -21,7 +21,7 @@ function createScene() {
   if (!T) return null;
   let renderer;
   try { renderer = new T.WebGLRenderer({ canvas: $("spGL"), antialias: true, alpha: true }); } catch { return null; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, innerWidth < 760 ? 1.5 : 1.75)); // điện thoại: đỡ nặng GPU
   const scene = new T.Scene(), cam = new T.PerspectiveCamera(45, 1, 0.1, 200);
   cam.position.set(0, 0, 14);
   scene.add(new T.AmbientLight(0xffffff, 0.85));
@@ -130,7 +130,10 @@ function createScene() {
     place($("spInfo"), infoTop);
     place($("spHint"), infoTop + $("spInfo").offsetHeight + 22);
     const nameEl = $("spName");
-    nameEl.style.fontSize = `${(s.fs * (tw / visW) * w) / s.w}px`;
+    let fontPx = (s.fs * (tw / visW) * w) / s.w;
+    nameEl.style.fontSize = `${fontPx}px`;
+    // Lưới an toàn: font chưa tải kịp lúc đo, hay tên rất dài, thì thu chữ cho vừa 92% bề ngang (không bao giờ bị cắt chữ).
+    if (nameEl.scrollWidth > w * 0.92) { fontPx *= (w * 0.92) / nameEl.scrollWidth; nameEl.style.fontSize = `${fontPx}px`; }
     nameEl.style.top = `${proj(0) - nameEl.offsetHeight / 2}px`;
   }
 
@@ -215,7 +218,6 @@ export function startSplash({ gate = false } = {}) {
   const windows = EVENT.guestWindows.map((w) => `<b class="d">${esc(w.from)}–${esc(w.to)}</b>`).join(" | ");
   $("spInfo").innerHTML = `đến chung vui ngày tốt nghiệp của <b>${esc(EVENT.graduateShort)}</b><br><b class="d">${esc(EVENT.date.split("-").reverse().join("."))}</b> · IUH · ${windows}`;
   gsap.set(ui, { autoAlpha: 0 });
-  gsap.set("#spName", { xPercent: -50 });
 
   let scene = null;
   try { scene = createScene(); } catch (err) { console.error(err); }
@@ -272,7 +274,8 @@ export function startSplash({ gate = false } = {}) {
       formTl.to(scene.S, { m: 1, duration: 2.6, ease: "power2.inOut" }, 0)
         .to(scene.S, { capIn: 1, duration: 1.2, ease: "bounce.out" }, 1.5)
         .to(scene.S, { dim: 1, duration: 0.9, ease: "power2.out" }, 2.2)
-        .fromTo("#spName", { autoAlpha: 0, filter: "blur(12px)", scale: 1.05 }, { autoAlpha: 1, filter: "blur(0px)", scale: 1, duration: 0.9, ease: "power2.out" }, 2.2);
+        // Không dùng filter: blur trên chữ tô bằng background-clip:text, Safari vẽ sai (mất một phần chữ).
+        .fromTo("#spName", { autoAlpha: 0, scale: 1.06, y: 6 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.9, ease: "power2.out" }, 2.2);
     } else {
       formTl.fromTo("#spName", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0);
     }

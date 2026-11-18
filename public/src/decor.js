@@ -24,44 +24,56 @@ export function initDecor() {
   const sections = [
     ["Lời mời", document.querySelector(".term")],
     ["Thông tin", $("facts-h").closest("section")],
-    ["Thiệp mời", $("pr-h").closest("section")],
     ["Lịch trình", $("pipe-h").closest("section")],
+    ["Thiệp mời", $("pr-h").closest("section")],
     ["Đường đi", $("map-h").closest("section")],
     ["Lưu ý", $("lint-h").closest("section")],
   ];
   const list = $("gList"), fill = $("gFill"), gbarFill = $("gbarFill"), mini = $("mini");
+  // ScrollSmoother dịch nội dung bằng transform nên scrollIntoView không cuộn được.
+  const goTo = (el) => {
+    const smoother = window.ScrollSmoother?.get();
+    if (smoother) smoother.scrollTo(el, true, "top 24px");
+    else el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+  };
+  // Đang chọn khung giờ thì cuộn lên xem lại lịch trình.
+  $("seeSchedule").addEventListener("click", () => goTo($("pipe-h").closest("section")));
+
   const items = sections.map(([label, el]) => {
     const li = document.createElement("li");
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = label;
-    b.addEventListener("click", () => {
-      // ScrollSmoother dịch nội dung bằng transform nên scrollIntoView không cuộn được.
-      const smoother = window.ScrollSmoother?.get();
-      if (smoother) smoother.scrollTo(el, true, "top 24px");
-      else el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
-    });
+    b.addEventListener("click", () => goTo(el));
     li.append(b);
     list.append(li);
     return li;
   });
 
-  let ratio = 0, slider = null;
+  let ratio = 0, slider = null, tops = [], lastCur = -1;
+  const wide = matchMedia("(min-width:1180px)"); // nhánh git và bản đồ thu nhỏ chỉ hiện trên màn hình rộng
+
+  // Hàm cuộn chạy mỗi khung hình (ScrollSmoother gọi qua onUpdate): không đọc vị trí phần tử ở đây, vì đọc sau khi ghi
+  // buộc trình duyệt tính lại bố cục giữa chừng và làm giật. Vị trí các mục đo một lần, đo lại khi đổi kích thước hay refresh.
+  const docTop = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+  const measureTops = () => { tops = sections.map(([, el]) => docTop(el)); lastCur = -1; };
 
   const onScroll = () => {
     const doc = document.documentElement;
     const y = scrollY, max = Math.max(1, doc.scrollHeight - innerHeight);
+    // Màn hình hẹp chỉ còn vạch tiến độ: dùng transform để không tính lại bố cục mỗi lần cuộn.
+    gbarFill.style.transform = `scaleY(${(y / max).toFixed(4)})`;
+    if (!wide.matches) return;
+    if (slider) slider.style.transform = `translate3d(0,${(y * ratio).toFixed(1)}px,0)`;
+    const probe = y + innerHeight * 0.45;
     let cur = 0;
-    sections.forEach(([, el], i) => { if (el.getBoundingClientRect().top < innerHeight * 0.45) cur = i; });
+    tops.forEach((t, i) => { if (t < probe) cur = i; });
+    if (cur === lastCur) return;
+    lastCur = cur;
     items.forEach((li, i) => { li.classList.toggle("past", i <= cur); li.classList.toggle("now", i === cur); });
     const center = (li) => li.offsetTop + li.offsetHeight / 2;
     fill.style.top = center(items[0]) + "px";
     fill.style.height = center(items[cur]) - center(items[0]) + "px";
-    gbarFill.style.height = (y / max) * 100 + "%";
-    if (slider) {
-      slider.style.top = y * ratio + "px";
-      slider.style.height = innerHeight * ratio + "px";
-    }
   };
 
   const buildMini = () => {
@@ -85,10 +97,15 @@ export function initDecor() {
       document.querySelectorAll(".wrap .panel").forEach((el) => block(el));
       document.querySelectorAll(".wrap h2").forEach((el) => block(el, "t"));
       slider = document.createElement("i");
+      slider.style.top = "0";
+      slider.style.height = innerHeight * ratio + "px";
       mini.append(slider);
     }
+    measureTops();
     onScroll();
   };
+  // Ghim lịch trình chèn thêm khoảng đệm: đo lại vị trí các mục sau mỗi lần ScrollTrigger tính lại.
+  window.ScrollTrigger?.addEventListener("refresh", () => { measureTops(); onScroll(); });
 
   // Viền sáng chạy theo con trỏ trên các khung (CSS .panel::after đọc --mx, --my).
   addEventListener("pointermove", (e) => {

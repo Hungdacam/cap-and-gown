@@ -56,6 +56,12 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
   const form = $("rsvpForm"), plus = $("plusOnes"), arrival = $("arrival"), msg = $("rsvpMsg"), count = $("rsvpCount"), send = $("rsvpSend");
   const updateCount = () => (count.textContent = `${msg.value.length}/300`);
   msg.addEventListener("input", updateCount);
+  // Khung giờ khách chọn được viền sáng trên thước giờ của lịch trình (khối "đợt 1", "đợt 2").
+  const markPicked = () => {
+    const id = chosen === "no" ? "" : arrival.value;
+    document.querySelectorAll(".r-blk.meet").forEach((b, i) => b.classList?.toggle("picked", id === "ca-hai" || id === `dot${i + 1}`));
+  };
+  arrival.addEventListener("change", markPicked);
 
   const select = (status) => {
     chosen = status;
@@ -64,6 +70,7 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
     $("plusField").hidden = status === "no";
     $("arrivalField").hidden = status === "no";
     send.textContent = saved ? "Cập nhật xác nhận" : "Gửi xác nhận";
+    markPicked();
   };
   STATUSES.forEach((s) => $(s).addEventListener("click", () => select(s)));
 

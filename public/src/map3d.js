@@ -23,8 +23,10 @@ export function initMap3d({ onHop = () => {} } = {}) {
   const wrap = $("map3d"), cv = $("campus");
   let renderer;
   try { renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch { return null; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
-  let raf = 0, visible = false; // khai báo trước paint(): paint gọi kick()
+  // Điện thoại: hạ độ phân giải và vẽ ~30 hình/giây khi không có gì đang chạy, để cuộn trang qua bản đồ vẫn mượt.
+  const phone = matchMedia("(hover: none), (max-width: 760px)").matches;
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, phone ? 1.25 : 1.75));
+  let raf = 0, visible = false, lastDraw = 0; // khai báo trước paint(): paint gọi kick()
   const scene = new T.Scene(), cam = new T.PerspectiveCamera(38, 1, 0.1, 300);
   scene.add(new T.AmbientLight(0xffffff, 0.72));
   const dl = new T.DirectionalLight(0xffffff, 0.8); dl.position.set(-8, 16, 10); scene.add(dl);
@@ -226,8 +228,11 @@ export function initMap3d({ onHop = () => {} } = {}) {
   const over = new T.Vector3(), want = new T.Vector3(), wantLook = new T.Vector3();
   let first = true;
   const t0 = performance.now();
-  function frame() {
+  function frame(now) {
     raf = 0;
+    const busy = drag !== null || (S.u > 0 && S.u < 1) || S.chase > 0.001 || S.draw < 1;
+    if (phone && !busy && now - lastDraw < 32) { if (visible) raf = requestAnimationFrame(frame); return; }
+    lastDraw = now;
     const t = (performance.now() - t0) / 1000, e = ez(S.intro), asp = cam.aspect;
     // camera tổng quan: hạ từ trên cao xuống góc nghiêng theo cuộn
     const dist = asp > 1.6 ? 19 : asp > 1.15 ? 22 : 29;
@@ -254,9 +259,9 @@ export function initMap3d({ onHop = () => {} } = {}) {
     head.visible = !!curve && S.draw > 0.05; head.position.set(p.x, 0.32 + Math.sin(t * 6) * 0.05, p.z); head.rotation.y = t * 3;
     trail.forEach((d, i) => { const v = u - (i + 1) * 0.012; d.visible = head.visible && moving && v > 0; if (d.visible) { const q = curve.getPointAt(v); d.position.set(q.x, 0.3, q.z); d.scale.setScalar(1 - i * 0.1); } });
     hopNodes.forEach((n, i) => { n.rotation.y = t * 2; n.position.y = 0.32 + Math.sin(t * 3 + i) * 0.04; });
-    const now = performance.now();
-    hits = hits.filter((h) => now - h.t < 1200);
-    ripples.forEach((m, i) => { const h = hits[i]; m.visible = !!h; if (h) { const k = (now - h.t) / 1200; m.position.set(h.p.x, 0.1, h.p.z); m.scale.setScalar(1 + k * 6); m.material.opacity = 1 - k; } });
+    const nowMs = performance.now();
+    hits = hits.filter((h) => nowMs - h.t < 1200);
+    ripples.forEach((m, i) => { const h = hits[i]; m.visible = !!h; if (h) { const k = (nowMs - h.t) / 1200; m.position.set(h.p.x, 0.1, h.p.z); m.scale.setScalar(1 + k * 6); m.material.opacity = 1 - k; } });
     beamM.opacity = 0.22 + Math.sin(t * 2.2) * 0.06;
     beacons.forEach((b, bi) => {
       b.gem.rotation.y = t * 1.5 * b.sign; b.gem.position.y = 0.55 + Math.sin(t * 2.2 + bi) * 0.07;

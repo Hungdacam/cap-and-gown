@@ -63,8 +63,9 @@ export function renderStatic() {
     EVENT.guestWindows.map((w, i) => `<span class="r-blk meet" data-a="${esc(w.from)}" data-b="${esc(w.to)}" style="left:${pct(w.from)};width:${width(w.from, w.to)}">đợt ${i + 1}</span>`).join("") +
     `<span class="r-blk cer" data-a="${esc(EVENT.ceremonyStart)}" data-b="${esc(EVENT.ceremonyEnd)}" style="left:${pct(EVENT.ceremonyStart)};width:${width(EVENT.ceremonyStart, EVENT.ceremonyEnd)}">nhận bằng</span>` +
     '<i class="r-now" id="rNow" hidden></i>';
-  const ticks = ["08:30", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
-  $("rTicks").innerHTML = ticks.map((t, i) => `<span style="left:${pct(t)}">${i === 0 || i === ticks.length - 1 ? t : `${t.slice(0, 2)}h`}</span>`).join("");
+  // Không ghi nhãn ở đầu thước (08:30): nằm quá sát nhãn 9h nên đè nhau trên điện thoại. Bong bóng đầu đọc đã ghi giờ.
+  const ticks = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+  $("rTicks").innerHTML = ticks.map((t) => `<span style="left:${pct(t)}">${Number(t.slice(0, 2))}h</span>`).join("");
   $("rLegendCer").textContent = `${EVENT.graduateShort} nhận bằng · ${EVENT.ceremonySession}`;
 
   // Lịch trình: tạo một lần để giữ trạng thái và các hiệu ứng khi tải xong khách.

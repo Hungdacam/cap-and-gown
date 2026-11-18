@@ -248,7 +248,9 @@ html.splash-on{overflow:hidden}
 .sp-greet,.sp-info,.sp-hint{position:absolute;left:16px;right:16px;text-align:center;visibility:hidden}
 .sp-greet{top:28%;font:500 .8rem var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
 /* Tên khách rõ nét, màu chuyển như các hạt; không có WebGL thì đứng ở vị trí mặc định này. */
-.sp-name{position:absolute;top:38%;left:50%;white-space:nowrap;padding:.04em .06em;visibility:hidden;font:700 clamp(2.4rem,11vw,4.5rem)/1 var(--f-display);color:transparent;background:linear-gradient(90deg,var(--accent),var(--merge) 50%,var(--pink));-webkit-background-clip:text;background-clip:text}
+.sp-name{position:absolute;top:38%;left:0;right:0;margin-inline:auto;width:-webkit-fit-content;width:fit-content;white-space:nowrap;padding:.04em .08em;visibility:hidden;font:700 clamp(2.4rem,11vw,4.5rem)/1.05 var(--f-display);color:var(--accent)}
+/* Safari tô màu chuyển bằng -webkit-background-clip:text; khung chữ ôm sát tên nên không có phần chữ nằm ngoài vùng tô. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){.sp-name{color:transparent;background:linear-gradient(90deg,var(--accent),var(--merge) 50%,var(--pink));-webkit-background-clip:text;background-clip:text}}
 .sp-info{top:60%;font-size:.95rem;line-height:1.7;color:var(--muted)}
 .sp-info b{color:var(--text);font-weight:600}
 .sp-info b.d{font-family:var(--f-mono);color:var(--accent)}
@@ -323,7 +325,7 @@ html.splash-on{overflow:hidden}
 .mini b.t{background:var(--muted);box-shadow:none;opacity:.6}
 .mini i{position:absolute;left:-5px;right:-5px;display:block;border:1px solid var(--accent);border-radius:3px;background:var(--glow)}
 .gbar{position:fixed;left:0;top:0;bottom:0;width:3px;background:var(--line);z-index:30}
-.gbar i{display:block;width:100%;height:0;background:linear-gradient(var(--accent),var(--merge))}
+.gbar i{display:block;width:100%;height:100%;transform:scaleY(0);transform-origin:0 0;will-change:transform;background:linear-gradient(var(--accent),var(--merge))}
 @media (min-width:1180px){
   .g-rail,.mini{display:block}
   .gbar{display:none}
@@ -338,12 +340,14 @@ html.splash-on{overflow:hidden}
 
 /* viền sáng theo con trỏ và vạch quét khi một khung hiện ra */
 .panel{position:relative}
+@media (hover:hover) and (pointer:fine){
 .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1px;opacity:0;transition:opacity .3s;
   background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),var(--accent),transparent 65%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-@media (hover:hover){.panel:hover::after{opacity:1}}
-.panel::before{content:"";position:absolute;left:0;right:0;top:var(--scan,0%);height:2px;z-index:3;pointer-events:none;opacity:var(--scanO,0);
+.panel:hover::after{opacity:1}
+}
+.panel::before{content:"";position:absolute;left:0;right:0;top:0;transform:translate3d(0,var(--scanY,0px),0);height:2px;z-index:3;pointer-events:none;opacity:var(--scanO,0);
   background:linear-gradient(90deg,transparent,var(--accent),transparent);box-shadow:0 0 14px var(--accent)}
 
 /* thẻ tốt nghiệp: tia quét qua ảnh trước khi đóng dấu */
@@ -404,17 +408,17 @@ html.splash-on{overflow:hidden}
 .r-tip{margin-left:auto;color:var(--accent)}
 .r-box{position:relative;padding-top:30px}
 .r-track{position:relative;height:36px;border-radius:6px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
-.r-blk{position:absolute;top:3px;bottom:3px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .66rem var(--f-mono);white-space:nowrap;overflow:hidden;color:var(--bg);transition:filter .25s,transform .25s}
+.r-blk{position:absolute;top:3px;bottom:3px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .62rem/1 var(--f-body);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;color:var(--bg);transition:transform .25s,box-shadow .25s}
+.r-blk.picked{box-shadow:0 0 0 2px var(--ok),0 0 12px color-mix(in srgb,var(--ok) 55%,transparent)}
 .r-blk.meet{background:var(--accent)}
 .r-blk.cer{background:repeating-linear-gradient(135deg,var(--pink) 0 6px,color-mix(in srgb,var(--pink) 72%,var(--bg)) 6px 12px)}
-.r-blk.hot{transform:scaleY(1.18);filter:drop-shadow(0 0 8px var(--glow)) brightness(1.12)}
+.r-blk.hot{transform:scaleY(1.18)}
 .r-now{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--amber);box-shadow:0 0 10px var(--amber)}
 .r-head{position:absolute;top:0;bottom:0;left:0;width:0;pointer-events:none}
 .r-head::before{content:"";position:absolute;top:26px;bottom:-4px;left:-1px;width:2px;background:var(--text)}
 .r-bub{position:absolute;top:0;left:0;transform:translateX(-50%);white-space:nowrap;font:700 .7rem var(--f-mono);padding:2px 7px;border-radius:4px;background:var(--text);color:var(--bg);font-variant-numeric:tabular-nums}
 .r-ticks{position:relative;height:18px;font:.68rem var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
 .r-ticks span{position:absolute;top:0;transform:translateX(-50%)}
-.r-ticks span:first-child{transform:none}
 .r-ticks span:last-child{transform:translateX(-100%)}
 .stage{transition:background .3s}
 .stage.hot{background:var(--surface-2)}
@@ -474,3 +478,12 @@ footer{align-items:center}
   .odo i{transition:none}
 }
 .map:not(.has-3d) .lg-3d,.map.has-3d .lg-2d{display:none}
+
+/* ===== Điện thoại: ghim lịch trình bằng position:sticky (scroll-effects.js bật .sticky khi cuộn gốc) =====
+   Trình duyệt tự giữ khung đứng yên nên không trễ nhịp so với cuộn gốc như pin bằng JS (rung trên iOS/Chrome).
+   Dùng svh: không đổi khi thanh địa chỉ co giãn, khung không nhảy. vh là dự phòng cho trình duyệt cũ. */
+.pipe-stage.sticky{height:calc(var(--ph,520px) + 110vh);height:calc(var(--ph,520px) + 110svh)}
+.pipe-stage.sticky #pipePanel{position:sticky;top:max(12px,calc((100vh - var(--ph,520px)) / 2));top:max(12px,calc((100svh - var(--ph,520px)) / 2))}
+.r-head{will-change:transform}
+.lbl-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.linkish{font:500 .76rem var(--f-mono);color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}

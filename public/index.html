@@ -97,6 +97,25 @@
     </div>
   </section>
 
+  <!-- ===== PIPELINE = LỊCH TRÌNH ===== -->
+  <section class="sec" aria-labelledby="pipe-h">
+    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 9b07c3e</span>.github/workflows/<b>graduation.yml</b></span><h2 id="pipe-h">Lịch trình ngày lễ</h2></div>
+    <div class="pipe-stage" id="pipeStage">
+    <div class="panel" id="pipePanel">
+      <div class="ruler">
+        <div class="r-legend"><span><i class="sw meet"></i>khung giờ gặp khách</span><span><i class="sw cer"></i><span id="rLegendCer"></span></span><span class="r-tip">↕ cuộn để tua qua ngày lễ</span></div>
+        <div class="r-box">
+          <div class="r-head" id="rHead" aria-hidden="true"><span class="r-bub" id="rBub">08:30</span></div>
+          <div class="r-track" id="rTrack"></div>
+        </div>
+        <div class="r-ticks" id="rTicks" aria-hidden="true"></div>
+      </div>
+      <div class="pipe" id="pipe"></div>
+      <div class="bar"><i id="pipeBar"></i></div>
+    </div>
+    </div>
+  </section>
+
   <!-- ===== PR CARD = THIỆP CHÍNH ===== -->
   <section class="sec" aria-labelledby="pr-h">
     <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 4e1d2a7</span>github.com/hung/life › <b>pull/2026</b></span></div>
@@ -126,7 +145,7 @@
       </div>
       <form class="rsvp-form" id="rsvpForm" hidden novalidate>
         <div class="field" id="arrivalField">
-          <label for="arrival">Khung giờ sẽ đến</label>
+          <div class="lbl-row"><label for="arrival">Khung giờ sẽ đến</label><button class="linkish" id="seeSchedule" type="button">xem lịch trình ↑</button></div>
           <select id="arrival" name="arrival"></select>
         </div>
         <div class="field" id="plusField">
@@ -172,23 +191,6 @@
         <a class="btn" id="calIcs" href="/api/calendar">Lịch iPhone (.ics)</a>
         <small class="cal-hint" id="calHint" hidden>Trên iPhone, hãy mở trang này bằng Safari rồi bấm lại để thêm vào Lịch.</small>
       </div>
-    </div>
-  </section>
-
-  <!-- ===== PIPELINE = LỊCH TRÌNH ===== -->
-  <section class="sec" aria-labelledby="pipe-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 9b07c3e</span>.github/workflows/<b>graduation.yml</b></span><h2 id="pipe-h">Lịch trình ngày lễ</h2></div>
-    <div class="panel" id="pipePanel">
-      <div class="ruler">
-        <div class="r-legend"><span><i class="sw meet"></i>khung giờ gặp khách</span><span><i class="sw cer"></i><span id="rLegendCer"></span></span><span class="r-tip">↕ cuộn để tua qua ngày lễ</span></div>
-        <div class="r-box">
-          <div class="r-head" id="rHead" aria-hidden="true"><span class="r-bub" id="rBub">08:30</span></div>
-          <div class="r-track" id="rTrack"></div>
-        </div>
-        <div class="r-ticks" id="rTicks" aria-hidden="true"></div>
-      </div>
-      <div class="pipe" id="pipe"></div>
-      <div class="bar"><i id="pipeBar"></i></div>
     </div>
   </section>
 

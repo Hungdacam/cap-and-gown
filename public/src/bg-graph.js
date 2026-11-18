@@ -5,6 +5,8 @@ import { $, canAnimate } from "./util.js";
 export function initBgGraph() {
   const T = window.THREE;
   if (!canAnimate() || !T) return;
+  // Điện thoại: các khung đã che gần hết bề ngang nên nền gần như không thấy, bỏ hẳn để dành GPU cho cuộn mượt.
+  if (matchMedia("(hover: none), (max-width: 760px)").matches) return;
   const cv = $("bggraph");
   let renderer;
   try { renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch { return; }

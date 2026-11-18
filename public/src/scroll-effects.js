@@ -15,23 +15,40 @@ const revealer = (when) => (trigger, targets, from, stagger = 0) => {
 const pad = (n) => String(n).padStart(2, "0");
 const hm = (m) => `${pad(Math.floor(m / 60))}:${pad(Math.round(m) % 60)}`;
 
-/** Đầu đọc trên thước giờ: chặng và khối giờ tương ứng sáng lên. p từ 0 (08:30) tới 1 (14:00). */
-function scrubRuler(p) {
-  const m = RULER_FROM + p * (RULER_TO - RULER_FROM);
-  let tag = "";
-  $("rHead").style.left = `${p * 100}%`;
-  document.querySelectorAll(".r-blk").forEach((b) => b.classList.toggle("hot", m >= minutes(b.dataset.a) && m < minutes(b.dataset.b)));
-  document.querySelectorAll(".stage").forEach((s) => {
-    const on = m >= minutes(s.dataset.at) && m < minutes(s.dataset.end);
-    s.classList.toggle("hot", on);
-    if (on) tag = s.classList.contains("cer") ? " · nhận bằng" : " · gặp khách";
-  });
-  $("rBub").textContent = hm(m) + tag;
+/**
+ * Đầu đọc trên thước giờ: chặng và khối giờ tương ứng sáng lên. p từ 0 (08:30) tới 1 (14:00).
+ * Chạy mỗi khung hình khi cuộn, nên chỉ dùng transform (không tính lại bố cục) và chỉ đụng DOM khi phút đổi.
+ */
+function createRuler() {
+  const head = $("rHead"), bub = $("rBub"), box = head.parentElement;
+  const blocks = [...document.querySelectorAll(".r-blk")].map((el) => ({ el, a: minutes(el.dataset.a), b: minutes(el.dataset.b), on: false }));
+  const stages = [...document.querySelectorAll(".stage")].map((el) => ({ el, a: minutes(el.dataset.at), b: minutes(el.dataset.end), cer: el.classList.contains("cer"), on: false }));
+  let width = box.clientWidth, lastMin = -1;
+  new ResizeObserver(() => { width = box.clientWidth; }).observe(box);
+  return (p) => {
+    head.style.transform = `translate3d(${(p * width).toFixed(1)}px,0,0)`;
+    const m = Math.round(RULER_FROM + p * (RULER_TO - RULER_FROM));
+    if (m === lastMin) return;
+    lastMin = m;
+    let tag = "";
+    for (const x of blocks) { const on = m >= x.a && m < x.b; if (on !== x.on) { x.on = on; x.el.classList.toggle("hot", on); } }
+    for (const x of stages) {
+      const on = m >= x.a && m < x.b;
+      if (on !== x.on) { x.on = on; x.el.classList.toggle("hot", on); }
+      if (on) tag = x.cer ? " · nhận bằng" : " · gặp khách";
+    }
+    bub.textContent = hm(m) + tag;
+  };
 }
 
 export function initScrollEffects(opening, { map } = {}) {
   if (!canAnimate()) return;
   gsap.registerPlugin(ScrollTrigger);
+  // Thanh địa chỉ Safari/Chrome trên điện thoại co giãn khi cuộn làm chiều cao màn hình đổi liên tục;
+  // đo lại mọi mốc mỗi lần như vậy khiến trang giật. Chỉ đo lại khi đổi chiều rộng (xoay máy).
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  // Máy chỉ có cảm ứng: ScrollSmoother không làm mượt, trang cuộn gốc của trình duyệt.
+  const nativeScroll = ScrollTrigger.isTouch === 1 || getComputedStyle($("smooth-wrapper")).position !== "fixed";
   const when = onReveal(opening);
   const reveal = revealer(when);
 
@@ -59,11 +76,12 @@ export function initScrollEffects(opening, { map } = {}) {
   }
 
   // Các khung lớn: một kiểu chuyển cảnh chung, lật nhẹ từ trên xuống kèm vạch quét.
+  // Chỉ opacity và transform (GPU lo), không dùng clip-path: clip-path vẽ lại cả khung mỗi khung hình, giật trên điện thoại.
   gsap.utils.toArray(".pr, .map, .gmap, #lint, #contact").forEach((p) => {
     const tl = gsap.timeline({ paused: true })
-      .fromTo(p, { clipPath: "inset(0% 0% 100% 0% round 10px)", rotateX: 14, y: 40, transformPerspective: 1100, transformOrigin: "50% 0%" },
-        { clipPath: "inset(0% 0% 0% 0% round 10px)", rotateX: 0, y: 0, duration: 1, ease: "power3.out", clearProps: "clipPath,transform" })
-      .fromTo(p, { "--scan": "0%", "--scanO": 1 }, { "--scan": "100%", "--scanO": 0, duration: 1, ease: "power3.out" }, 0);
+      .fromTo(p, { opacity: 0, rotateX: 10, y: 48, transformPerspective: 1100, transformOrigin: "50% 0%" },
+        { opacity: 1, rotateX: 0, y: 0, duration: 0.9, ease: "power3.out", clearProps: "opacity,transform" })
+      .fromTo(p, { "--scanY": "0px", "--scanO": 1 }, { "--scanY": () => `${p.offsetHeight}px`, "--scanO": 0, duration: 0.9, ease: "power3.out" }, 0);
     when(p, () => tl.play());
   });
 
@@ -84,18 +102,35 @@ export function initScrollEffects(opening, { map } = {}) {
   when(".eta", armOdometer, "top 92%");
   reveal(".rsvp", ".rsvp > :not([hidden])", { y: 26 }, 0.1);
 
-  // Lịch trình: ghim khung lại, mỗi đoạn cuộn ứng với một khoảng giờ 08:30 → 14:00.
-  // scrub phải gắn vào một tween thì mới được làm mượt; .sec là flex nên phải bật pinSpacing tường minh.
-  const head = { p: 0 };
+  // Lịch trình: khung đứng yên, mỗi đoạn cuộn ứng với một khoảng giờ 08:30 → 14:00.
+  // scrub phải gắn vào một tween thì mới được làm mượt.
+  const scrubRuler = createRuler(), head = { p: 0 };
   scrubRuler(0);
-  gsap.to(head, {
-    p: 1, ease: "none", onUpdate: () => scrubRuler(head.p),
-    scrollTrigger: {
-      trigger: "#pipePanel", pin: true, pinSpacing: true, anticipatePin: 1, scrub: 0.9, invalidateOnRefresh: true,
-      start: () => ($("pipePanel").offsetHeight < innerHeight * 0.8 ? "center center" : "top 12%"),
-      end: () => `+=${Math.round(innerHeight * 1.5)}`,
-    },
-  });
+  const panel = $("pipePanel"), stage = $("pipeStage");
+  if (nativeScroll) {
+    // Điện thoại: trang cuộn gốc (ScrollSmoother tắt trên máy cảm ứng). Ghim bằng JS luôn trễ một nhịp so với cuộn gốc
+    // nên khung rung trên iOS Safari và Chrome; position:sticky do trình duyệt tự giữ nên đứng yên tuyệt đối.
+    stage.classList.add("sticky");
+    const measure = () => stage.style.setProperty("--ph", `${panel.offsetHeight}px`);
+    measure();
+    new ResizeObserver(measure).observe(panel);
+    const top = () => parseFloat(getComputedStyle(panel).top) || 0;
+    gsap.to(head, {
+      p: 1, ease: "none", onUpdate: () => scrubRuler(head.p),
+      scrollTrigger: { trigger: stage, start: () => `top ${top()}px`, end: () => `bottom ${top() + panel.offsetHeight}px`, scrub: 0.5, invalidateOnRefresh: true },
+    });
+  } else {
+    // Máy tính: ScrollSmoother dịch nội dung bằng transform, pin của ScrollTrigger đồng bộ với nó.
+    // .sec là flex nên phải bật pinSpacing tường minh.
+    gsap.to(head, {
+      p: 1, ease: "none", onUpdate: () => scrubRuler(head.p),
+      scrollTrigger: {
+        trigger: panel, pin: true, pinSpacing: true, anticipatePin: 1, scrub: 0.9, invalidateOnRefresh: true,
+        start: () => (panel.offsetHeight < innerHeight * 0.8 ? "center center" : "top 12%"),
+        end: () => `+=${Math.round(innerHeight * 1.5)}`,
+      },
+    });
+  }
   // clearProps chỉ xoá transform: left/width của khối giờ nằm trong style inline, xoá "all" là mất vị trí.
   reveal("#pipePanel", ".r-blk", { scaleX: 0, opacity: 1, transformOrigin: "0 50%", duration: 0.8, clearProps: "transform" }, 0.18);
   reveal("#pipe", ".stage", { y: 34 }, 0.12);
