@@ -248,9 +248,9 @@ html.splash-on{overflow:hidden}
 .sp-greet,.sp-info,.sp-hint{position:absolute;left:16px;right:16px;text-align:center;visibility:hidden}
 .sp-greet{top:28%;font:500 .8rem var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
 /* Tên khách rõ nét, màu chuyển như các hạt; không có WebGL thì đứng ở vị trí mặc định này. */
-.sp-name{position:absolute;top:38%;left:0;right:0;margin-inline:auto;width:-webkit-fit-content;width:fit-content;white-space:nowrap;padding:.04em .08em;visibility:hidden;font:700 clamp(2.4rem,11vw,4.5rem)/1.05 var(--f-display);color:var(--accent)}
-/* Safari tô màu chuyển bằng -webkit-background-clip:text; khung chữ ôm sát tên nên không có phần chữ nằm ngoài vùng tô. */
-@supports ((-webkit-background-clip:text) or (background-clip:text)){.sp-name{color:transparent;background:linear-gradient(90deg,var(--accent),var(--merge) 50%,var(--pink));-webkit-background-clip:text;background-clip:text}}
+.sp-name{position:absolute;top:38%;left:0;right:0;margin-inline:auto;width:-webkit-fit-content;width:fit-content;visibility:hidden;font:700 clamp(2.4rem,11vw,4.5rem)/1 var(--f-display);line-height:0}
+/* Tên được vẽ lên canvas (splash.js paintName), không dùng chữ HTML với background-clip:text vì Safari vẽ thiếu. */
+.sp-name canvas{display:block}
 .sp-info{top:60%;font-size:.95rem;line-height:1.7;color:var(--muted)}
 .sp-info b{color:var(--text);font-weight:600}
 .sp-info b.d{font-family:var(--f-mono);color:var(--accent)}

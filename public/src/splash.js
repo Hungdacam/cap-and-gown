@@ -15,6 +15,45 @@ const seg = (p, a, b) => clamp01((p - a) / (b - a));
 const ez = (v) => { v = clamp01(v); return v * v * (3 - 2 * v); };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Vẽ tên khách rõ nét lên <canvas> trong #spName, màu chuyển như các hạt sáng. Trả về bề rộng (px CSS).
+ * Không dùng chữ HTML với background-clip:text: Safari trên iPhone không vẽ lại vùng tô khi chữ đổi cỡ trên lớp GPU,
+ * khách chỉ thấy nửa tên (ví dụ "Chị" của "Chị Thự"). Canvas là ảnh bitmap nên trình duyệt nào cũng hiện đủ.
+ */
+function paintName(el, name, fontPx) {
+  let c = el.querySelector("canvas");
+  if (!c) { c = document.createElement("canvas"); el.replaceChildren(c); }
+  el.setAttribute("role", "img");
+  el.setAttribute("aria-label", name); // tên khách chỉ đi vào thuộc tính và canvas, không bao giờ thành HTML
+  const dpr = Math.min(devicePixelRatio || 1, 3);
+  const font = `700 ${fontPx}px "Chakra Petch", "Be Vietnam Pro", system-ui, sans-serif`;
+  const g = c.getContext("2d");
+  g.font = font;
+  const m = g.measureText(name);
+  const asc = m.actualBoundingBoxAscent || fontPx * 0.95, desc = m.actualBoundingBoxDescent || fontPx * 0.3;
+  const padX = fontPx * 0.12, padY = fontPx * 0.12; // chừa chỗ cho dấu trên chữ hoa (Á, Ấ) và dấu dưới (ị, ọ)
+  const w = Math.ceil(m.width + padX * 2), h = Math.ceil(asc + desc + padY * 2);
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  c.style.width = `${w}px`; c.style.height = `${h}px`;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.font = font;
+  g.textBaseline = "alphabetic";
+  const grad = g.createLinearGradient(padX, 0, w - padX, 0);
+  grad.addColorStop(0, css("--accent")); grad.addColorStop(0.5, css("--merge")); grad.addColorStop(1, css("--pink"));
+  g.fillStyle = grad;
+  g.fillText(name, padX, padY + asc);
+  return w;
+}
+
+/** Cỡ chữ để tên rộng tối đa `maxW` px: vẽ thử một lần rồi thu theo tỉ lệ nếu quá rộng. */
+function fitName(el, name, fontPx, maxW) {
+  const w = paintName(el, name, fontPx);
+  if (w <= maxW) return fontPx;
+  const fitted = (fontPx * maxW) / w;
+  paintName(el, name, fitted);
+  return fitted;
+}
+
 /** Cảnh three.js. Trả về null nếu thiếu THREE hoặc máy không tạo được WebGL. */
 function createScene() {
   const T = window.THREE;
@@ -129,13 +168,16 @@ function createScene() {
     const infoTop = proj(-textH / 2 - 0.35);
     place($("spInfo"), infoTop);
     place($("spHint"), infoTop + $("spInfo").offsetHeight + 22);
-    const nameEl = $("spName");
-    let fontPx = (s.fs * (tw / visW) * w) / s.w;
-    nameEl.style.fontSize = `${fontPx}px`;
-    // Lưới an toàn: font chưa tải kịp lúc đo, hay tên rất dài, thì thu chữ cho vừa 92% bề ngang (không bao giờ bị cắt chữ).
-    if (nameEl.scrollWidth > w * 0.92) { fontPx *= (w * 0.92) / nameEl.scrollWidth; nameEl.style.fontSize = `${fontPx}px`; }
-    nameEl.style.top = `${proj(0) - nameEl.offsetHeight / 2}px`;
+    // Tên rõ nét đè đúng chỗ các hạt kết thành; tên dài hay font chưa tải kịp thì thu cho vừa 92% bề ngang.
+    if (name) {
+      const nameEl = $("spName");
+      nameFont = fitName(nameEl, name, (s.fs * (tw / visW) * w) / s.w, w * 0.92);
+      nameEl.style.top = `${proj(0) - nameEl.offsetHeight / 2}px`;
+    }
   }
+  let nameFont = 0;
+  // Đổi giao diện sáng/tối: chỉ vẽ lại màu của tên, không xếp lại các hạt.
+  const repaintName = () => { if (lastName && nameFont) paintName($("spName"), lastName, nameFont); };
 
   const S = { vis: 0, m: 0, burst: 0, toss: 0, capIn: 0, dim: 0 };
   let px = 0, py = 0, mx = 0, my = 0;
@@ -174,7 +216,7 @@ function createScene() {
     renderer.render(scene, cam);
   }
   const onResize = () => layout();
-  const onTheme = () => paint();
+  const onTheme = () => { paint(); repaintName(); };
   const scheme = matchMedia("(prefers-color-scheme: dark)");
   addEventListener("resize", onResize);
   scheme.addEventListener?.("change", onTheme);
@@ -264,20 +306,20 @@ export function startSplash({ gate = false } = {}) {
 
   /** Tên khách kết lại từ hạt, rồi chữ thật hiện rõ, hạt lùi thành quầng sáng. */
   async function form(greeting, name) {
-    $("spGreet").textContent = greeting;
-    $("spName").textContent = name; // textContent: tên khách là dữ liệu không tin cậy
+    $("spGreet").textContent = greeting; // textContent: lời chào và tên khách là dữ liệu không tin cậy
     await Promise.all([fonts, ready]);
     if (!el.isConnected) return;
+    // Tên được vẽ lên canvas sau khi font đã tải, với cỡ chữ cuối cùng (xem paintName).
     if (scene) scene.layout(name);
+    else fitName($("spName"), name, parseFloat(getComputedStyle($("spName")).fontSize) || 48, innerWidth * 0.92);
     formTl = gsap.timeline({ onComplete: markFormed });
     if (scene) {
       formTl.to(scene.S, { m: 1, duration: 2.6, ease: "power2.inOut" }, 0)
         .to(scene.S, { capIn: 1, duration: 1.2, ease: "bounce.out" }, 1.5)
         .to(scene.S, { dim: 1, duration: 0.9, ease: "power2.out" }, 2.2)
-        // Không dùng filter: blur trên chữ tô bằng background-clip:text, Safari vẽ sai (mất một phần chữ).
-        .fromTo("#spName", { autoAlpha: 0, scale: 1.06, y: 6 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.9, ease: "power2.out" }, 2.2);
+        .fromTo("#spName", { autoAlpha: 0, scale: 1.06, y: 6 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.9, ease: "power2.out", clearProps: "transform" }, 2.2);
     } else {
-      formTl.fromTo("#spName", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0);
+      formTl.fromTo("#spName", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8, clearProps: "transform" }, 0);
     }
     formTl.fromTo("#spGreet", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.6 }, scene ? 1.8 : 0.3)
       .fromTo("#spInfo", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.6 }, scene ? 2.3 : 0.5);
