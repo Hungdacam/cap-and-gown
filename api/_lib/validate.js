@@ -41,6 +41,12 @@ export function parseRsvpBody(body) {
   return { ok: true, value: { slug, status, plusOnes, arrival, message } };
 }
 
+/**
+ * Cột link_chung của tab Khach: đánh dấu slug gửi cho cả nhóm (group công ty, lớp...).
+ * Nhiều người mở chung một link nên không nhận xác nhận (sẽ ghi đè nhau), chỉ nhận lời chúc, mỗi lời một dòng.
+ */
+export const isSharedFlag = (v) => /^(x|có|co|chung|1|true|yes)$/i.test(String(v ?? "").trim());
+
 export const MIN_WISH = 2;
 export const MAX_WISH_NAME = 60;
 
@@ -61,5 +67,7 @@ export function parseWishBody(body) {
   if (typeof name !== "string") return { ok: false, error: "bad_name" };
   name = name.replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
   if ([...name].length > MAX_WISH_NAME) return { ok: false, error: "name_too_long" };
-  return { ok: true, value: { message, name } };
+  // slug của link chung (nếu có) chỉ để biết lời chúc từ nhóm nào; sai định dạng thì bỏ qua, không chặn lời chúc.
+  const slug = isValidSlug(body.slug) ? body.slug : "";
+  return { ok: true, value: { message, name, slug } };
 }

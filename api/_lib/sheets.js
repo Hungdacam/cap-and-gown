@@ -1,10 +1,10 @@
 // Lưu trữ bằng Google Sheets qua REST API, không dùng thư viện ngoài.
 // Hai tab:
-//   Khach    : slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau
+//   Khach    : slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung
 //   XacNhan  : slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den
-//   LoiChuc  : thoi_gian | loi_chuc | ky_ten | thiet_bi | ip   (lời chúc riêng tư từ link công khai)
+//   LoiChuc  : thoi_gian | loi_chuc | ky_ten | thiet_bi | ip | nguon   (nguon: slug link chung, trống = link công khai)
 import { createSign } from "node:crypto";
-import { safeCall } from "./validate.js";
+import { safeCall, isSharedFlag } from "./validate.js";
 import { findArrival, toArrival } from "../../public/src/arrival.js";
 
 const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
@@ -83,11 +83,12 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
     short: String(r[2] ?? "").trim(),
     call: safeCall(r[3]),
     openedAt: String(r[7] ?? "").trim(),
+    shared: isSharedFlag(r[8]),
   });
 
   async function guestRows(force = false) {
     if (!force && guestCache.rows && now() - guestCache.at < GUEST_TTL_MS) return guestCache;
-    const rows = (await read("Khach!A2:H")).map(toGuest).filter((g) => g.slug && g.name);
+    const rows = (await read("Khach!A2:I")).map(toGuest).filter((g) => g.slug && g.name);
     guestCache = { rows, at: now() };
     return guestCache;
   }
@@ -129,8 +130,8 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
       else await append("XacNhan!A:F", values);
     },
 
-    async addWish({ message, name = "", createdAt, device = "", ip = "" }) {
-      await append("LoiChuc!A:E", [[createdAt, message, name, device, ip]]);
+    async addWish({ message, name = "", createdAt, device = "", ip = "", source = "" }) {
+      await append("LoiChuc!A:F", [[createdAt, message, name, device, ip, source]]);
     },
 
     async markOpened(slug, row, at) {

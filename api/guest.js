@@ -15,7 +15,8 @@ export default async function handler(req, res) {
     const guest = await store.getGuest(slug);
     if (!guest) return res.status(404).json({ error: "not_found" });
 
-    const found = await store.getRsvp(slug);
+    // Link chung (cả nhóm mở chung): không có xác nhận riêng, khách để lại lời chúc thay vào đó.
+    const found = guest.shared ? null : await store.getRsvp(slug);
 
     if (!guest.openedAt) {
       // Ghi lần mở đầu tiên. Lỗi ghi không được làm hỏng thiệp.
@@ -26,6 +27,7 @@ export default async function handler(req, res) {
       name: guest.name,
       short: guest.short,
       call: guest.call,
+      ...(guest.shared ? { shared: true } : {}),
       rsvp: found
         ? { status: found.status, plusOnes: found.plusOnes, arrival: found.arrival || "", message: found.message, updatedAt: found.updatedAt }
         : null,

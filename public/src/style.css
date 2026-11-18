@@ -487,3 +487,17 @@ footer{align-items:center}
 .r-head{will-change:transform}
 .lbl-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .linkish{font:500 .76rem var(--f-mono);color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ===== Danh xưng "Tân kỹ sư" (EVENT.title): vàng, có vệt sáng lướt qua.
+   Vệt sáng là lớp phủ chạy bằng transform, không dùng background-clip:text (Safari vẽ thiếu chữ). ===== */
+@keyframes sweep{0%,55%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.t-gold{position:relative;display:inline-block;overflow:hidden;vertical-align:bottom;color:var(--amber);font-weight:700;letter-spacing:.02em;
+  text-shadow:0 0 14px color-mix(in srgb,var(--amber) 45%,transparent)}
+.t-gold::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-130%);animation:sweep 4.5s ease-in-out 2s infinite}
+.sp-info b.ttl{white-space:nowrap}
+/* dải băng chéo góc ảnh thẻ (thẻ màu sáng ở cả hai giao diện nên dùng màu vàng cố định) */
+.c-ribbon{position:absolute;left:-34px;top:14px;width:132px;transform:rotate(-35deg);padding:3px 0;text-align:center;overflow:hidden;
+  font:800 .56rem/1.2 var(--f-mono);letter-spacing:.14em;color:#3a2600;background:linear-gradient(90deg,#f2b33d,#ffe9a8 50%,#f2b33d);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.c-ribbon::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-130%);animation:sweep 4.5s ease-in-out 2.6s infinite}
+@media (max-width:640px){.c-ribbon{left:-36px;top:9px;width:120px;font-size:.44rem;letter-spacing:.08em}}
+@media (prefers-reduced-motion:reduce){.t-gold::after,.c-ribbon::after{animation:none}}

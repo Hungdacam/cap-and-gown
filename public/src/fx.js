@@ -117,7 +117,7 @@ const MOOD = {
   yes: { c: "--ok", t: ({ pron }) => `Hẹn gặp ${pron}!`, s: ({ when }) => `${when ? `Lúc ${when} · ` : ""}${EVENT.meetingPoint}` },
   maybe: { c: "--amber", t: () => "Chưa chắc cũng không sao", s: () => `Báo lại cho ${host} trước ngày ${formatDayMonth(EVENT.rsvpDeadline)} nhé` },
   no: { c: "--pink", t: () => "Tiếc quá!", s: ({ pron }) => `${host} cảm ơn ${pron} đã báo. Hẹn dịp khác nhé.` },
-  wish: { c: "--accent", t: () => "Đã gửi lời chúc!", s: () => `${host} cảm ơn bạn rất nhiều.` },
+  wish: { c: "--accent", t: () => "Đã gửi lời chúc!", s: ({ pron }) => `${host} cảm ơn ${pron} rất nhiều.` },
 };
 let moodTl = null;
 

@@ -23,6 +23,8 @@ export default async function handler(req, res) {
     const store = await getStore();
     const guest = await store.getGuest(parsed.value.slug);
     if (!guest) return res.status(400).json({ error: "unknown_guest" });
+    // Link chung: nhiều người cùng slug, xác nhận người sau sẽ ghi đè người trước. Chỉ nhận lời chúc (POST /api/wish).
+    if (guest.shared) return res.status(400).json({ error: "shared_link" });
 
     await store.upsertRsvp({ ...parsed.value, updatedAt: new Date().toISOString() });
     return res.status(200).json({ ok: true });

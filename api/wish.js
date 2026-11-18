@@ -1,10 +1,11 @@
 import { getStore } from "./_lib/store.js";
 import { parseWishBody } from "./_lib/validate.js";
 
-// Link công khai đăng lên mạng xã hội nên giới hạn số lời chúc mỗi IP.
+// Link công khai đăng lên mạng xã hội nên giới hạn số lời chúc mỗi người gửi.
+// Đếm theo IP + trình duyệt, không chỉ IP: cả văn phòng thường đi chung một IP, đếm theo IP sẽ chặn nhầm đồng nghiệp.
 // Bộ đếm nằm trong bộ nhớ của từng instance: đủ chặn bấm gửi liên tục, không phải chống spam tuyệt đối.
 const WINDOW_MS = 10 * 60_000;
-const MAX_PER_WINDOW = 5;
+const MAX_PER_WINDOW = 8;
 const hits = new Map();
 
 export function __resetWishLimitForTests() { hits.clear(); }
@@ -52,16 +53,21 @@ export default async function handler(req, res) {
   if (parsed.spam) return res.status(200).json({ ok: true }); // bot điền ô bẫy: trả như thành công, không ghi
 
   const ip = String(req.headers?.["x-forwarded-for"] ?? "").split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
-  if (limited(ip)) return res.status(429).json({ error: "too_many" });
+  const ua = String(req.headers?.["user-agent"] ?? "");
+  if (limited(`${ip}|${ua}`)) return res.status(429).json({ error: "too_many" });
 
   try {
     const store = await getStore();
+    // Nguồn: chỉ ghi slug khi slug đó thật sự là link chung, để không ai tự đặt nguồn tùy ý. Trống = link công khai.
+    const { slug, ...wish } = parsed.value;
+    const source = slug && (await store.getGuest(slug))?.shared ? slug : "";
     // Form đã báo khách: Hưng ghi lại thời gian, loại thiết bị và IP để chống spam.
     await store.addWish({
-      ...parsed.value,
+      ...wish,
       createdAt: new Date().toISOString(),
-      device: deviceLabel(req.headers?.["user-agent"]),
+      device: deviceLabel(ua),
       ip,
+      source,
     });
     return res.status(200).json({ ok: true });
   } catch (e) {

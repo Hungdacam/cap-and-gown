@@ -18,7 +18,7 @@ function setup({ khach = [], xacnhan = [], clock } = {}) {
     const m = u.match(/values\/([^?]+?)(:append)?(\?|$)/);
     const range = decodeURIComponent(m[1]);
     if ((init.method || "GET") === "GET") {
-      if (range === "Khach!A2:H") return json({ values: state.khach });
+      if (range === "Khach!A2:I") return json({ values: state.khach });
       if (range === "XacNhan!A2:F") return json({ values: state.xacnhan });
     }
     return json({});
@@ -56,7 +56,7 @@ test("token được dùng lại cho các lần gọi sau", async () => {
 test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và ô trống", async () => {
   const { store } = setup({ khach: [["", "Dòng trống slug"], ["t-l-1abc", "Trần Thị Mỹ Linh", "Linh", "chị", "Lớp", "Zalo", "x", ""], ["s-e-2abc", "Sếp", "", "sếp"], ["a-b-3abc", "Nguyễn A", "A", " "]] });
   const g = await store.getGuest("t-l-1abc");
-  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "" });
+  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "", shared: false });
   assert.equal((await store.getGuest("s-e-2abc")).call, "sếp");
   assert.equal((await store.getGuest("a-b-3abc")).call, "");
   assert.equal(await store.getGuest("khong-co-1"), null);
@@ -117,12 +117,19 @@ test("upsertRsvp: dòng mới thì append, đã có thì ghi đè đúng dòng, 
   assert.deepEqual(JSON.parse(put.body), { values: [["a-b-c1", "Không đi được", 0, "", "T2", ""]] }, "không đi thì xoá giờ đến cũ");
 });
 
-test("addWish append vào tab LoiChuc A:E, luôn RAW để lời chúc hay chữ ký bắt đầu bằng = không thành công thức", async () => {
+test("addWish append vào tab LoiChuc A:F (cột F là nguồn), luôn RAW để lời chúc hay chữ ký bắt đầu bằng = không thành công thức", async () => {
   const { store, calls } = setup();
-  await store.addWish({ message: "=chúc mừng", name: "=Minh", createdAt: "2026-11-25T03:00:00.000Z", device: "iPhone · Zalo", ip: "1.2.3.4" });
+  await store.addWish({ message: "=chúc mừng", name: "=Minh", createdAt: "2026-11-25T03:00:00.000Z", device: "iPhone · Zalo", ip: "1.2.3.4", source: "cty-dotb-x1" });
   const post = sheetCalls(calls).find((c) => c.method === "POST");
-  assert.match(decodeURIComponent(post.url), /values\/LoiChuc!A:E:append\?valueInputOption=RAW&insertDataOption=INSERT_ROWS/);
-  assert.deepEqual(JSON.parse(post.body), { values: [["2026-11-25T03:00:00.000Z", "=chúc mừng", "=Minh", "iPhone · Zalo", "1.2.3.4"]] });
+  assert.match(decodeURIComponent(post.url), /values\/LoiChuc!A:F:append\?valueInputOption=RAW&insertDataOption=INSERT_ROWS/);
+  assert.deepEqual(JSON.parse(post.body), { values: [["2026-11-25T03:00:00.000Z", "=chúc mừng", "=Minh", "iPhone · Zalo", "1.2.3.4", "cty-dotb-x1"]] });
+});
+
+test("cột I link_chung: x, có, chung, true... đánh dấu link chung; trống hay giá trị khác là khách riêng", async () => {
+  const row = (slug, flag) => [slug, "Nhóm", "", "anh chị", "", "", "", "", flag];
+  const { store } = setup({ khach: [row("cty-a-1", "x"), row("cty-b-1", " Có "), row("cty-c-1", "chung"), row("cty-d-1", "TRUE"), row("le-e-1", ""), row("le-f-1", "không"), ["le-g-1", "Khách cũ", "G", "anh"]] });
+  for (const s of ["cty-a-1", "cty-b-1", "cty-c-1", "cty-d-1"]) assert.equal((await store.getGuest(s)).shared, true, s);
+  for (const s of ["le-e-1", "le-f-1", "le-g-1"]) assert.equal((await store.getGuest(s)).shared, false, s);
 });
 
 test("markOpened ghi cột H đúng dòng và cập nhật cache", async () => {

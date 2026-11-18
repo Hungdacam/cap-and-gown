@@ -33,6 +33,9 @@ export function renderStatic() {
   $("cardCohort").textContent = EVENT.cohort;
   $("cardPhoto").alt = `Ảnh thẻ của ${EVENT.graduate}`;
   $("cardStamp").textContent = COPY.prBadge.toUpperCase();
+  // Danh xưng "Tân kỹ sư": dải băng trên ảnh thẻ và một dòng terminal ở đầu thiệp.
+  $("cardTitle").textContent = EVENT.title.toUpperCase();
+  $("titleLine").textContent = `${EVENT.title} ${EVENT.graduateShort}`;
   $("cardName").textContent = EVENT.graduate;
   $("cardMajor").textContent = EVENT.major;
   $("cardDate").textContent = `Lễ tốt nghiệp ${EVENT.date.split("-").reverse().join("/")}`;

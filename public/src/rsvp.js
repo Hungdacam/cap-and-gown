@@ -27,7 +27,7 @@ function setLog(html, isError = false) {
 
 /**
  * state: { slug, guest, rsvp, mode }
- * mode: "ok" | "generic" (link không nhận ra) | "error" (không tải được)
+ * mode: "ok" | "shared" (link chung của nhóm, chỉ nhận lời chúc) | "generic" (link không nhận ra) | "error" (không tải được)
  */
 export function initRsvp({ slug, guest, rsvp, mode }) {
   let saved = rsvp; // { status, plusOnes, arrival, message, updatedAt } | null
@@ -38,7 +38,7 @@ export function initRsvp({ slug, guest, rsvp, mode }) {
   const host = esc(EVENT.graduateShort);
 
   const showChecks = () =>
-    renderChecks({ guest, present: saved?.status === "yes", note: saved?.status === "yes" ? `${guest.name} sẽ đến` : mode === "generic" ? "Gửi Hưng vài lời chúc ↓" : WAITING });
+    renderChecks({ guest, present: saved?.status === "yes", note: saved?.status === "yes" ? `${guest.name} sẽ đến` : mode === "generic" || mode === "shared" ? "Gửi Hưng vài lời chúc ↓" : WAITING });
   showChecks();
 
   if (mode !== "ok") {

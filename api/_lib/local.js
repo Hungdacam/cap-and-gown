@@ -2,7 +2,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { safeCall } from "./validate.js";
+import { safeCall, isSharedFlag } from "./validate.js";
 
 const dataDir = (f) => fileURLToPath(new URL(`../../data/${f}`, import.meta.url));
 
@@ -21,7 +21,7 @@ export function createLocalStore() {
       const g = list.find((x) => x.slug === slug);
       if (!g) return null;
       const s = await loadStore();
-      return { row: 0, slug, name: g.name, short: g.short || "", call: safeCall(g.call), openedAt: s.opened?.[slug] || "" };
+      return { row: 0, slug, name: g.name, short: g.short || "", call: safeCall(g.call), openedAt: s.opened?.[slug] || "", shared: g.shared === true || isSharedFlag(g.link_chung) };
     },
     async getRsvp(slug) {
       const s = await loadStore();
@@ -32,9 +32,9 @@ export function createLocalStore() {
       (s.rsvps ||= {})[slug] = { status, plusOnes, arrival, message, updatedAt };
       await saveStore(s);
     },
-    async addWish({ message, name = "", createdAt, device = "", ip = "" }) {
+    async addWish({ message, name = "", createdAt, device = "", ip = "", source = "" }) {
       const s = await loadStore();
-      (s.wishes ||= []).push({ createdAt, message, name, device, ip });
+      (s.wishes ||= []).push({ createdAt, message, name, device, ip, source });
       await saveStore(s);
     },
     async markOpened(slug, _row, at) {

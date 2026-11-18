@@ -26,6 +26,8 @@ export const EVENT = {
   address: "12 Nguyễn Văn Bảo, Gò Vấp, TP.HCM",
   major: "Kỹ thuật Phần mềm",
   degree: "Kỹ sư Phần mềm",
+  displayName: "Hưng Lê", // tên hiện trên màn mở thiệp ("đến chung vui ngày tốt nghiệp của Hưng Lê")
+  title: "Tân kỹ sư", // danh xưng nổi bật: dòng terminal, dải băng trên thẻ, tiêu đề thiệp
   cohort: "K17",
   dressCode: "Thoải mái, thuận tiện chụp ảnh",
 
@@ -37,7 +39,7 @@ export const COPY = {
   invitationGreeting: "Trân trọng kính mời",
   // {pron} được thay bằng cách gọi khách, ví dụ "chị Linh"
   lede: `Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng ${EVENT.graduateShort} cũng ra trường. ${EVENT.graduateShort} rất mong {pron} sẽ có mặt trong ngày đặc biệt này.`,
-  prTitle: `${EVENT.graduateShort} chính thức tốt nghiệp rồi!`,
+  prTitle: `${EVENT.graduateShort} chính thức tốt nghiệp rồi!`,
   prNumber: "#2026",
   prBadge: "Đã tốt nghiệp",
   fromLabel: "sinh viên",

@@ -71,6 +71,19 @@ test("GET khách và POST RSVP chấp nhận slug cM-bV, không đổi hoa thư�
   assert.equal(db.rsvps["cm-bv"], undefined);
 });
 
+test("link chung của nhóm: GET báo shared, không trả xác nhận; POST /api/rsvp bị từ chối để không ghi đè nhau", async () => {
+  const slug = "cty-dotb-x1";
+  db.guests[slug] = { row: 4, slug, name: "Anh chị em DotB", short: "DotB", call: "anh chị", openedAt: "", shared: true };
+  db.rsvps[slug] = { status: "yes", plusOnes: 0, arrival: "dot1", message: "cũ", updatedAt: "t" };
+  const g = await get(slug);
+  assert.equal(g.statusCode, 200);
+  assert.deepEqual(g.body, { name: "Anh chị em DotB", short: "DotB", call: "anh chị", shared: true, rsvp: null });
+  const res = await post({ slug, status: "yes", arrival: "dot1" });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.error, "shared_link");
+  assert.equal(db.rsvps[slug].message, "cũ", "không ghi đè");
+});
+
 test("POST /api/rsvp: dữ liệu sai bị từ chối và không ghi gì", async () => {
   assert.equal((await post({ slug: "thuy-duong-k7q2", status: "maybe?" })).statusCode, 400);
   assert.equal((await post({ slug: "thuy-duong-k7q2", status: "yes", plusOnes: 9, arrival: "dot1" })).statusCode, 400);

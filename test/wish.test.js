@@ -6,10 +6,11 @@ import { __setStoreForTests } from "../api/_lib/store.js";
 import { fakeRes } from "./helpers.js";
 
 let saved;
+const GUESTS = { "cty-dotb-x1": { slug: "cty-dotb-x1", shared: true }, "le-linh-1": { slug: "le-linh-1", shared: false } };
 beforeEach(() => {
   saved = [];
   __resetWishLimitForTests();
-  __setStoreForTests({ addWish: async (w) => { saved.push(w); } });
+  __setStoreForTests({ addWish: async (w) => { saved.push(w); }, getGuest: async (s) => GUESTS[s] || null });
 });
 
 const IPHONE_ZALO = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Zalo iOS/500";
@@ -20,7 +21,9 @@ const post = async (body, { ip = "1.2.3.4", headers = { "content-type": "applica
 };
 
 test("parseWishBody: làm sạch, giới hạn 2–300 ký tự, ô bẫy bot", () => {
-  assert.deepEqual(parseWishBody({ message: "  Chúc mừng!\u0007 " }), { ok: true, value: { message: "Chúc mừng!", name: "" } });
+  assert.deepEqual(parseWishBody({ message: "  Chúc mừng!\u0007 " }), { ok: true, value: { message: "Chúc mừng!", name: "", slug: "" } });
+  assert.equal(parseWishBody({ message: "Chúc mừng", slug: "cty-dotb-x1" }).value.slug, "cty-dotb-x1");
+  for (const slug of ["../x", "a", 5, {}]) assert.equal(parseWishBody({ message: "Chúc mừng", slug }).value.slug, "", String(slug));
   assert.equal(parseWishBody({ message: "a\nb" }).value.message, "a\nb");
   assert.equal(parseWishBody({ message: " a " }).error, "empty_wish");
   assert.equal(parseWishBody({}).error, "empty_wish");
@@ -49,11 +52,12 @@ test("deviceLabel: nhãn thiết bị dễ đọc", () => {
 });
 
 test("POST /api/wish lưu lời chúc, chữ ký, thời gian, thiết bị và IP (đã báo trên form)", async () => {
-  const res = await post({ message: "Chúc Hưng thành công!", name: "Minh Anh", slug: "a-b-c1" });
+  const res = await post({ message: "Chúc Hưng thành công!", name: "Minh Anh" });
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body, { ok: true });
   assert.equal(saved.length, 1);
-  assert.deepEqual(Object.keys(saved[0]).sort(), ["createdAt", "device", "ip", "message", "name"]);
+  assert.deepEqual(Object.keys(saved[0]).sort(), ["createdAt", "device", "ip", "message", "name", "source"]);
+  assert.equal(saved[0].source, "", "link công khai: nguồn trống");
   assert.equal(saved[0].message, "Chúc Hưng thành công!");
   assert.equal(saved[0].name, "Minh Anh");
   assert.equal(saved[0].device, "iPhone · Zalo");
@@ -78,13 +82,22 @@ test("POST /api/wish: sai dữ liệu, sai content-type, sai phương thức", a
   assert.equal((await post({}, { method: "GET" })).statusCode, 405);
 });
 
-test("POST /api/wish: mỗi IP tối đa 5 lời chúc trong 10 phút, IP khác không bị ảnh hưởng", async () => {
-  for (let i = 0; i < 5; i++) assert.equal((await post({ message: `Chúc lần ${i}` })).statusCode, 200);
-  const blocked = await post({ message: "Lần 6" });
+test("POST /api/wish: link chung ghi nguồn là slug; slug riêng hay không có thật thì để trống (không tự đặt nguồn được)", async () => {
+  await post({ message: "Chúc mừng từ công ty", slug: "cty-dotb-x1" });
+  await post({ message: "Gắn slug khách riêng", slug: "le-linh-1" });
+  await post({ message: "Gắn slug bịa", slug: "khong-co-1" });
+  assert.deepEqual(saved.map((w) => w.source), ["cty-dotb-x1", "", ""]);
+});
+
+test("POST /api/wish: tối đa 8 lời chúc mỗi máy trong 10 phút; đồng nghiệp chung IP văn phòng nhưng khác máy vẫn gửi được", async () => {
+  for (let i = 0; i < 8; i++) assert.equal((await post({ message: `Chúc lần ${i}` })).statusCode, 200);
+  const blocked = await post({ message: "Lần 9" });
   assert.equal(blocked.statusCode, 429);
   assert.equal(blocked.body.error, "too_many");
-  assert.equal((await post({ message: "Người khác" }, { ip: "5.6.7.8" })).statusCode, 200);
-  assert.equal(saved.length, 6);
+  const android = "Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
+  assert.equal((await post({ message: "Đồng nghiệp cùng văn phòng" }, { headers: { "content-type": "application/json", "user-agent": android } })).statusCode, 200);
+  assert.equal((await post({ message: "Người ở nơi khác" }, { ip: "5.6.7.8" })).statusCode, 200);
+  assert.equal(saved.length, 10);
 });
 
 test("POST /api/wish: lỗi lưu trữ trả 500 không lộ chi tiết", async () => {

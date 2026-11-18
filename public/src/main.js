@@ -57,18 +57,21 @@ async function boot() {
       if (found) {
         guest = { ...found.guest, call: normalizeCall(found.guest.call) };
         rsvp = found.rsvp;
-        mode = "ok";
+        // Link chung (cột link_chung trong Sheet): chào đúng tên nhóm nhưng chỉ nhận lời chúc, không nhận xác nhận.
+        mode = guest.shared ? "shared" : "ok";
       }
     } catch (err) {
       console.error(err);
       mode = "error";
     }
   }
-  const name = mode === "ok" ? capFirst(pronoun(guest)) : guest.name;
-  renderGuest(guest, mode === "ok" ? slug : "", name);
+  const known = mode === "ok" || mode === "shared";
+  const name = known ? capFirst(pronoun(guest)) : guest.name;
+  renderGuest(guest, known ? slug : "", name);
   initRsvp({ slug, guest, rsvp, mode });
-  // Thiệp chung (link công khai): thay phần xác nhận bằng form lời chúc (chữ ký không bắt buộc).
+  // Link công khai và link chung của nhóm: thay phần xác nhận bằng form lời chúc, mỗi lời chúc là một dòng mới (không ghi đè).
   if (mode === "generic") initWish();
+  if (mode === "shared") initWish({ slug, pron: pronoun(guest) });
   splash.setGuest(COPY.invitationGreeting, name);
 
   // Thiệp lộ ra thì terminal gõ lệnh, tên khách giải mã, thẻ tốt nghiệp đung đưa.
