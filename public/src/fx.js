@@ -22,7 +22,7 @@ function setup() {
   size();
   addEventListener("resize", size);
 }
-const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
+const kick = () => { canvas.classList.add("on"); if (!raf) raf = requestAnimationFrame(step); };
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 function burstAt(x, y, c) {
@@ -73,6 +73,7 @@ function step() {
   }
   ctx.globalAlpha = 1;
   if (parts.length) raf = requestAnimationFrame(step);
+  else { ctx.clearRect(0, 0, W, H); canvas.classList.remove("on"); } // ẩn hẳn canvas lúc rảnh (xem #confetti trong style.css)
 }
 
 /** Pháo giấy bắn từ (x, y); không truyền thì bắn từ giữa màn hình. */

@@ -179,7 +179,10 @@ pre.out{margin:0;padding:12px;border-radius:6px;background:var(--bg);border:1px 
 footer{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);text-align:center;display:flex;flex-direction:column;gap:4px}
 footer b{color:var(--ok);font-weight:500}
 
-#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+/* Canvas là phần tử thay thế: inset:0 không kéo giãn được, thiếu width/height thì nó nằm 300×150 ở góc trái trên.
+   Chỉ hiện khi đang có hiệu ứng: Safari iOS vẽ canvas rỗng cố định thành mảng đen chớp khi cuộn. */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;display:none}
+#confetti.on{display:block}
 
 @media (max-width:640px){
   .pr-grid{grid-template-columns:1fr}
