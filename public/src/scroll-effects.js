@@ -52,7 +52,10 @@ export function initScrollEffects(opening, { map } = {}) {
   const when = onReveal(opening);
   const reveal = revealer(when);
 
-  gsap.to(".term", { scale: 0.93, opacity: 0.35, ease: "none", scrollTrigger: { trigger: ".term", start: 0, end: "bottom top", scrub: true } });
+  // Máy cảm ứng bỏ hiệu ứng thu nhỏ + mờ dần khung terminal khi cuộn: Safari iOS phải vẽ lại cả khung
+  // (overflow:hidden + bo góc, bên trong có con trỏ nhấp nháy và vệt sáng chạy) mỗi khung hình cuộn,
+  // và vẽ sai thành một mảng đen chớp liên tục đè lên lời chào.
+  if (!nativeScroll) gsap.to(".term", { scale: 0.93, opacity: 0.35, ease: "none", scrollTrigger: { trigger: ".term", start: 0, end: "bottom top", scrub: true } });
 
   // Đầu mỗi mục: đường dẫn tự gõ ra như terminal, tiêu đề trồi lên.
   gsap.utils.toArray(".sec-head").forEach((head) => {
