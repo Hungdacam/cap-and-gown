@@ -7,7 +7,9 @@ const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 20
 const pem = privateKey.export({ type: "pkcs8", format: "pem" });
 const envKey = pem.replace(/\n/g, "\\n"); // đúng dạng khi dán vào biến môi trường Vercel
 
-function setup({ khach = [], xacnhan = [], clock } = {}) {
+const HEAD = ["slug", "ho_ten", "ten_goi", "xung_ho", "nhom", "kenh_gui", "da_gui", "mo_lan_dau", "link_chung", "khach_di_tiec"];
+
+function setup({ khach = [], xacnhan = [], clock, head = HEAD } = {}) {
   const calls = [];
   const state = { khach, xacnhan, t: clock ?? 1_000_000_000_000 };
   const fetchImpl = async (url, init = {}) => {
@@ -18,7 +20,7 @@ function setup({ khach = [], xacnhan = [], clock } = {}) {
     const m = u.match(/values\/([^?]+?)(:append)?(\?|$)/);
     const range = decodeURIComponent(m[1]);
     if ((init.method || "GET") === "GET") {
-      if (range === "Khach!A2:I") return json({ values: state.khach });
+      if (range === "Khach!A1:Z") return json({ values: [head, ...state.khach] });
       if (range === "XacNhan!A2:F") return json({ values: state.xacnhan });
     }
     return json({});
@@ -56,7 +58,7 @@ test("token được dùng lại cho các lần gọi sau", async () => {
 test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và ô trống", async () => {
   const { store } = setup({ khach: [["", "Dòng trống slug"], ["t-l-1abc", "Trần Thị Mỹ Linh", "Linh", "chị", "Lớp", "Zalo", "x", ""], ["s-e-2abc", "Sếp", "", "sếp"], ["a-b-3abc", "Nguyễn A", "A", " "]] });
   const g = await store.getGuest("t-l-1abc");
-  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "", shared: false });
+  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "", shared: false, party: false });
   assert.equal((await store.getGuest("s-e-2abc")).call, "sếp");
   assert.equal((await store.getGuest("a-b-3abc")).call, "");
   assert.equal(await store.getGuest("khong-co-1"), null);
@@ -130,6 +132,21 @@ test("cột I link_chung: x, có, chung, true... đánh dấu link chung; trốn
   const { store } = setup({ khach: [row("cty-a-1", "x"), row("cty-b-1", " Có "), row("cty-c-1", "chung"), row("cty-d-1", "TRUE"), row("le-e-1", ""), row("le-f-1", "không"), ["le-g-1", "Khách cũ", "G", "anh"]] });
   for (const s of ["cty-a-1", "cty-b-1", "cty-c-1", "cty-d-1"]) assert.equal((await store.getGuest(s)).shared, true, s);
   for (const s of ["le-e-1", "le-f-1", "le-g-1"]) assert.equal((await store.getGuest(s)).shared, false, s);
+});
+
+test("cột khach_di_tiec: điền 1 là khách được mời tiệc; tìm cột theo tiêu đề, thiếu tiêu đề thì dùng cột J", async () => {
+  const row = (slug, flag) => [slug, "Khách", "", "anh", "", "", "", "", "", flag];
+  const { store } = setup({ khach: [row("ti-a-1", "1"), row("ti-b-1", " x "), row("ko-c-1", ""), row("ko-d-1", "0"), ["ko-e-1", "Khách cũ", "E", "anh"]] });
+  for (const s of ["ti-a-1", "ti-b-1"]) assert.equal((await store.getGuest(s)).party, true, s);
+  for (const s of ["ko-c-1", "ko-d-1", "ko-e-1"]) assert.equal((await store.getGuest(s)).party, false, s);
+
+  // Chủ thiệp chèn cột tiệc ở chỗ khác (cột K) thì vẫn đọc đúng theo tiêu đề.
+  const moved = setup({ head: [...HEAD.slice(0, 9), "ghi_chu", " Khach_Di_Tiec "], khach: [["ti-f-1", "F", "", "chị", "", "", "", "", "", "1", ""], ["ti-g-1", "G", "", "chị", "", "", "", "", "", "", "1"]] });
+  assert.equal((await moved.store.getGuest("ti-f-1")).party, false, "cột J giờ là ghi_chu");
+  assert.equal((await moved.store.getGuest("ti-g-1")).party, true);
+
+  const noHead = setup({ head: HEAD.slice(0, 9), khach: [row("ti-h-1", "1")] });
+  assert.equal((await noHead.store.getGuest("ti-h-1")).party, true, "chưa có tiêu đề: cột J");
 });
 
 test("markOpened ghi cột H đúng dòng và cập nhật cache", async () => {

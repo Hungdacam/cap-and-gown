@@ -15,17 +15,20 @@ npm test        # dùng node --test (Node >= 20)
 ```
 
 Chưa có biến môi trường thì API dùng `data/guests.sample.json` (hoặc `data/guests.local.json` nếu bạn tạo, file này không được commit)
-và ghi RSVP vào `data/dev-store.json`. Link thử: `/t/my-linh-c3d4`. Mở `/` (không có slug) sẽ ra thiệp chung "Bạn thân mến", không có nút xác nhận.
+và ghi RSVP vào `data/dev-store.json`. Link thử: `/t/my-linh-c3d4` (có mời tiệc), `/t/hoang-quoc-e5f6` (không mời tiệc). Mở `/` (không có slug) sẽ ra thiệp chung "Bạn thân mến", không có nút xác nhận.
 
 ## Cài đặt một lần
 
 ### 1. Google Sheet
 Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 
-- Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung` (cột A đến I).
+- Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | khach_di_tiec` (cột A đến J).
   `link_chung`: để trống với khách riêng. Gõ `x` cho slug gửi vào group nhiều người (ví dụ group công ty):
   link đó vẫn chào đúng tên nhóm (`ten_goi` + `xung_ho`), nhưng không có nút xác nhận (nhiều người chung một
   link sẽ ghi đè nhau), thay vào đó là form lời chúc, mỗi lời chúc một dòng trong tab `LoiChuc`.
+  `khach_di_tiec`: điền `1` thì thiệp của khách đó có thêm phần mời tiệc thân mật (giờ đặt bàn, tên quán, nút Google Maps).
+  Cột này được tìm theo tiêu đề ở hàng 1 nên đặt ở cột nào cũng được. Thông tin quán sửa ở `api/_lib/party.js`
+  (để ở server, khách không được mời không xem được, kể cả khi đọc mã nguồn trang).
   Ví dụ dòng cho group công ty: `cty-dotb-x7k2 | Anh chị em DotB | DotB | anh chị | Công ty | Telegram | | | x`.
 - Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den` (cột A đến F).
   `gio_den` là khung giờ khách chọn: `Đợt 1 · 09:00–11:00`, `Đợt 2 · 12:30–13:30` hoặc `Cả hai đợt`
@@ -113,7 +116,7 @@ design/thiep.html  bản thiết kế đã chốt
 
 ## Ghi chú kỹ thuật
 
-- API: `GET /api/guest?slug=` → `{name, short, call, shared?, rsvp|null}` hoặc 404 (`shared: true` với link chung, khi đó `POST /api/rsvp` trả 400 `shared_link`). `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, arrival: dot1|dot2|ca-hai (bắt buộc khi yes), message ≤ 300}`, bắt buộc `Content-Type: application/json`. `POST /api/wish` `{message: 2–300 ký tự, name?: ≤ 60 ký tự, slug?: slug link chung}` (có ô bẫy bot `website`; server tự ghi thiết bị từ User-Agent và IP), cũng bắt buộc JSON.
+- API: `GET /api/guest?slug=` → `{name, short, call, shared?, party?, rsvp|null}` hoặc 404 (`shared: true` với link chung, khi đó `POST /api/rsvp` trả 400 `shared_link`). `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, arrival: dot1|dot2|ca-hai (bắt buộc khi yes), message ≤ 300}`, bắt buộc `Content-Type: application/json`. `POST /api/wish` `{message: 2–300 ký tự, name?: ≤ 60 ký tự, slug?: slug link chung}` (có ô bẫy bot `website`; server tự ghi thiết bị từ User-Agent và IP), cũng bắt buộc JSON.
 - Danh sách khách cache 60 giây; gặp slug lạ thì đọc lại Sheet nếu cache cũ hơn 10 giây, nên thêm khách xong dùng link được gần như ngay.
 - Mọi ghi vào Sheet dùng `valueInputOption=RAW` nên lời nhắn bắt đầu bằng `=` không bị chạy thành công thức.
 - Header bảo mật và CSP nằm trong `vercel.json`. CSP chưa kiểm trên deploy thật: mở DevTools trên bản preview, nếu có lỗi chặn thì nới đúng chỗ đó.
