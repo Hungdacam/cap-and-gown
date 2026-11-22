@@ -49,6 +49,9 @@ export const COPY = {
   footerLine: `${EVENT.graduateShort} hẹn gặp {pron} ở buổi lễ`,
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
   genericName: "Bạn thân mến",
+  // Tiệc thân mật, chỉ hiện với khách có cột khach_di_tiec = 1. Giờ, tên quán, link bản đồ nằm ở api/_lib/party.js.
+  partyLede: `Chụp ảnh xong, ${EVENT.graduateShort} xin mời {pron} ở lại dùng bữa trưa thân mật cùng ${EVENT.graduateShort}.`,
+  partyBooking: `${EVENT.graduateShort} đã đặt bàn lúc {time}. Đến nơi, {pron} chỉ cần báo nhân viên tên đặt bàn là {name}, sẽ có người dẫn vào bàn.`,
   tapHint: "Chạm để mở thiệp", // màn hình mở đầu trên điện thoại
   clickHint: "Bấm để mở thiệp", // màn hình mở đầu trên máy tính
 };

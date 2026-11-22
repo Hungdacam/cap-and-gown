@@ -1,6 +1,6 @@
 [
   { "slug": "minh-anh-a1b2", "name": "Phạm Minh Anh", "short": "Minh Anh", "call": "bạn" },
-  { "slug": "my-linh-c3d4", "name": "Trần Thị Mỹ Linh", "short": "Linh", "call": "chị" },
+  { "slug": "my-linh-c3d4", "name": "Trần Thị Mỹ Linh", "short": "Linh", "call": "chị", "khach_di_tiec": "1" },
   { "slug": "hoang-quoc-e5f6", "name": "Nguyễn Hoàng Quốc", "short": "Quốc", "call": "anh" },
   { "slug": "thi-hoa-g7h8", "name": "Cô Võ Thị Hòa", "short": "Hòa", "call": "cô" },
   { "slug": "hoi-k17-i9j0", "name": "Hội K17 thân yêu", "short": "", "call": "cả nhóm" }

@@ -4,8 +4,9 @@
 //   npm run guest -- --file danh-sach.csv        (CSV: ho_ten,xung_ho,nhom,kenh_gui)
 //   BASE_URL=https://ten-mien-cua-ban.vn npm run guest -- "Nguyễn Văn A" bạn
 //
-// Cột của tab Khach: slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung
+// Cột của tab Khach: slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | khach_di_tiec
 // link_chung (cột I) để trống với khách riêng; gõ "x" cho link gửi cả nhóm (group công ty...): link đó chỉ nhận lời chúc.
+// khach_di_tiec (cột J): điền 1 thì thiệp hiện thêm phần mời tiệc thân mật (thông tin quán ở api/_lib/party.js).
 import { randomInt } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { normalizeCall, isGroupCall } from "../public/src/address.js";

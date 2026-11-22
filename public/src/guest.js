@@ -21,7 +21,11 @@ export async function fetchGuest(slug, fetchImpl = fetch) {
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`guest ${res.status}`);
   const data = await res.json();
-  return { guest: { name: data.name, call: data.call, short: data.short?.trim() || data.name || "", shared: data.shared === true }, rsvp: data.rsvp || null };
+  return {
+    guest: { name: data.name, call: data.call, short: data.short?.trim() || data.name || "", shared: data.shared === true },
+    rsvp: data.rsvp || null,
+    party: data.party || null, // chỉ có với khách được mời tiệc thân mật
+  };
 }
 
 /** Lời chúc (chữ ký không bắt buộc) từ link công khai. Ném lỗi kèm mã (`err.code`) để giao diện báo đúng. */

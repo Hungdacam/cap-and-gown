@@ -46,6 +46,8 @@ export function parseRsvpBody(body) {
  * Nhiều người mở chung một link nên không nhận xác nhận (sẽ ghi đè nhau), chỉ nhận lời chúc, mỗi lời một dòng.
  */
 export const isSharedFlag = (v) => /^(x|có|co|chung|1|true|yes)$/i.test(String(v ?? "").trim());
+/** Cột khach_di_tiec: điền 1 (hoặc x, có) là khách được mời dự tiệc thân mật. */
+export const isPartyFlag = (v) => /^(1|x|có|co|true|yes)$/i.test(String(v ?? "").trim());
 
 export const MIN_WISH = 2;
 export const MAX_WISH_NAME = 60;
