@@ -9,6 +9,7 @@ import { initDecor } from "./decor.js";
 import { getSlug, fetchGuest, GENERIC_GUEST, pronoun } from "./guest.js";
 import { initRsvp } from "./rsvp.js";
 import { initWish } from "./wish.js";
+import { initParty } from "./party.js";
 import { googleCalendarUrl, needsSafariForIcs } from "./calendar.js";
 import { startSplash } from "./splash.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
@@ -50,13 +51,14 @@ async function boot() {
   const splash = startSplash({ gate: !isMusicOff() });
 
   const slug = getSlug();
-  let guest = GENERIC_GUEST, rsvp = null, mode = "generic";
+  let guest = GENERIC_GUEST, rsvp = null, party = null, mode = "generic";
   if (slug) {
     try {
       const found = await fetchGuest(slug);
       if (found) {
         guest = { ...found.guest, call: normalizeCall(found.guest.call) };
         rsvp = found.rsvp;
+        party = found.party;
         // Link chung (cột link_chung trong Sheet): chào đúng tên nhóm nhưng chỉ nhận lời chúc, không nhận xác nhận.
         mode = guest.shared ? "shared" : "ok";
       }
@@ -72,6 +74,10 @@ async function boot() {
   // Link công khai và link chung của nhóm: thay phần xác nhận bằng form lời chúc, mỗi lời chúc là một dòng mới (không ghi đè).
   if (mode === "generic") initWish();
   if (mode === "shared") initWish({ slug, pron: pronoun(guest) });
+  // Mời tiệc thân mật (cột khach_di_tiec). Hiện trước khi dựng hiệu ứng cuộn để ScrollTrigger đo đúng vị trí.
+  if (known && party) {
+    try { initParty(party, pronoun(guest)); } catch (err) { console.error(err); }
+  }
   splash.setGuest(COPY.invitationGreeting, name);
 
   // Thiệp lộ ra thì terminal gõ lệnh, tên khách giải mã, thẻ tốt nghiệp đung đưa.

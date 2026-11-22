@@ -195,6 +195,28 @@
     </div>
   </section>
 
+  <!-- ===== TIỆC THÂN MẬT: chỉ hiện với khách có cột khach_di_tiec = 1 (party.js) ===== -->
+  <section class="sec" id="partySec" aria-labelledby="party-h" hidden>
+    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 7d4a0f2</span>$ git merge <b>after-party</b></span><h2 id="party-h">Tiệc thân mật</h2></div>
+    <div class="panel party" id="party">
+      <div class="pt-stub">
+        <span class="pt-k">đặt bàn</span>
+        <span class="pt-clock" id="partyTime"></span>
+        <small id="partyDate"></small>
+      </div>
+      <div class="pt-body">
+        <p class="pt-lede" id="partyLede"></p>
+        <div class="pt-place">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <b id="partyPlace"></b>
+          <small id="partyAddr" hidden></small>
+        </div>
+        <p class="pt-book" id="partyBook"></p>
+        <div class="fa"><a class="btn primary" id="partyMap" href="#" target="_blank" rel="noopener">Mở Google Maps ↗</a><button class="btn" id="partyCopy" type="button">Sao chép tên quán</button></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== MAP = TOPOLOGY ===== -->
   <section class="sec" aria-labelledby="map-h">
     <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● c58f1e0</span>network/<b>campus.topology</b></span><h2 id="map-h">Đường đi &amp; gửi xe</h2></div>

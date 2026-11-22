@@ -101,6 +101,11 @@ export function initScrollEffects(opening, { map } = {}) {
   reveal(".eta", ".eta-v > span", { rotateX: -88, y: 18, duration: 0.7, ease: "back.out(1.6)" }, 0.09);
   when(".eta", armOdometer, "top 92%");
   reveal(".rsvp", ".rsvp > :not([hidden])", { y: 26 }, 0.1);
+  // Tiệc thân mật (chỉ khách được mời): tấm vé trượt vào, giờ đặt bàn đóng dấu xuống.
+  if (!$("partySec").hidden) {
+    reveal("#party", "#party .pt-stub, #party .pt-body > *", { x: -18, duration: 0.7 }, 0.08);
+    reveal("#party", "#partyTime", { scale: 1.8, rotate: -10, duration: 0.6, delay: 0.3, ease: "back.out(2.2)" });
+  }
 
   // Lịch trình: khung đứng yên, mỗi đoạn cuộn ứng với một khoảng giờ 08:30 → 14:00.
   // scrub phải gắn vào một tween thì mới được làm mượt.
