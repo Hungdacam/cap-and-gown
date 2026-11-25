@@ -1,7 +1,8 @@
-# cap-and-gown · Thiệp mời tốt nghiệp
+# cap-and-gown · Lời cảm ơn sau lễ tốt nghiệp
 
-Thiệp mời động cho lễ tốt nghiệp **25/11/2026** (IUH, 12 Nguyễn Văn Bảo, Gò Vấp). Mỗi khách có một link riêng
-`/t/<slug>`; trang tự điền đúng tên và cách xưng hô, khách bấm xác nhận có đến hay không, dữ liệu lưu vào Google Sheet.
+Thư cảm ơn sau lễ tốt nghiệp **25/11/2026** (IUH), gửi cho cả người đã đến lẫn người gửi quà, gửi lời chúc. Link riêng
+`/t/<slug>` chào đúng tên và cách xưng hô, link chung `/` gửi "mọi người". Trang có ảnh khoảnh khắc ngày lễ, link album
+Google Drive và form lời nhắn gửi Hưng (lưu vào Google Sheet). Bản thiệp mời có xác nhận tham dự trước đây nằm trong lịch sử git.
 
 - Giao diện: HTML + CSS + ES modules thuần, không bundler (`public/`). Thư viện duy nhất là GSAP 3.15.0, lưu sẵn trong `public/vendor/gsap/`.
 - API: hai hàm serverless trên Vercel (`api/guest.js`, `api/rsvp.js`), gọi Google Sheets REST bằng service account (JWT RS256 qua `node:crypto`).
@@ -15,27 +16,27 @@ npm test        # dùng node --test (Node >= 20)
 ```
 
 Chưa có biến môi trường thì API dùng `data/guests.sample.json` (hoặc `data/guests.local.json` nếu bạn tạo, file này không được commit)
-và ghi RSVP vào `data/dev-store.json`. Link thử: `/t/my-linh-c3d4` (có mời tiệc), `/t/hoang-quoc-e5f6` (không mời tiệc). Mở `/` (không có slug) sẽ ra thiệp chung "Bạn thân mến", không có nút xác nhận.
+và ghi RSVP vào `data/dev-store.json`. Link thử: `/t/my-linh-c3d4` (có ảnh riêng), `/t/cty-dotb-x7k2` (link chung của group công ty, ảnh tập thể khung rộng),
+`/t/hoang-quoc-e5f6` (không có ảnh riêng). Mở `/` sẽ ra thư gửi "Mọi người". Chạy ở máy mà chưa có file ảnh thì trang vẽ ảnh mẫu.
 
 ## Cài đặt một lần
 
 ### 1. Google Sheet
 Tạo Sheet mới với hai tab, hàng 1 là tiêu đề:
 
-- Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | khach_di_tiec` (cột A đến J).
+- Tab `Khach`: `slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | anh_rieng` (cột A đến J).
   `link_chung`: để trống với khách riêng. Gõ `x` cho slug gửi vào group nhiều người (ví dụ group công ty):
-  link đó vẫn chào đúng tên nhóm (`ten_goi` + `xung_ho`), nhưng không có nút xác nhận (nhiều người chung một
-  link sẽ ghi đè nhau), thay vào đó là form lời chúc, mỗi lời chúc một dòng trong tab `LoiChuc`.
-  `khach_di_tiec`: điền `1` thì thiệp của khách đó có thêm phần mời tiệc thân mật (giờ đặt bàn, tên quán, nút Google Maps).
-  Cột này được tìm theo tiêu đề ở hàng 1 nên đặt ở cột nào cũng được. Thông tin quán sửa ở `api/_lib/party.js`
-  (để ở server, khách không được mời không xem được, kể cả khi đọc mã nguồn trang).
-  Ví dụ dòng cho group công ty: `cty-dotb-x7k2 | Anh chị em DotB | DotB | anh chị | Công ty | Telegram | | | x`.
+  link đó chào đúng tên nhóm (`ten_goi` + `xung_ho`), form lời nhắn nhắc mỗi người ký tên, và ảnh riêng dùng lời
+  của ảnh tập thể với khung ảnh ngang rộng (ảnh chụp chung đông người).
+  `anh_rieng`: tên file ảnh (ví dụ `dotb-all.jpg`) chép vào `public/media/khach/`. Có thì trang hiện "Ảnh của chị Linh và Hưng"
+  (link chung: "Ảnh chung của ... và Hưng"). Ảnh ngang tự dùng khung rộng. Chỉ nhận tên file `.jpg`, `.png`, `.webp`, không
+  đường dẫn. Cột này được tìm theo tiêu đề ở hàng 1 nên đặt ở cột nào cũng được. Không có file thì trên site ẩn khung ảnh.
+  Ví dụ dòng cho group công ty: `cty-dotb-x7k2 | Anh chị em DotB | DotB | anh chị | Công ty | Telegram | | | x | dotb-all.jpg`.
 - Tab `XacNhan`: `slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den` (cột A đến F).
   `gio_den` là khung giờ khách chọn: `Đợt 1 · 09:00–11:00`, `Đợt 2 · 12:30–13:30` hoặc `Cả hai đợt`
   (bắt buộc khi "Sẽ đến", để trống khi "Không đi được"). Sheet cũ chỉ cần thêm tiêu đề `gio_den` ở ô F1.
-- Tab `LoiChuc`: `thoi_gian | loi_chuc | ky_ten | thiet_bi | ip | nguon` (cột A đến F). Lời chúc gửi từ link công
-  khai (không có slug) hoặc link chung của nhóm. `nguon` là slug của link chung, trống là link công khai, để lọc
-  lời chúc theo nhóm. Chữ ký không bắt buộc. Form báo rõ cho khách là có ghi thời gian, loại thiết bị và IP để
+- Tab `LoiChuc`: `thoi_gian | loi_chuc | ky_ten | thiet_bi | ip | nguon` (cột A đến F). Lời nhắn gửi từ mọi link.
+  `nguon` là slug của link riêng hoặc link chung (chỉ ghi khi slug có thật), trống là link công khai, để biết ai nhắn. Chữ ký không bắt buộc. Form báo rõ cho khách là có ghi thời gian, loại thiết bị và IP để
   chống spam. Mỗi máy (IP + trình duyệt) gửi tối đa 8 lời chúc trong 10 phút; cả văn phòng chung một IP vẫn gửi được.
 
 Lời văn tự xưng **Hưng** (cấu hình `EVENT.graduateShort`). Cách gọi người nhận là `xung_ho + ten_goi`, dùng nhất quán
@@ -88,12 +89,11 @@ Slug phân biệt hoa/thường: ô A ghi `cM-bV` thì link là `/t/cM-bV`; gi�
 
 ## Sửa nội dung
 
-Mọi chữ, giờ giấc, lộ trình, lưu ý nằm trong `public/src/config.js`. Mục ghi `CẦN ĐIỀN` còn thiếu thông tin thật:
+Mọi chữ, ảnh và lộ trình nằm trong `public/src/config.js`. Mục ghi `CẦN ĐIỀN` còn thiếu thông tin thật:
 
-- [ ] `EVENT.meetingPoint`: vị trí điểm hẹn trong trường
-- [ ] `ROUTES` (ô tô): tên và địa chỉ bãi ô tô
-- [ ] `MAP`: link ghim Google Maps của bãi chợ Gò Vấp, cổng sau (Lê Quang Định), cổng chính
-- [ ] Vẽ lại sơ đồ SVG trong `public/index.html` theo ảnh bản đồ thật (giữ nguyên id các khối thì code không cần đổi)
+- [ ] `PHOTOS`: ảnh khoảnh khắc đặc biệt (chép vào `public/media/album/`, điền `src`, sửa giờ và chú thích)
+- [ ] `ALBUM.driveUrl`: link chia sẻ album Google Drive (để trống thì trang báo "link album sẽ có trong vài ngày tới")
+- [ ] Ảnh riêng trong `public/media/khach/` và cột `anh_rieng` trong tab `Khach`
 
 ## Nhạc nền
 
@@ -116,7 +116,7 @@ design/thiep.html  bản thiết kế đã chốt
 
 ## Ghi chú kỹ thuật
 
-- API: `GET /api/guest?slug=` → `{name, short, call, shared?, party?, rsvp|null}` hoặc 404 (`shared: true` với link chung, khi đó `POST /api/rsvp` trả 400 `shared_link`). `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, arrival: dot1|dot2|ca-hai (bắt buộc khi yes), message ≤ 300}`, bắt buộc `Content-Type: application/json`. `POST /api/wish` `{message: 2–300 ký tự, name?: ≤ 60 ký tự, slug?: slug link chung}` (có ô bẫy bot `website`; server tự ghi thiết bị từ User-Agent và IP), cũng bắt buộc JSON.
+- API: `GET /api/guest?slug=` → `{name, short, call, shared?, photo?, rsvp|null}` hoặc 404 (`shared: true` với link chung, khi đó `POST /api/rsvp` trả 400 `shared_link`). `POST /api/rsvp` `{slug, status: yes|maybe|no, plusOnes: 0–5, arrival: dot1|dot2|ca-hai (bắt buộc khi yes), message ≤ 300}`, bắt buộc `Content-Type: application/json`. `POST /api/wish` `{message: 2–300 ký tự, name?: ≤ 60 ký tự, slug?: slug của khách}` (có ô bẫy bot `website`; server tự ghi thiết bị từ User-Agent và IP), cũng bắt buộc JSON.
 - Danh sách khách cache 60 giây; gặp slug lạ thì đọc lại Sheet nếu cache cũ hơn 10 giây, nên thêm khách xong dùng link được gần như ngay.
 - Mọi ghi vào Sheet dùng `valueInputOption=RAW` nên lời nhắn bắt đầu bằng `=` không bị chạy thành công thức.
 - Header bảo mật và CSP nằm trong `vercel.json`. CSP chưa kiểm trên deploy thật: mở DevTools trên bản preview, nếu có lỗi chặn thì nới đúng chỗ đó.

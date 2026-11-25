@@ -1,4 +1,4 @@
-import { EVENT, ROUTES, DEFAULT_ROUTE, MAP } from "./config.js";
+import { EVENT, ROUTES, DEFAULT_ROUTE } from "./config.js";
 import { $, esc } from "./util.js";
 import { initMap3d } from "./map3d.js";
 
@@ -84,54 +84,5 @@ export function initMap() {
     });
   });
   show(DEFAULT_ROUTE);
-  setupCopyAddress();
   return { startTour, map3d };
-}
-
-function setupCopyAddress() {
-  $("mapLink").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(MAP.schoolQuery);
-
-  const addr = `${EVENT.school}, ${EVENT.address}`;
-  $("copyAddr").addEventListener("click", async () => {
-    const btn = $("copyAddr");
-    try {
-      await navigator.clipboard.writeText(addr);
-      btn.textContent = "Đã sao chép địa chỉ";
-    } catch {
-      btn.textContent = EVENT.address;
-    }
-    setTimeout(() => (btn.textContent = "Sao chép địa chỉ cho Grab"), 2500);
-  });
-}
-
-/** Nhúng Google Map thật. Không lấy được link thì ẩn khung, nút "Mở Google Maps" vẫn dùng được. */
-export async function initGoogleMap(fetchImpl = fetch) {
-  try {
-    const res = await fetchImpl("/api/map");
-    if (!res.ok) throw new Error(`map ${res.status}`);
-    const { url } = await res.json();
-    $("gmapFrame").src = url;
-  } catch (err) {
-    console.error(err);
-    $("gmapFrame").hidden = true;
-  }
-}
-
-export function initPhoneCopy() {
-  const btn = $("copyPhone");
-  btn.addEventListener("click", async () => {
-    const txt = $("phone").textContent.replace(/\s/g, "");
-    try {
-      await navigator.clipboard.writeText(txt);
-      btn.textContent = "Đã sao chép";
-    } catch {
-      const r = document.createRange();
-      r.selectNodeContents($("phone"));
-      const s = getSelection();
-      s.removeAllRanges();
-      s.addRange(r);
-      btn.textContent = "Đã chọn số";
-    }
-    setTimeout(() => (btn.textContent = "Sao chép số"), 2000);
-  });
 }

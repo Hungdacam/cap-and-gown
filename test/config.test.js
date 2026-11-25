@@ -43,9 +43,8 @@ test("mỗi lộ trình trỏ tới id có thật trong sơ đồ, và id mặc 
 });
 
 test("mọi id mà JS tìm đều có trong index.html hoặc do JS tự tạo", () => {
-  const src = ["main", "render", "rsvp", "wish", "map", "countdown", "music", "decor", "splash", "hero", "facts", "fx", "map3d", "bg-graph", "scroll-effects"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
+  const src = ["main", "render", "wish", "map", "music", "decor", "splash", "hero", "gallery", "fx", "map3d", "bg-graph", "scroll-effects"].map((f) => readFileSync(new URL(`../public/src/${f}.js`, import.meta.url), "utf8")).join("\n");
   const wanted = new Set([...src.matchAll(/\$\("([A-Za-z0-9_-]+)"\)/g)].map((m) => m[1]));
-  ["yes", "maybe", "no"].forEach((i) => wanted.add(i));
   // id do JS dựng ra (ví dụ #credN trong render.js) thì phải có chuỗi id="..." trong chính mã nguồn.
   const missing = [...wanted].filter((id) => !html.includes(`id="${id}"`) && !src.includes(`id="${id}"`));
   assert.deepEqual(missing, []);
@@ -76,8 +75,8 @@ test("mức độ lưu ý hợp lệ", () => {
 });
 
 test("lời văn tự xưng Hưng, không dùng mình hoặc tôi", () => {
-  const copy = JSON.stringify([C.COPY, C.EVENT.dressCode, C.SCHEDULE, C.ROUTES, C.NOTES, C.CALENDAR, html]).normalize("NFC");
+  const copy = JSON.stringify([C.COPY, C.PHOTOS, C.EVENT.dressCode, C.SCHEDULE, C.ROUTES, C.NOTES, C.CALENDAR, html]).normalize("NFC");
   assert.equal(C.EVENT.graduateShort, "Hưng");
-  assert.match(C.COPY.lede, /Hưng rất mong \{pron\}/);
+  assert.match(C.COPY.lede, /Cảm ơn \{pron\}/);
   assert.doesNotMatch(copy, /(^|[^\p{L}])(mình|tôi)(?=$|[^\p{L}])/iu);
 });

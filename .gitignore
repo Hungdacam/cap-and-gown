@@ -8,3 +8,6 @@ data/guests.local.json
 data/dev-store.json
 *.log
 .DS_Store
+
+# Ảnh gốc độ phân giải cao, chỉ để trên máy (trang dùng bản đã thu nhỏ trong public/media/album/)
+anh-goc/

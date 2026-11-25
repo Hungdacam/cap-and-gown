@@ -1,6 +1,5 @@
 import { getStore } from "./_lib/store.js";
 import { isValidSlug } from "./_lib/validate.js";
-import { PARTY } from "./_lib/party.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -29,8 +28,8 @@ export default async function handler(req, res) {
       short: guest.short,
       call: guest.call,
       ...(guest.shared ? { shared: true } : {}),
-      // Chỉ khách có cột khach_di_tiec mới nhận thông tin tiệc thân mật.
-      ...(guest.party ? { party: PARTY } : {}),
+      // Ảnh riêng (cột anh_rieng): chỉ trả cho đúng khách đó, không nằm trong file công khai nào.
+      ...(guest.photo ? { photo: guest.photo } : {}),
       rsvp: found
         ? { status: found.status, plusOnes: found.plusOnes, arrival: found.arrival || "", message: found.message, updatedAt: found.updatedAt }
         : null,

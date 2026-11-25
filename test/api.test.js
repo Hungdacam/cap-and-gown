@@ -84,15 +84,10 @@ test("link chung của nhóm: GET báo shared, không trả xác nhận; POST /a
   assert.equal(db.rsvps[slug].message, "cũ", "không ghi đè");
 });
 
-test("khách có cột khach_di_tiec nhận thông tin tiệc thân mật, khách khác không thấy", async () => {
-  db.guests["di-tiec-1"] = { row: 5, slug: "di-tiec-1", name: "Trần Mỹ Linh", short: "Linh", call: "chị", openedAt: "", party: true };
-  const g = await get("di-tiec-1");
-  assert.equal(g.statusCode, 200);
-  assert.equal(g.body.party.time, "13:30");
-  assert.equal(g.body.party.bookingName, "Hưng");
-  assert.match(g.body.party.mapUrl, /^https:\/\//);
-  assert.ok(g.body.party.place);
-  assert.equal("party" in (await get("thuy-duong-k7q2")).body, false);
+test("khách có ảnh riêng (cột anh_rieng) nhận đường dẫn ảnh, khách khác không có khóa photo", async () => {
+  db.guests["co-anh-1"] = { row: 5, slug: "co-anh-1", name: "Trần Mỹ Linh", short: "Linh", call: "chị", openedAt: "", photo: "/media/khach/linh.jpg" };
+  assert.equal((await get("co-anh-1")).body.photo, "/media/khach/linh.jpg");
+  assert.equal("photo" in (await get("thuy-duong-k7q2")).body, false);
 });
 
 test("POST /api/rsvp: dữ liệu sai bị từ chối và không ghi gì", async () => {

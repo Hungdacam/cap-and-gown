@@ -1,11 +1,11 @@
 // Lưu trữ bằng Google Sheets qua REST API, không dùng thư viện ngoài.
 // Hai tab:
-//   Khach    : slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | khach_di_tiec
-//              (cột khach_di_tiec tìm theo tiêu đề ở hàng 1, không thấy thì dùng cột J)
+//   Khach    : slug | ho_ten | ten_goi | xung_ho | nhom | kenh_gui | da_gui | mo_lan_dau | link_chung | ... | anh_rieng
+//              (cột anh_rieng tìm theo tiêu đề ở hàng 1, đặt ở cột nào cũng được)
 //   XacNhan  : slug | trang_thai | so_nguoi_di_cung | loi_nhan | cap_nhat_luc | gio_den
 //   LoiChuc  : thoi_gian | loi_chuc | ky_ten | thiet_bi | ip | nguon   (nguon: slug link chung, trống = link công khai)
 import { createSign } from "node:crypto";
-import { safeCall, isSharedFlag, isPartyFlag } from "./validate.js";
+import { safeCall, isSharedFlag, photoPath } from "./validate.js";
 import { findArrival, toArrival } from "../../public/src/arrival.js";
 
 const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
@@ -77,7 +77,7 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
   const append = (range, values) =>
     call("POST", `${encodeURIComponent(range)}:append`, { query: "?valueInputOption=RAW&insertDataOption=INSERT_ROWS", body: { values } });
 
-  const toGuest = (partyCol) => (r, i) => ({
+  const toGuest = (photoCol) => (r, i) => ({
     row: i + 2,
     slug: String(r[0] ?? "").trim(),
     name: String(r[1] ?? "").trim(),
@@ -85,15 +85,15 @@ export function createSheetsStore({ sheetId, email, privateKey, fetchImpl = fetc
     call: safeCall(r[3]),
     openedAt: String(r[7] ?? "").trim(),
     shared: isSharedFlag(r[8]),
-    party: isPartyFlag(r[partyCol]),
+    photo: photoCol >= 0 ? photoPath(r[photoCol]) : "",
   });
 
   async function guestRows(force = false) {
     if (!force && guestCache.rows && now() - guestCache.at < GUEST_TTL_MS) return guestCache;
-    // Đọc cả hàng tiêu đề để tìm cột khach_di_tiec, chèn cột đó ở đâu cũng được. Các cột khác vẫn đọc theo thứ tự.
+    // Đọc cả hàng tiêu đề để tìm cột anh_rieng, chèn cột đó ở đâu cũng được. Các cột khác vẫn đọc theo thứ tự.
     const [head = [], ...body] = await read("Khach!A1:Z");
-    const found = head.findIndex((h) => String(h ?? "").trim().toLowerCase() === "khach_di_tiec");
-    const rows = body.map(toGuest(found >= 0 ? found : 9)).filter((g) => g.slug && g.name);
+    const photoCol = head.findIndex((h) => String(h ?? "").trim().toLowerCase() === "anh_rieng");
+    const rows = body.map(toGuest(photoCol)).filter((g) => g.slug && g.name);
     guestCache = { rows, at: now() };
     return guestCache;
   }

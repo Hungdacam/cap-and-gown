@@ -22,12 +22,10 @@ export function initDecor() {
   drawBarcode();
 
   const sections = [
-    ["Lời mời", document.querySelector(".term")],
-    ["Thông tin", $("facts-h").closest("section")],
-    ["Lịch trình", $("pipe-h").closest("section")],
-    ["Thiệp mời", $("pr-h").closest("section")],
-    ["Đường đi", $("map-h").closest("section")],
-    ["Lưu ý", $("lint-h").closest("section")],
+    ["Lời cảm ơn", document.querySelector(".term")],
+    ["Khoảnh khắc", $("album-h").closest("section")],
+    ["Lời nhắn", $("msg-h").closest("section")],
+    ["Nơi gặp nhau", $("map-h").closest("section")],
   ];
   const list = $("gList"), fill = $("gFill"), gbarFill = $("gbarFill"), mini = $("mini");
   // ScrollSmoother dịch nội dung bằng transform nên scrollIntoView không cuộn được.
@@ -36,8 +34,6 @@ export function initDecor() {
     if (smoother) smoother.scrollTo(el, true, "top 24px");
     else el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
   };
-  // Đang chọn khung giờ thì cuộn lên xem lại lịch trình.
-  $("seeSchedule").addEventListener("click", () => goTo($("pipe-h").closest("section")));
 
   const items = sections.map(([label, el]) => {
     const li = document.createElement("li");

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Thiệp mời tốt nghiệp</title>
-<meta name="description" content="Thiệp mời dự buổi chụp ảnh chúc mừng tốt nghiệp ngày 25/11/2026 tại Trường Đại học Công nghiệp TP.HCM (IUH).">
+<title>Lời cảm ơn của Hưng</title>
+<meta name="description" content="Lời cảm ơn sau lễ tốt nghiệp ngày 25/11/2026 tại Trường Đại học Công nghiệp TP.HCM (IUH).">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0e1220">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Thiệp mời tốt nghiệp">
-<meta property="og:description" content="Cùng chung vui ngày tốt nghiệp 25/11/2026 tại IUH.">
+<meta property="og:title" content="Lời cảm ơn của Hưng">
+<meta property="og:description" content="Cảm ơn mọi người đã chung vui ngày tốt nghiệp 25/11/2026.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
@@ -22,7 +22,7 @@
 <body>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
-<nav class="g-rail" aria-label="Các mục của thiệp">
+<nav class="g-rail" aria-label="Các mục của thư cảm ơn">
   <span class="g-tag">sinh-viên</span>
   <div class="g-wrap"><ol class="g-list" id="gList"></ol><i class="g-fill" id="gFill"></i></div>
   <span class="g-tag">cựu-sinh-viên</span>
@@ -30,7 +30,7 @@
 <div class="mini" id="mini" aria-hidden="true"></div>
 <div class="gbar" aria-hidden="true"><i id="gbarFill"></i></div>
 
-<!-- ===== SPLASH: hạt sáng xoáy như thiên hà rồi kết thành tên khách, mũ 3D rơi xuống; chạm thì mũ tung lên, hạt bung, nền tan dần ===== -->
+<!-- ===== SPLASH: hạt sáng xoáy như thiên hà rồi kết thành tên khách, mũ 3D rơi xuống; chạm thì mũ tung lên, hạt bung ===== -->
 <div class="splash" id="splash" aria-hidden="true">
   <canvas id="spGL" aria-hidden="true"></canvas>
   <div class="sp-chrome" id="spChrome" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl" id="spTl"></span><span class="br" id="spBr"></span></div>
@@ -49,17 +49,18 @@
 <div id="smooth-content">
 <div class="wrap">
 
-  <!-- ===== TERMINAL HERO ===== -->
-  <section class="panel term" aria-label="Lời chào">
+  <!-- ===== TERMINAL HERO: lời cảm ơn ===== -->
+  <section class="panel term" aria-label="Lời cảm ơn">
     <div class="term-bar"><i></i><i></i><i></i><span id="termTitle">hung@grad: ~/2026</span></div>
     <div class="term-body">
       <div class="hero-main">
-      <div class="ln"><span class="prompt">➜ ~/2026</span> ./invite <span class="c-str">--guest=<span id="slugEcho">guest</span></span></div>
-      <div class="ln c-cmt">[ok] đang mở thiệp mời… xong</div>
+      <div class="ln"><span class="prompt">➜ ~/2026</span> ./thank-you <span class="c-str">--guest=<span id="slugEcho">guest</span></span></div>
+      <div class="ln c-cmt">[ok] lễ tốt nghiệp <span id="dayLine"></span>… xong</div>
       <div class="ln c-cmt">[ok] kiểm tra bằng tốt nghiệp… <span class="c-ok" id="credits"></span></div>
       <div class="ln c-cmt">[ok] cấp danh hiệu… <span class="t-gold" id="titleLine"></span></div>
+      <div class="ln c-cmt">[ok] gửi lời cảm ơn tới… <span class="c-ok" id="guestLine"></span></div>
       <h1 class="hello">
-        <span class="greet" id="greet">// Trân trọng kính mời</span>
+        <span class="greet" id="greet">// Gửi lời cảm ơn đến</span>
         <span class="guest" id="guestName"></span><span class="caret"></span>
       </h1>
       <p class="lede" id="lede"></p>
@@ -72,107 +73,45 @@
     </div>
   </section>
 
-  <!-- ===== THÔNG TIN CHÍNH: giờ giấc, địa điểm, số liên lạc ===== -->
-  <section class="sec" aria-labelledby="facts-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 0a3e5b8</span>README.md › <b>thông tin chính</b></span><h2 class="sr" id="facts-h">Thông tin chính</h2></div>
-    <div class="facts" id="facts">
-      <div class="panel fact time">
-        <span class="fk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Thời gian</span>
-        <span class="fv" id="factDate"></span>
-        <div class="when-row" id="factPills"></div>
-        <span class="fs" id="factNote"></span>
-        <div class="fa"><a class="btn" id="factCal" href="#" target="_blank" rel="noopener">Thêm vào lịch ↗</a></div>
+  <!-- ===== ALBUM: ảnh riêng của khách + vòng ảnh 3D ngày lễ ===== -->
+  <section class="sec album" aria-labelledby="album-h">
+    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 3f9c2e1</span>photos/<b>25-11-2026</b></span><h2 id="album-h">Khoảnh khắc ngày lễ</h2></div>
+    <p class="sec-sub" id="albumSub"></p>
+
+    <figure class="panel me" id="me" hidden>
+      <button class="me-photo" id="mePhoto" type="button"><img id="meImg" alt=""><i class="me-tape" aria-hidden="true"></i></button>
+      <figcaption class="me-text">
+        <span class="me-k" id="meLabel"></span>
+        <b id="meCap"></b>
+        <span id="meSub"></span>
+      </figcaption>
+    </figure>
+
+    <div class="ring" id="ring" role="group" aria-label="Album ảnh ngày lễ. Kéo ngang để xoay, chạm vào ảnh để xem lớn.">
+      <div class="ring-spin" id="ringSpin"></div>
+    </div>
+    <div class="ring-hint" id="ringHint" aria-hidden="true">← kéo để xoay · chạm vào ảnh để xem lớn →</div>
+
+    <div class="panel drive" id="drive">
+      <svg class="drive-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.4l2 2h8.6A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="9.5" cy="13.5" r="1.6"/><path d="m21 17-4.5-4.5L11 18"/></svg>
+      <div class="drive-text">
+        <span class="drive-cmd">$ open drive://album/<b>25-11-2026</b></span>
+        <b id="driveTitle"></b>
+        <span id="driveText"></span>
       </div>
-      <div class="panel fact place">
-        <span class="fk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Địa điểm</span>
-        <span class="fv" id="factPlace"></span>
-        <span class="fs" id="factAddr"></span>
-        <div class="fa"><button class="btn" id="toMap" type="button">Xem đường đi ↓</button></div>
-      </div>
-      <div class="panel fact call" id="factCallCard">
-        <span class="fk"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Liên hệ Hưng</span>
-        <span class="fv mono" id="factPhone"></span>
-        <span class="fs" id="factCallNote"></span>
-        <div class="fa"><a class="btn primary" id="factCallLink" href="#">Gọi ngay</a><button class="btn" id="copyPhone2" type="button">Sao chép số</button></div>
-      </div>
+      <a class="btn primary" id="driveLink" href="#" target="_blank" rel="noopener">Mở album Google Drive ↗</a>
     </div>
   </section>
 
-  <!-- ===== PIPELINE = LỊCH TRÌNH ===== -->
-  <section class="sec" aria-labelledby="pipe-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 9b07c3e</span>.github/workflows/<b>graduation.yml</b></span><h2 id="pipe-h">Lịch trình ngày lễ</h2></div>
-    <div class="pipe-stage" id="pipeStage">
-    <div class="panel" id="pipePanel">
-      <div class="ruler">
-        <div class="r-legend"><span><i class="sw meet"></i>khung giờ gặp khách</span><span><i class="sw cer"></i><span id="rLegendCer"></span></span><span class="r-tip">↕ cuộn để tua qua ngày lễ</span></div>
-        <div class="r-box">
-          <div class="r-head" id="rHead" aria-hidden="true"><span class="r-bub" id="rBub">08:30</span></div>
-          <div class="r-track" id="rTrack"></div>
-        </div>
-        <div class="r-ticks" id="rTicks" aria-hidden="true"></div>
-      </div>
-      <div class="pipe" id="pipe"></div>
-      <div class="bar"><i id="pipeBar"></i></div>
-    </div>
-    </div>
-  </section>
-
-  <!-- ===== PR CARD = THIỆP CHÍNH ===== -->
-  <section class="sec" aria-labelledby="pr-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 4e1d2a7</span>github.com/hung/life › <b>pull/2026</b></span></div>
-    <article class="panel pr">
-      <div class="pr-head">
-        <h2 class="pr-title" id="pr-h"><span id="prTitle"></span> <span class="num" id="prNum"></span></h2>
-        <div class="pr-meta" id="prMeta"></div>
-      </div>
-      <div class="pr-grid">
-        <div class="yaml" id="yaml" aria-label="Thông tin sự kiện"></div>
-        <div class="checks" id="checks"></div>
-      </div>
-      <div class="eta">
-        <span class="eta-l">Đếm ngược thời gian tốt nghiệp</span>
-        <div class="eta-v" aria-hidden="true">
-          <span><b id="cd-d">00</b><em>ngày</em></span><span><b id="cd-h">00</b><em>giờ</em></span><span><b id="cd-m">00</b><em>phút</em></span><span><b id="cd-s">00</b><em>giây</em></span>
-        </div>
-        <span class="sr" id="cdText"></span>
-      </div>
-    </article>
-
-    <div class="rsvp">
-      <div class="rsvp-btns" id="rsvpBtns" role="group" aria-label="Xác nhận tham dự" hidden>
-        <button class="btn primary" id="yes" type="button" aria-pressed="false">✓ Sẽ đến</button>
-        <button class="btn" id="maybe" type="button" aria-pressed="false">Chưa chắc</button>
-        <button class="btn" id="no" type="button" aria-pressed="false">Không đi được</button>
-      </div>
-      <form class="rsvp-form" id="rsvpForm" hidden novalidate>
-        <div class="field" id="arrivalField">
-          <div class="lbl-row"><label for="arrival">Khung giờ sẽ đến</label><button class="linkish" id="seeSchedule" type="button">xem lịch trình ↑</button></div>
-          <select id="arrival" name="arrival"></select>
-        </div>
-        <div class="field" id="plusField">
-          <label for="plusOnes">Số người đi cùng</label>
-          <select id="plusOnes" name="plusOnes">
-            <option value="0">Không có người đi cùng</option>
-            <option value="1">Thêm 1 người</option>
-            <option value="2">Thêm 2 người</option>
-            <option value="3">Thêm 3 người</option>
-            <option value="4">Thêm 4 người</option>
-            <option value="5">Thêm 5 người</option>
-          </select>
-        </div>
+  <!-- ===== LỜI NHẮN GỬI HƯNG ===== -->
+  <section class="sec" aria-labelledby="msg-h">
+    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 8e2d4b7</span>$ git commit -m <b>"gửi Hưng"</b></span><h2 id="msg-h">Lời nhắn gửi Hưng</h2></div>
+    <p class="sec-sub" id="msgSub"></p>
+    <div class="rsvp" id="msgBox">
+      <form class="rsvp-form wish-form panel" id="wishForm" hidden novalidate>
         <div class="field">
-          <label id="messageLabel" for="rsvpMsg">Lời nhắn (không bắt buộc)</label>
-          <textarea id="rsvpMsg" name="message" maxlength="300" placeholder="Ví dụ: Sẽ đến muộn khoảng 15 phút…"></textarea>
-          <span class="count" id="rsvpCount">0/300</span>
-        </div>
-        <div class="row-actions">
-          <button class="btn primary" id="rsvpSend" type="submit">Gửi xác nhận</button>
-        </div>
-      </form>
-      <form class="rsvp-form wish-form" id="wishForm" hidden novalidate>
-        <div class="field">
-          <label for="wishMsg">Lời chúc gửi Hưng</label>
-          <textarea id="wishMsg" name="message" maxlength="300" placeholder="Chúc mừng tân kỹ sư…"></textarea>
+          <label for="wishMsg">Lời nhắn</label>
+          <textarea id="wishMsg" name="message" maxlength="300" placeholder="Viết đôi lời cho tân kỹ sư…"></textarea>
           <span class="count" id="wishCount">0/300</span>
         </div>
         <div class="field">
@@ -180,96 +119,59 @@
           <input id="wishName" name="name" type="text" maxlength="60" autocomplete="name" placeholder="Để trống nếu không muốn ghi tên">
         </div>
         <input class="hp" type="text" id="wishWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <p class="wish-note">Lời chúc chỉ Hưng đọc, không công khai. Để chống spam, Hưng ghi lại thời gian gửi, loại thiết bị và địa chỉ IP.</p>
+        <p class="wish-note">Lời nhắn chỉ Hưng đọc, không công khai. Để chống spam, Hưng ghi lại thời gian gửi, loại thiết bị và địa chỉ IP.</p>
         <div class="row-actions">
-          <button class="btn primary" id="wishSend" type="submit">Gửi lời chúc</button>
+          <button class="btn primary" id="wishSend" type="submit">Gửi lời nhắn</button>
         </div>
       </form>
-      <div class="panel log" id="log" aria-live="polite"><span class="c-cmt">› Chọn một trạng thái để xác nhận tham dự</span></div>
-      <div class="cal" id="cal" hidden>
-        <span class="lbl-s">Thêm vào lịch</span>
-        <a class="btn" id="calGoogle" href="#" target="_blank" rel="noopener">Google Calendar ↗</a>
-        <a class="btn" id="calIcs" href="/api/calendar">Lịch iPhone (.ics)</a>
-        <small class="cal-hint" id="calHint" hidden>Trên iPhone, hãy mở trang này bằng Safari rồi bấm lại để thêm vào Lịch.</small>
-      </div>
+      <div class="panel log" id="log" aria-live="polite"></div>
     </div>
   </section>
 
-  <!-- ===== TIỆC THÂN MẬT: chỉ hiện với khách có cột khach_di_tiec = 1 (party.js) ===== -->
-  <section class="sec" id="partySec" aria-labelledby="party-h" hidden>
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 7d4a0f2</span>$ git merge <b>after-party</b></span><h2 id="party-h">Tiệc thân mật</h2></div>
-    <div class="panel party" id="party">
-      <div class="pt-stub">
-        <span class="pt-k">đặt bàn</span>
-        <span class="pt-clock" id="partyTime"></span>
-        <small id="partyDate"></small>
-      </div>
-      <div class="pt-body">
-        <p class="pt-lede" id="partyLede"></p>
-        <div class="pt-place">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <b id="partyPlace"></b>
-          <small id="partyAddr" hidden></small>
-        </div>
-        <p class="pt-book" id="partyBook"></p>
-        <div class="fa"><a class="btn primary" id="partyMap" href="#" target="_blank" rel="noopener">Mở Google Maps ↗</a><button class="btn" id="partyCopy" type="button">Sao chép tên quán</button></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== MAP = TOPOLOGY ===== -->
+  <!-- ===== MAP = TOPOLOGY: nơi gặp nhau ===== -->
   <section class="sec" aria-labelledby="map-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● c58f1e0</span>network/<b>campus.topology</b></span><h2 id="map-h">Đường đi &amp; gửi xe</h2></div>
+    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● c58f1e0</span>network/<b>campus.topology</b></span><h2 id="map-h">Nơi Hưng và mọi người gặp nhau</h2></div>
+    <p class="sec-sub" id="mapSub"></p>
     <div class="tabs" id="tabs" role="tablist" aria-label="Phương tiện"></div>
     <div class="panel map" id="mapPanel">
       <div class="map3d" id="map3d">
         <canvas id="campus" role="img" aria-label="Sơ đồ 3D minh họa khuôn viên IUH: cổng chính trên đường Nguyễn Văn Bảo, sân xe đạp, khu điểm hẹn trước nhà E hoặc nhà H, cổng sau phía đường Lê Quang Định, bãi xe chợ Gò Vấp, bãi ô tô và hai điểm xuống Grab"></canvas>
-        <div class="m3-hud"><button class="m3-play" id="m3play" type="button">▶ Chạy lộ trình</button><span class="m3-status" id="m3status" aria-hidden="true">kéo ngang để xoay</span></div>
+        <div class="m3-hud"><button class="m3-play" id="m3play" type="button">▶ Chạy lại lộ trình</button><span class="m3-status" id="m3status" aria-hidden="true">kéo ngang để xoay</span></div>
       </div>
       <div class="map-scroll">
         <svg viewBox="0 0 640 360" role="img" aria-label="Sơ đồ minh họa: chợ Gò Vấp, đường Lê Quang Định, cổng sau, cổng chính, hai điểm xuống Grab và điểm hẹn trong trường">
           <rect class="m-bg" width="640" height="360"/>
           <g id="grid"></g>
-          <!-- roads -->
           <line class="m-road" x1="0" y1="52" x2="640" y2="52"/>
           <text class="m-s" x="16" y="30">đường Lê Quang Định</text>
           <line class="m-road" x1="0" y1="330" x2="640" y2="330"/>
-          <text class="m-s" x="624" y="352" text-anchor="end">đường Nguyễn Văn Bảo · một chiều gần trường</text>
-          <!-- campus -->
+          <text class="m-s" x="624" y="352" text-anchor="end">đường Nguyễn Văn Bảo</text>
           <rect class="m-node" x="210" y="76" width="400" height="226" rx="12"/>
           <text class="m-s" x="226" y="98">khuôn viên IUH</text>
-          <!-- hall -->
           <rect class="m-hall" x="440" y="100" width="150" height="70" rx="10"/>
           <text class="m-t" x="515" y="132" text-anchor="middle" style="font-weight:700">HỘI TRƯỜNG</text>
           <text class="m-s" x="515" y="150" text-anchor="middle" id="hallLabel">nhận bằng · 11:04</text>
-          <!-- meeting -->
           <circle class="m-pink" cx="360" cy="200" r="9"/>
           <circle cx="360" cy="200" r="16" fill="none" stroke="var(--pink)" stroke-opacity=".4"/>
           <text class="m-t" x="382" y="196">điểm hẹn</text>
-          <text class="m-s" x="382" y="212" id="meetLabel">09:00 · sẽ cập nhật</text>
-          <!-- gates -->
+          <text class="m-s" x="382" y="212" id="meetLabel"></text>
           <rect class="m-acc" x="300" y="69" width="36" height="14" rx="3"/>
           <text class="m-s" x="344" y="80">cổng sau</text>
           <rect class="m-acc" x="380" y="295" width="36" height="14" rx="3"/>
           <text class="m-s" x="424" y="306">cổng chính · số 12</text>
-          <!-- moto lot -->
           <g id="n-moto">
             <rect class="m-p1" x="20" y="72" width="170" height="64" rx="8"/>
             <text class="m-t" x="105" y="100" text-anchor="middle" style="fill:var(--ok);font-weight:700">bãi xe chợ Gò Vấp</text>
             <text class="m-s" x="105" y="119" text-anchor="middle">đối diện Betma English</text>
           </g>
-          <!-- car lot -->
           <g id="n-car">
             <rect class="m-p2" x="20" y="200" width="170" height="64" rx="8"/>
             <text class="m-t" x="105" y="228" text-anchor="middle" style="fill:var(--amber);font-weight:700">bãi ô tô</text>
-            <text class="m-s" x="105" y="247" text-anchor="middle">sẽ cập nhật sau</text>
           </g>
-          <!-- grab drop -->
           <g id="n-grab">
             <rect class="m-acc" x="300" y="320" width="48" height="20" rx="4"/>
             <text x="324" y="334" text-anchor="middle" style="fill:var(--bg);font-family:var(--f-mono);font-size:10px;font-weight:700">GRAB</text>
           </g>
-          <!-- grab drop at back gate, Lê Quang Định -->
           <g id="n-grab2">
             <rect class="m-acc" x="344" y="42" width="48" height="20" rx="4"/>
             <text x="368" y="56" text-anchor="middle" style="fill:var(--bg);font-family:var(--f-mono);font-size:10px;font-weight:700">GRAB</text>
@@ -290,25 +192,6 @@
         </div>
       </div>
     </div>
-    <div class="panel gmap">
-      <iframe id="gmapFrame" title="Google Map: Trường Đại học Công nghiệp TP.HCM" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-      <div class="map-foot">
-        <div class="map-actions">
-          <button class="btn" id="copyAddr" type="button">Sao chép địa chỉ cho Grab</button>
-          <a class="btn" id="mapLink" href="#" target="_blank" rel="noopener">Mở Google Maps ↗</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== LINTER = LƯU Ý ===== -->
-  <section class="sec" aria-labelledby="lint-h">
-    <div class="sec-head"><span class="path"><span class="hash" aria-hidden="true">● 21fa9d4</span>$ npx <b>grad-lint</b> ./ban-than</span><h2 id="lint-h">Vài lưu ý trước khi đi</h2></div>
-    <div class="panel lint" id="lint"></div>
-    <div class="panel ping" id="contact" hidden>
-      <div><span class="cmd" id="contactLabel">Cần hỗ trợ đường đi?</span><br><a class="num" id="phone" href="#"></a></div>
-      <button class="btn" id="copyPhone" type="button">Sao chép số</button>
-    </div>
   </section>
 
   <footer>
@@ -321,6 +204,7 @@
       <circle cx="12" cy="70" r="6" class="c-main"/><circle cx="262" cy="70" r="8" class="c-main" id="mDot"/><circle cx="348" cy="70" r="6" class="c-main"/>
     </svg>
     <span><b>✓</b> <span id="footLine"></span></span>
+    <span class="foot-merged" id="footMerged"></span>
     <span id="footSub"></span>
   </footer>
 </div>
@@ -331,9 +215,13 @@
   <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
   <span id="musicLabel">Bật nhạc</span>
 </button>
-<!-- Nút gọi nổi: hiện khi đã cuộn qua phần thông tin chính, bấm để sao chép số. Nhạc ở góc phải nên nút này ở góc trái. -->
-<button class="callfab" id="callfab" type="button" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span id="callfabT"></span></button>
-<!-- Thẻ cảm xúc sau mỗi lựa chọn (chỉ để nhìn; nội dung đã có trong #log). -->
+<!-- Xem ảnh lớn. position:fixed nên nằm ngoài #smooth-wrapper. -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Xem ảnh" hidden>
+  <button class="lb-x" id="lbClose" type="button" aria-label="Đóng">✕</button>
+  <button class="lb-nav prev" id="lbPrev" type="button" aria-label="Ảnh trước">‹</button>
+  <figure class="lb-fig" id="lbFig"><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure>
+  <button class="lb-nav next" id="lbNext" type="button" aria-label="Ảnh sau">›</button>
+</div>
 <div class="mood" id="mood" aria-hidden="true"><div class="mood-card" id="moodCard"><span class="mood-ic" id="moodIc"></span><b id="moodT"></b><small id="moodS"></small></div></div>
 
 <script src="/vendor/gsap/gsap.min.js"></script>
