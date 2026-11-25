@@ -7,7 +7,7 @@ const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 20
 const pem = privateKey.export({ type: "pkcs8", format: "pem" });
 const envKey = pem.replace(/\n/g, "\\n"); // đúng dạng khi dán vào biến môi trường Vercel
 
-const HEAD = ["slug", "ho_ten", "ten_goi", "xung_ho", "nhom", "kenh_gui", "da_gui", "mo_lan_dau", "link_chung", "khach_di_tiec"];
+const HEAD = ["slug", "ho_ten", "ten_goi", "xung_ho", "nhom", "kenh_gui", "da_gui", "mo_lan_dau", "link_chung", "anh_rieng"];
 
 function setup({ khach = [], xacnhan = [], clock, head = HEAD } = {}) {
   const calls = [];
@@ -58,7 +58,7 @@ test("token được dùng lại cho các lần gọi sau", async () => {
 test("getGuest map đúng cột, giữ xưng hô tùy chỉnh và ô trống", async () => {
   const { store } = setup({ khach: [["", "Dòng trống slug"], ["t-l-1abc", "Trần Thị Mỹ Linh", "Linh", "chị", "Lớp", "Zalo", "x", ""], ["s-e-2abc", "Sếp", "", "sếp"], ["a-b-3abc", "Nguyễn A", "A", " "]] });
   const g = await store.getGuest("t-l-1abc");
-  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "", shared: false, party: false });
+  assert.deepEqual(g, { row: 3, slug: "t-l-1abc", name: "Trần Thị Mỹ Linh", short: "Linh", call: "chị", openedAt: "", shared: false, photo: "" });
   assert.equal((await store.getGuest("s-e-2abc")).call, "sếp");
   assert.equal((await store.getGuest("a-b-3abc")).call, "");
   assert.equal(await store.getGuest("khong-co-1"), null);
@@ -134,19 +134,18 @@ test("cột I link_chung: x, có, chung, true... đánh dấu link chung; trốn
   for (const s of ["le-e-1", "le-f-1", "le-g-1"]) assert.equal((await store.getGuest(s)).shared, false, s);
 });
 
-test("cột khach_di_tiec: điền 1 là khách được mời tiệc; tìm cột theo tiêu đề, thiếu tiêu đề thì dùng cột J", async () => {
-  const row = (slug, flag) => [slug, "Khách", "", "anh", "", "", "", "", "", flag];
-  const { store } = setup({ khach: [row("ti-a-1", "1"), row("ti-b-1", " x "), row("ko-c-1", ""), row("ko-d-1", "0"), ["ko-e-1", "Khách cũ", "E", "anh"]] });
-  for (const s of ["ti-a-1", "ti-b-1"]) assert.equal((await store.getGuest(s)).party, true, s);
-  for (const s of ["ko-c-1", "ko-d-1", "ko-e-1"]) assert.equal((await store.getGuest(s)).party, false, s);
+test("cột anh_rieng: tên file thành đường dẫn /media/khach/; tìm cột theo tiêu đề; tên lạ hay đường dẫn bị bỏ qua", async () => {
+  const row = (slug, file) => [slug, "Khách", "", "anh", "", "", "", "", "", file];
+  const { store } = setup({ khach: [row("a-a-1", "linh.jpg"), row("b-b-1", " dotb-all.webp "), row("c-c-1", ""), row("d-d-1", "../secret.jpg"), row("e-e-1", "a/b.png"), row("f-f-1", "anh.gif"), ["g-g-1", "Khách cũ", "G", "anh"]] });
+  assert.equal((await store.getGuest("a-a-1")).photo, "/media/khach/linh.jpg");
+  assert.equal((await store.getGuest("b-b-1")).photo, "/media/khach/dotb-all.webp");
+  for (const s of ["c-c-1", "d-d-1", "e-e-1", "f-f-1", "g-g-1"]) assert.equal((await store.getGuest(s)).photo, "", s);
 
-  // Chủ thiệp chèn cột tiệc ở chỗ khác (cột K) thì vẫn đọc đúng theo tiêu đề.
-  const moved = setup({ head: [...HEAD.slice(0, 9), "ghi_chu", " Khach_Di_Tiec "], khach: [["ti-f-1", "F", "", "chị", "", "", "", "", "", "1", ""], ["ti-g-1", "G", "", "chị", "", "", "", "", "", "", "1"]] });
-  assert.equal((await moved.store.getGuest("ti-f-1")).party, false, "cột J giờ là ghi_chu");
-  assert.equal((await moved.store.getGuest("ti-g-1")).party, true);
-
-  const noHead = setup({ head: HEAD.slice(0, 9), khach: [row("ti-h-1", "1")] });
-  assert.equal((await noHead.store.getGuest("ti-h-1")).party, true, "chưa có tiêu đề: cột J");
+  // Chèn cột ở chỗ khác (cột K) vẫn đọc đúng theo tiêu đề; Sheet chưa có cột này thì không ai có ảnh riêng.
+  const moved = setup({ head: [...HEAD.slice(0, 9), "ghi_chu", " Anh_Rieng "], khach: [["h-h-1", "H", "", "chị", "", "", "", "", "", "khong-phai.jpg", "h.jpg"]] });
+  assert.equal((await moved.store.getGuest("h-h-1")).photo, "/media/khach/h.jpg");
+  const noHead = setup({ head: HEAD.slice(0, 9), khach: [row("i-i-1", "i.jpg")] });
+  assert.equal((await noHead.store.getGuest("i-i-1")).photo, "");
 });
 
 test("markOpened ghi cột H đúng dòng và cập nhật cache", async () => {

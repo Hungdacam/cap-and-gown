@@ -58,9 +58,10 @@ export default async function handler(req, res) {
 
   try {
     const store = await getStore();
-    // Nguồn: chỉ ghi slug khi slug đó thật sự là link chung, để không ai tự đặt nguồn tùy ý. Trống = link công khai.
+    // Nguồn: slug của link riêng hoặc link chung, để Hưng biết lời nhắn từ ai. Chỉ ghi khi slug có thật trong danh sách
+    // khách, để không ai tự đặt nguồn tùy ý. Trống = link công khai.
     const { slug, ...wish } = parsed.value;
-    const source = slug && (await store.getGuest(slug))?.shared ? slug : "";
+    const source = slug && (await store.getGuest(slug)) ? slug : "";
     // Form đã báo khách: Hưng ghi lại thời gian, loại thiết bị và IP để chống spam.
     await store.addWish({
       ...wish,

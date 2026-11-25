@@ -82,11 +82,11 @@ test("POST /api/wish: sai dữ liệu, sai content-type, sai phương thức", a
   assert.equal((await post({}, { method: "GET" })).statusCode, 405);
 });
 
-test("POST /api/wish: link chung ghi nguồn là slug; slug riêng hay không có thật thì để trống (không tự đặt nguồn được)", async () => {
+test("POST /api/wish: link chung và link riêng ghi nguồn là slug; slug không có thật thì để trống (không tự đặt nguồn được)", async () => {
   await post({ message: "Chúc mừng từ công ty", slug: "cty-dotb-x1" });
-  await post({ message: "Gắn slug khách riêng", slug: "le-linh-1" });
+  await post({ message: "Lời nhắn của khách riêng", slug: "le-linh-1" });
   await post({ message: "Gắn slug bịa", slug: "khong-co-1" });
-  assert.deepEqual(saved.map((w) => w.source), ["cty-dotb-x1", "", ""]);
+  assert.deepEqual(saved.map((w) => w.source), ["cty-dotb-x1", "le-linh-1", ""]);
 });
 
 test("POST /api/wish: tối đa 8 lời chúc mỗi máy trong 10 phút; đồng nghiệp chung IP văn phòng nhưng khác máy vẫn gửi được", async () => {

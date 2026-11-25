@@ -46,8 +46,14 @@ export function parseRsvpBody(body) {
  * Nhiều người mở chung một link nên không nhận xác nhận (sẽ ghi đè nhau), chỉ nhận lời chúc, mỗi lời một dòng.
  */
 export const isSharedFlag = (v) => /^(x|có|co|chung|1|true|yes)$/i.test(String(v ?? "").trim());
-/** Cột khach_di_tiec: điền 1 (hoặc x, có) là khách được mời dự tiệc thân mật. */
-export const isPartyFlag = (v) => /^(1|x|có|co|true|yes)$/i.test(String(v ?? "").trim());
+/**
+ * Cột anh_rieng: tên file ảnh riêng của khách (hoặc ảnh tập thể của link chung) trong public/media/khach/.
+ * Chỉ nhận tên file đơn giản, không đường dẫn, nên không trỏ ra ngoài thư mục đó được. Sai thì bỏ qua.
+ */
+export const photoPath = (v) => {
+  const name = String(v ?? "").trim();
+  return /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}.(jpe?g|png|webp)$/i.test(name) ? `/media/khach/${name}` : "";
+};
 
 export const MIN_WISH = 2;
 export const MAX_WISH_NAME = 60;

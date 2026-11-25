@@ -2,7 +2,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { safeCall, isSharedFlag, isPartyFlag } from "./validate.js";
+import { safeCall, isSharedFlag, photoPath } from "./validate.js";
 
 const dataDir = (f) => fileURLToPath(new URL(`../../data/${f}`, import.meta.url));
 
@@ -21,7 +21,7 @@ export function createLocalStore() {
       const g = list.find((x) => x.slug === slug);
       if (!g) return null;
       const s = await loadStore();
-      return { row: 0, slug, name: g.name, short: g.short || "", call: safeCall(g.call), openedAt: s.opened?.[slug] || "", shared: g.shared === true || isSharedFlag(g.link_chung), party: g.party === true || isPartyFlag(g.khach_di_tiec) };
+      return { row: 0, slug, name: g.name, short: g.short || "", call: safeCall(g.call), openedAt: s.opened?.[slug] || "", shared: g.shared === true || isSharedFlag(g.link_chung), photo: photoPath(g.anh_rieng) };
     },
     async getRsvp(slug) {
       const s = await loadStore();

@@ -255,10 +255,9 @@ export function startSplash({ gate = false } = {}) {
   }
 
   const ui = ["#spGreet", "#spName", "#spInfo", "#spHint", "#spChrome"];
-  $("spTl").textContent = "~/2026 ▸ ./invite";
+  $("spTl").textContent = "~/2026 ▸ ./thank-you";
   $("spBr").textContent = `lễ tốt nghiệp · ${EVENT.cohort}`;
-  const windows = EVENT.guestWindows.map((w) => `<b class="d">${esc(w.from)}–${esc(w.to)}</b>`).join(" | ");
-  $("spInfo").innerHTML = `đến chung vui ngày tốt nghiệp của <b class="ttl">${esc(EVENT.displayName)}</b><br><b class="d">${esc(EVENT.date.split("-").reverse().join("."))}</b> · IUH · ${windows}`;
+  $("spInfo").innerHTML = `đã chung vui ngày tốt nghiệp của <b class="ttl">${esc(EVENT.displayName)}</b><br><b class="d">${esc(EVENT.date.split("-").reverse().join("."))}</b> · IUH · ${esc(EVENT.degree)}`;
   gsap.set(ui, { autoAlpha: 0 });
 
   let scene = null;

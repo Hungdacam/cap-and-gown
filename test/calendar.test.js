@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { googleCalendarUrl, buildIcs, calendarRange, icsText, needsSafariForIcs } from "../public/src/calendar.js";
 import { formatDateVi, formatDayMonth } from "../public/src/util.js";
 import calendarHandler from "../api/calendar.js";
@@ -55,13 +54,6 @@ test("GET /api/calendar trả file lịch để iPhone mở hộp thêm lịch",
   const bad = fakeRes();
   calendarHandler({ method: "POST" }, bad);
   assert.equal(bad.statusCode, 405);
-});
-
-test("nút .ics là link thật, không có download để iPhone không chỉ lưu vào Tệp", () => {
-  const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
-  const tag = html.match(/<a [^>]*id="calIcs"[^>]*>/)?.[0];
-  assert.ok(tag?.includes('href="/api/calendar"'));
-  assert.ok(!tag.includes("download"));
 });
 
 test("chỉ nhắc mở Safari khi đang ở iPhone/iPad và không phải Safari", () => {

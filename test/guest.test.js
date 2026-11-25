@@ -24,14 +24,14 @@ test("lời chào trên splash ghép đúng tên gọi", () => {
   assert.equal(pronoun({ call: " ", short: "Minh Anh" }), "Minh Anh");
   assert.equal(pronoun({ short: "Minh Anh" }), "Minh Anh");
   assert.equal(pronoun({ call: "cô", short: "Cô Mai" }), "Cô Mai");
-  assert.equal(pronoun(GENERIC_GUEST), "bạn");
+  assert.equal(pronoun(GENERIC_GUEST), "mọi người");
 });
 
-test("Hưng mời cô Mai và bác Vinh, không tự thêm bạn khi để trống xưng hô", () => {
+test("Hưng cảm ơn cô Mai và bác Vinh, không tự thêm bạn khi để trống xưng hô", () => {
   const guest = { name: "Cô Mai và bác Vinh", short: "cô Mai và bác Vinh", call: "" };
   assert.equal(pronoun(guest), "cô Mai và bác Vinh");
-  assert.match(guestText(COPY.lede, guest), /Hưng rất mong cô Mai và bác Vinh sẽ có mặt/);
-  assert.equal(guestText(COPY.footerLine, guest), "Hưng hẹn gặp cô Mai và bác Vinh ở buổi lễ");
+  assert.match(guestText(COPY.lede, guest), /Cảm ơn cô Mai và bác Vinh đã dành cho Hưng/);
+  assert.equal(guestText(COPY.footerLine, guest), "Hưng cảm ơn cô Mai và bác Vinh rất nhiều");
   assert.equal(pronoun({ call: "cô", short: "Mai và bác Vinh" }), "cô Mai và bác Vinh");
 });
 
@@ -39,13 +39,20 @@ test("thiếu tên gọi thì dùng họ tên, không ghép trùng danh xưng", 
   const fetchImpl = async () => ({ ok: true, json: async () => ({ name: "Cô Mai", short: " ", call: "cô" }) });
   const found = await fetchGuest("co-mai-1234", fetchImpl);
   assert.equal(pronoun(found.guest), "Cô Mai");
+  assert.equal(found.guest.photo, "");
 });
 
-test("câu cá nhân hóa dùng xưng hô từ Sheet, thiệp chung mặc định bạn", () => {
+test("ảnh riêng chỉ nhận đường dẫn trong /media/khach/", async () => {
+  const get = (photo) => fetchGuest("a-b-1", async () => ({ ok: true, json: async () => ({ name: "A", short: "A", call: "anh", photo }) }));
+  assert.equal((await get("/media/khach/a.jpg")).guest.photo, "/media/khach/a.jpg");
+  for (const p of ["https://x.com/a.jpg", "javascript:alert(1)", 5, undefined]) assert.equal((await get(p)).guest.photo, "", String(p));
+});
+
+test("câu cá nhân hóa dùng xưng hô từ Sheet, link công khai gọi mọi người", () => {
   const text = "Hẹn gặp {call}; thân gửi {pron}.";
   assert.equal(guestText(text, { call: "chị", short: "Linh" }), "Hẹn gặp chị; thân gửi chị Linh.");
   assert.equal(guestText(text, { call: "cậu", short: "Anh" }), "Hẹn gặp cậu; thân gửi cậu Anh.");
-  assert.equal(guestText(text, GENERIC_GUEST), "Hẹn gặp bạn; thân gửi bạn.");
+  assert.equal(guestText(text, GENERIC_GUEST), "Hẹn gặp mọi người; thân gửi mọi người.");
   assert.equal(guestText(text), "Hẹn gặp bạn; thân gửi bạn.");
   assert.equal(guestText("Hẹn gặp {pron}", { call: "chị", short: "{call}" }), "Hẹn gặp chị {call}");
 });

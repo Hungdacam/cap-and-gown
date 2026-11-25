@@ -26,8 +26,8 @@ export const EVENT = {
   address: "12 Nguyễn Văn Bảo, Gò Vấp, TP.HCM",
   major: "Kỹ thuật Phần mềm",
   degree: "Kỹ sư Phần mềm",
-  displayName: "Hưng Lê", // tên hiện trên màn mở thiệp ("đến chung vui ngày tốt nghiệp của Hưng Lê")
-  title: "Tân kỹ sư", // danh xưng nổi bật: dòng terminal, dải băng trên thẻ, tiêu đề thiệp
+  displayName: "Hưng Lê", // tên hiện trên màn mở đầu ("đã chung vui ngày tốt nghiệp của Hưng Lê")
+  title: "Tân kỹ sư", // danh xưng nổi bật: dòng terminal và dải băng trên thẻ
   cohort: "K17",
   dressCode: "Thoải mái, thuận tiện chụp ảnh",
 
@@ -35,25 +35,52 @@ export const EVENT = {
   meetingPoint: "trước nhà E hoặc nhà H", // để rộng một chút, khách dễ tìm hơn
 };
 
+// Lời văn của thư cảm ơn sau ngày lễ. Gửi cho cả người đã đến lẫn người chỉ gửi lời chúc, nên không câu nào khẳng định khách đã có mặt.
+// {pron}: cách gọi khách kèm tên (ví dụ "chị Linh"); link công khai là "mọi người".
 export const COPY = {
-  invitationGreeting: "Trân trọng kính mời",
-  // {pron} được thay bằng cách gọi khách, ví dụ "chị Linh"
-  lede: `Sau 5 năm cày cuốc, thi cử và những đêm làm đồ án tới sáng, cuối cùng ${EVENT.graduateShort} cũng ra trường. ${EVENT.graduateShort} rất mong {pron} sẽ có mặt trong ngày đặc biệt này.`,
-  prTitle: `${EVENT.graduateShort} chính thức tốt nghiệp rồi!`,
-  prNumber: "#2026",
-  prBadge: "Đã tốt nghiệp",
-  fromLabel: "sinh viên",
-  toLabel: "cựu sinh viên",
-  diffAdd: "+167 tín chỉ",
-  diffDel: "−0 lần bỏ cuộc",
-  footerLine: `${EVENT.graduateShort} hẹn gặp {pron} ở buổi lễ`,
+  greeting: "Gửi lời cảm ơn đến",
+  lede: `Ngày 25/11, ${EVENT.graduateShort} chính thức khép lại những năm tháng đại học. Cảm ơn {pron} đã dành cho ${EVENT.graduateShort} một phần của ngày hôm ấy, dù là ghé tận trường chung vui, gửi quà hay nhắn một lời chúc từ xa. Với ${EVENT.graduateShort}, điều nào cũng quý.`,
+  prBadge: "Đã tốt nghiệp", // con dấu trên thẻ tốt nghiệp
+  albumSub: `Vài khoảnh khắc ${EVENT.graduateShort} muốn giữ lại từ hôm 25/11. Kéo ngang để xoay vòng ảnh, chạm vào một tấm để xem lớn.`,
+  // Ảnh riêng (cột anh_rieng trong Sheet): khách riêng và ảnh tập thể của link chung có lời khác nhau.
+  meLabel: "dành riêng cho {pron}",
+  meCap: `Ảnh của {pron} và ${EVENT.graduateShort}`,
+  meSub: `Tấm này ${EVENT.graduateShort} giữ riêng cho {pron}. Chạm vào ảnh để xem lớn.`,
+  groupLabel: "ảnh tập thể",
+  groupCap: `Ảnh chung của {pron} và ${EVENT.graduateShort}`,
+  groupSub: `Đông đủ thế này mới đúng là ngày vui. Cảm ơn {pron} đã cùng nhau ghé chụp với ${EVENT.graduateShort}. Chạm vào ảnh để xem lớn, còn nhiều ảnh khác trong album bên dưới.`,
+  driveTitle: "Toàn bộ ảnh ngày lễ",
+  driveText: `Ảnh của cả ngày hôm ấy ${EVENT.graduateShort} gom lại trong một album Google Drive. Mời {pron} vào xem và lưu lại những tấm ưng ý nhé.`,
+  drivePending: `${EVENT.graduateShort} đang chọn và tải ảnh lên. Link album sẽ có ở đây trong vài ngày tới.`,
+  mapSub: `Hôm ấy, mỗi người tìm tới điểm hẹn theo một lối: Grab vào cổng chính hay cổng sau, xe máy, ô tô. Cảm ơn những ai đã lặn lội vào tận trường.`,
+  msgSub: `Lời chúc muộn, lời hỏi thăm hay một kỷ niệm của hôm ấy, {pron} cứ để lại ở đây. ${EVENT.graduateShort} sẽ đọc hết.`,
+  footerLine: `${EVENT.graduateShort} cảm ơn {pron} rất nhiều`,
+  footerAlumni: `${EVENT.graduateShort} giờ đã là cựu sinh viên IUH · ${EVENT.cohort}`,
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
-  genericName: "Bạn thân mến",
-  // Tiệc thân mật, chỉ hiện với khách có cột khach_di_tiec = 1. Giờ, tên quán, link bản đồ nằm ở api/_lib/party.js.
-  partyLede: `Chụp ảnh xong, ${EVENT.graduateShort} xin mời {pron} ở lại dùng bữa trưa thân mật cùng ${EVENT.graduateShort}.`,
-  partyBooking: `${EVENT.graduateShort} đã đặt bàn lúc {time}. Đến nơi, {pron} chỉ cần báo nhân viên tên đặt bàn là {name}, sẽ có người dẫn vào bàn.`,
-  tapHint: "Chạm để mở thiệp", // màn hình mở đầu trên điện thoại
-  clickHint: "Bấm để mở thiệp", // màn hình mở đầu trên máy tính
+  genericName: "Mọi người",
+  genericCall: "mọi người",
+  tapHint: "Chạm để mở thư cảm ơn", // màn hình mở đầu trên điện thoại
+  clickHint: "Bấm để mở thư cảm ơn", // màn hình mở đầu trên máy tính
+};
+
+// Album: vài khoảnh khắc ngày lễ quay trên vòng ảnh 3D, xếp theo giờ chụp (đọc từ EXIF).
+// Ảnh đã thu nhỏ: src (1600px, khi xem lớn) và thumb (560px, trên vòng ảnh); ảnh gốc giữ ở anh-goc/ (không đưa lên git).
+// at: giờ chụp, trống nếu ảnh không còn thông tin giờ. caption: không bắt buộc. src để trống thì vẽ ảnh mẫu.
+export const PHOTOS = [
+  { src: "/media/album/01.jpg", thumb: "/media/album/thumb/01.jpg", at: "10:56", caption: "" },
+  { src: "/media/album/02.jpg", thumb: "/media/album/thumb/02.jpg", at: "11:05", caption: "" },
+  { src: "/media/album/03.jpg", thumb: "/media/album/thumb/03.jpg", at: "12:25", caption: "" },
+  { src: "/media/album/04.jpg", thumb: "/media/album/thumb/04.jpg", at: "12:41", caption: "" },
+  { src: "/media/album/05.jpg", thumb: "/media/album/thumb/05.jpg", at: "12:53", caption: "" },
+  { src: "/media/album/06.jpg", thumb: "/media/album/thumb/06.jpg", at: "13:08", caption: "" },
+  { src: "/media/album/07.jpg", thumb: "/media/album/thumb/07.jpg", at: "13:25", caption: "" },
+  { src: "/media/album/08.jpg", thumb: "/media/album/thumb/08.jpg", at: "", caption: "" },
+  { src: "/media/album/09.jpg", thumb: "/media/album/thumb/09.jpg", at: "", caption: "" },
+];
+
+// Album Google Drive chứa toàn bộ ảnh trong ngày. CẦN ĐIỀN link chia sẻ (để trống thì hiện "sẽ có trong vài ngày tới").
+export const ALBUM = {
+  driveUrl: "",
 };
 
 // Điều kiện tốt nghiệp. Mục cuối về sự có mặt của khách tự đạt khi bấm "sẽ đến".
