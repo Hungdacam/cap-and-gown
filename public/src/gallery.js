@@ -125,7 +125,7 @@ function initFeatured(guest, open) {
   box.hidden = false;
 }
 
-/** Trả về { S, render, bindScroll } để scroll-effects nghiêng vòng ảnh theo cuộn, hoặc null khi không có hiệu ứng. */
+/** Trả về { S, render } để scroll-effects dựng vòng ảnh khi lướt tới, hoặc null khi không có hiệu ứng. */
 export function initGallery(guest = {}) {
   const open = createLightbox();
   const photos = PHOTOS.map((p, i) => {
@@ -169,7 +169,7 @@ export function initGallery(guest = {}) {
   }
 
   // Tự xoay chậm; kéo thì xoay theo tay, thả ra còn trôi theo đà.
-  const AUTO = -7; // độ mỗi giây
+  const AUTO = -5; // độ mỗi giây, chậm cho dễ nhìn
   let visible = false, dragging = false, last = 0;
   const tick = (_t, dt) => {
     if (!dragging) {
@@ -219,15 +219,6 @@ export function initGallery(guest = {}) {
   new ResizeObserver(layout).observe(ring);
   layout();
 
-  return {
-    S, render,
-    /** Cuộn trang cũng đẩy vòng ảnh quay theo một chút. */
-    bindScroll(trigger) {
-      ScrollTrigger.create({
-        trigger, start: "top bottom", end: "bottom top",
-        onUpdate: (self) => { if (!dragging) S.vel += Math.max(-60, Math.min(60, self.getVelocity() * -0.02)); },
-      });
-    },
-  };
+  return { S, render };
 }
 

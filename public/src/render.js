@@ -32,13 +32,8 @@ export function renderStatic() {
   $("hallLabel").textContent = `nhận bằng · ${EVENT.ceremonyStart}`;
 
   renderGuestCopy();
-  // Chân trang: nhánh sinh-viên đã merge xong, Hưng giờ là cựu sinh viên.
-  const merged = $("footMerged");
-  merged.textContent = "";
-  const tag = document.createElement("span");
-  tag.className = "c-ok";
-  tag.textContent = `merged ${dmy(EVENT.date)}`;
-  merged.append(`${COPY.footerAlumni} · `, tag);
+  // Chân trang: mốc tốt nghiệp trên nhánh, từ đó là cựu-sinh-viên.
+  $("gradTag").textContent = `tốt nghiệp · ${dmy(EVENT.date)}`;
   $("footSub").textContent = COPY.footerSub;
 }
 

@@ -195,16 +195,19 @@
   </section>
 
   <footer>
-    <svg class="merge-svg" viewBox="0 0 360 96" aria-hidden="true">
-      <text x="8" y="14">sinh-viên</text>
-      <text x="352" y="92" text-anchor="end">cựu-sinh-viên</text>
-      <path class="p-main" id="pMain" d="M12 70 H348"/>
-      <path class="p-br" id="pBr" d="M12 30 H170 C210 30 220 70 262 70"/>
-      <circle cx="12" cy="30" r="6" class="c-br"/><circle cx="90" cy="30" r="6" class="c-br"/><circle cx="170" cy="30" r="6" class="c-br"/>
-      <circle cx="12" cy="70" r="6" class="c-main"/><circle cx="262" cy="70" r="8" class="c-main" id="mDot"/><circle cx="348" cy="70" r="6" class="c-main"/>
+    <!-- Một nhánh duy nhất: sinh-viên tới mốc tốt nghiệp thì chính thức thành cựu-sinh-viên. -->
+    <svg class="merge-svg" viewBox="0 0 360 72" aria-hidden="true">
+      <text class="t-grad" id="gradTag" x="210" y="16" text-anchor="middle"></text>
+      <path class="p-br" id="pBr" d="M12 40 H210"/>
+      <path class="p-main" id="pMain" d="M210 40 H348"/>
+      <g id="svDots"><circle cx="12" cy="40" r="6" class="c-br"/><circle cx="78" cy="40" r="6" class="c-br"/><circle cx="144" cy="40" r="6" class="c-br"/></g>
+      <circle cx="210" cy="40" r="11" class="c-ring" id="mRing"/>
+      <circle cx="210" cy="40" r="8" class="c-main" id="mDot"/>
+      <circle cx="348" cy="40" r="6" class="c-main" id="endDot"/>
+      <text x="12" y="66">sinh-viên</text>
+      <text class="t-alumni" id="alumniTag" x="348" y="66" text-anchor="end">cựu-sinh-viên</text>
     </svg>
     <span><b>✓</b> <span id="footLine"></span></span>
-    <span class="foot-merged" id="footMerged"></span>
     <span id="footSub"></span>
   </footer>
 </div>

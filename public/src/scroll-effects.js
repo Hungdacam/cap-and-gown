@@ -48,13 +48,12 @@ export function initScrollEffects(opening, { map, gallery } = {}) {
     when("#me", () => tl.play(), "top 85%");
   }
 
-  // Vòng ảnh: từ nằm nghiêng như đặt trên mặt bàn, dựng đứng dần theo cuộn; cuộn nhanh thì vòng quay theo.
+  // Vòng ảnh: hơi nghiêng lúc chưa tới, lướt tới thì dựng đứng một lần rồi chỉ tự xoay chậm.
+  // Không gắn góc nghiêng hay tốc độ quay vào thanh cuộn: hai chuyển động chạy khớp nhau gây chóng mặt.
   if (gallery) {
-    gsap.fromTo(gallery.S, { tilt: 62, lift: 1 }, {
-      tilt: -6, lift: 0, ease: "none", onUpdate: () => gallery.render(),
-      scrollTrigger: { trigger: "#ring", start: "top bottom", end: "center 55%", scrub: 0.8 },
-    });
-    gallery.bindScroll("#ring");
+    gsap.set(gallery.S, { tilt: 24, lift: 0.5 });
+    gallery.render();
+    when("#ring", () => gsap.to(gallery.S, { tilt: -6, lift: 0, duration: 1.4, ease: "power3.out", onUpdate: () => gallery.render() }), "top 80%");
   }
   reveal("#ring", "#ringHint", { y: 10, delay: 0.4 });
 
@@ -77,12 +76,24 @@ export function initScrollEffects(opening, { map, gallery } = {}) {
   }
   reveal("#msgBox", "#log", { y: 16, delay: 0.3 });
 
-  // Chân trang: nhánh sinh-viên tự vẽ rồi merge vào cựu-sinh-viên.
-  ["#pMain", "#pBr"].forEach((sel) => {
-    const p = document.querySelector(sel), L = p.getTotalLength();
-    gsap.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, ease: "none", scrollTrigger: { trigger: "footer", start: "top 95%", end: "top 55%", scrub: 0.5 } });
-  });
-  gsap.fromTo("#mDot", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, ease: "back.out(3)", scrollTrigger: { trigger: "footer", start: "top 60%", toggleActions: "play none none reverse" } });
+  // Chân trang: nhánh sinh-viên vẽ tới mốc tốt nghiệp, mốc bật lên, từ đó chính thức là cựu-sinh-viên.
+  // Chạy trọn một lần khi lướt tới (không scrub), để hình không dừng nửa chừng.
+  const len = (sel) => document.querySelector(sel).getTotalLength();
+  const lBr = len("#pBr"), lMain = len("#pMain");
+  gsap.set("#pBr", { strokeDasharray: lBr, strokeDashoffset: lBr });
+  gsap.set("#pMain", { strokeDasharray: lMain, strokeDashoffset: lMain });
+  gsap.set(["#svDots circle", "#mDot", "#mRing", "#endDot"], { scale: 0, transformOrigin: "50% 50%" });
+  gsap.set(["#gradTag", "#alumniTag"], { opacity: 0 });
+  const foot = gsap.timeline({ paused: true })
+    .to("#pBr", { strokeDashoffset: 0, duration: 0.9, ease: "power1.inOut" }, 0)
+    .to("#svDots circle", { scale: 1, duration: 0.35, stagger: 0.28, ease: "back.out(3)" }, 0)
+    .to("#mDot", { scale: 1, duration: 0.5, ease: "back.out(3)" }, 0.85)
+    .fromTo("#mRing", { scale: 0.6, opacity: 1 }, { scale: 1.6, opacity: 0, duration: 0.9, ease: "power2.out" }, 0.9)
+    .to("#gradTag", { opacity: 1, duration: 0.4 }, 0.95)
+    .to("#pMain", { strokeDashoffset: 0, duration: 0.6, ease: "power1.out" }, 1.1)
+    .to("#endDot", { scale: 1, duration: 0.35, ease: "back.out(3)" }, 1.6)
+    .to("#alumniTag", { opacity: 1, duration: 0.4 }, 1.65);
+  when("footer", () => foot.play(), "top 85%");
   reveal("footer", "footer > span", { y: 16 }, 0.1);
 
   // Đổi tab bản đồ hay ảnh tải xong làm trang đổi chiều cao, các mốc phía dưới phải đo lại.

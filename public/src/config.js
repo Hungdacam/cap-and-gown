@@ -55,7 +55,6 @@ export const COPY = {
   mapSub: `Hôm ấy, mỗi người tìm tới điểm hẹn theo một lối: Grab vào cổng chính hay cổng sau, xe máy, ô tô. Cảm ơn những ai đã lặn lội vào tận trường.`,
   msgSub: `Lời chúc muộn, lời hỏi thăm hay một kỷ niệm của hôm ấy, {pron} cứ để lại ở đây. ${EVENT.graduateShort} sẽ đọc hết.`,
   footerLine: `${EVENT.graduateShort} cảm ơn {pron} rất nhiều`,
-  footerAlumni: `${EVENT.graduateShort} giờ đã là cựu sinh viên IUH · ${EVENT.cohort}`,
   footerSub: "built with ☕, Stack Overflow và sự đồng hành của mọi người",
   genericName: "Mọi người",
   genericCall: "mọi người",

@@ -489,6 +489,9 @@ footer{align-items:center}
 .merge-svg circle{stroke:var(--bg);stroke-width:3}
 .merge-svg .c-br{fill:var(--accent)} .merge-svg .c-main{fill:var(--merge)}
 .merge-svg text{font:11px var(--f-mono);fill:var(--muted)}
+.merge-svg .c-ring{fill:none;stroke:var(--merge);stroke-width:2;opacity:0}
+.merge-svg .t-grad{fill:var(--merge);font-weight:600}
+.merge-svg .t-alumni{fill:var(--text);font-weight:600}
 
 /* ===== Hiệu ứng theo tâm trạng (fx.js) ===== */
 .mood{position:fixed;inset:0;z-index:57;display:grid;place-items:center;pointer-events:none;perspective:900px;visibility:hidden;padding-inline:16px}
@@ -616,4 +619,3 @@ footer{align-items:center}
 .drive.pending{grid-template-columns:auto minmax(0,1fr)}
 .drive.pending .drive-ic{color:var(--muted)}
 @media (max-width:560px){.drive{grid-template-columns:auto minmax(0,1fr)}.drive .btn{grid-column:1 / -1;justify-content:center}}
-footer .foot-merged{color:var(--text);font-size:.84rem}
