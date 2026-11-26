@@ -79,7 +79,7 @@ export const PHOTOS = [
 
 // Album Google Drive chứa toàn bộ ảnh trong ngày. CẦN ĐIỀN link chia sẻ (để trống thì hiện "sẽ có trong vài ngày tới").
 export const ALBUM = {
-  driveUrl: "",
+  driveUrl: "https://drive.google.com/drive/folders/15pA4srb3ou4EJzdtkaB659VD0AFc42Fs",
 };
 
 // Điều kiện tốt nghiệp. Mục cuối về sự có mặt của khách tự đạt khi bấm "sẽ đến".
